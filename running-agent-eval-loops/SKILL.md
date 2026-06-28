@@ -1,6 +1,6 @@
 ---
 name: running-agent-eval-loops
-description: Use when building or modifying an agent's evaluation/regression loop — an evaluator behind an interface, async fire-and-forget scoring in request handlers, golden-case export, failure-case lifecycle, and score thresholds. Triggers on evaluator, regression harness, golden export, trace reviews, or failure cases.
+description: Builds an agent evaluation/regression loop — an evaluator behind an interface, async fire-and-forget turn scoring, golden-case export, failure-case lifecycle, and score thresholds — without slowing the user-facing turn. Use when building or modifying such a loop, or when the work involves an evaluator, regression harness, golden export, trace reviews, or failure cases.
 ---
 
 # Running Agent Eval Loops

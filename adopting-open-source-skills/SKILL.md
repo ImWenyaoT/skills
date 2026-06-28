@@ -1,6 +1,6 @@
 ---
 name: adopting-open-source-skills
-description: Use when considering external, community, open-source, copied, forked, or upgraded skills for your own workflows — vetting provenance and license, deciding use-as-is vs adapt vs clean-room, and recording attribution. Triggers on importing or forking a skill, or adapting someone else's workflow into your own.
+description: Vets and imports external skills into your own library — checking provenance and license, deciding use-as-is vs adapt vs clean-room rewrite, and recording attribution. Use when considering external, community, open-source, copied, forked, or upgraded skills for your workflows, when importing or forking a skill, or when adapting someone else's workflow into your own.
 ---
 
 # Adopting Open Source Skills

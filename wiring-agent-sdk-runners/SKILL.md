@@ -1,6 +1,6 @@
 ---
 name: wiring-agent-sdk-runners
-description: Use when integrating or modifying a vendor agent SDK (e.g. the OpenAI Agents SDK) behind an abstraction boundary — bounded turns, feature-flagged opt-in, dual/multi-provider config, and mapping SDK output onto your loop's step contract. Triggers on agent SDK integration, runner wiring, or provider config.
+description: Wires a vendor agent SDK behind an abstraction boundary — single import site, bounded turns, feature-flagged opt-in, dual/multi-provider config, and mapping SDK output onto your loop's step contract. Use when integrating or modifying a vendor agent SDK (e.g. the OpenAI Agents SDK); triggers on agent SDK integration, runner wiring, or provider config.
 ---
 
 # Wiring Agent SDK Runners

@@ -1,6 +1,6 @@
 ---
 name: building-bounded-agent-loops
-description: Use when implementing or modifying an agent loop that runs inside a request handler — bounded steps, terminality and handoff states, tool continuation, and routing which intents trigger retrieval vs cheap paths. Triggers on agent loop contracts, "one step per request", terminality, or handoff semantics in a stateless server.
+description: Guides designing an agent loop inside a stateless request handler so it advances one bounded step per request — capping internal turns, modeling terminality and handoff states, continuing after tools, and routing which intents trigger retrieval vs cheap paths. Use when implementing or modifying such a loop, or facing agent loop contracts, "one step per request", terminality, or handoff semantics in a stateless server.
 ---
 
 # Building Bounded Agent Loops
