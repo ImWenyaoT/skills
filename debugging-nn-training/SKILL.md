@@ -1,6 +1,6 @@
 ---
 name: debugging-nn-training
-description: 神经网络训练常见错误自检清单（基于 Karpathy "A Recipe for Training Neural Networks" 的 6 条经典坑）。当用户的 PyTorch/深度学习训练出现 loss 不下降、train/eval 指标不一致、梯度异常、acc 卡住、推理结果错乱等问题，或在做 code review / 写训练循环 / 排查"明明代码看着对但就是不收敛"时使用。覆盖 overfit-single-batch、train/eval mode、zero_grad、logits-vs-softmax、bias+BatchNorm、view-vs-permute 六大陷阱的症状识别、最小复现与修复。
+description: Debugs neural network/deep learning training failures and silent convergence bugs in PyTorch/JAX/TF. Use when loss does not decrease, train/eval metrics disagree, gradients explode/vanish, accuracy is stuck, inference is wrong, or a model cannot overfit one batch; also for training-loop code review. Covers Karpathy-style checks plus extended engineering sanity tests, minimal reproductions, and fixes.
 ---
 
 # 神经网络训练常见错误自检

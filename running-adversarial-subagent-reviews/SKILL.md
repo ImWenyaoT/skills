@@ -1,6 +1,6 @@
 ---
 name: running-adversarial-subagent-reviews
-description: Dispatches an independent, read-only sub-agent to attack a piece of work's assumptions and surface blockers before it is called done. Use when work is non-trivial, near completion, risky, delegated to sub-agents, or making claims about correctness, scope, or readiness. Triggers on pre-completion review, adversarial verification, or "is this actually done".
+description: Dispatches an independent, read-only sub-agent to attack a piece of work's assumptions and surface blockers. Use when the user explicitly asks for adversarial verification, an independent reviewer, "is this actually done", high-risk release/readiness checks, or validation of sub-agent results. Do not trigger for ordinary implementation, normal test runs, or routine completion summaries.
 ---
 
 # Running Adversarial Subagent Reviews

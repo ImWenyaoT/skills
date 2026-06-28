@@ -18,6 +18,9 @@ jobs:
       - name: Validate SKILL.md frontmatter
         run: python scripts/validate_skills.py
 
+      - name: Validate skill trigger health
+        run: python scripts/evaluate_skill_triggers.py
+
       - name: Compile bundled Python scripts
         run: |
           fail=0

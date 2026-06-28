@@ -90,11 +90,35 @@ git clone --depth 1 https://github.com/ImWenyaoT/skills.git /tmp/skills \
 cp .sync-local.env.example .sync-local.env   # 首次:改成你机器的镜像路径(gitignored)
 ./scripts/sync-to-local.sh                   # 无配置时默认 ~/.claude/skills + ~/.agents/skills
 
-# 提交前自查(与 CI 同款)
+# 提交前自查(与 CI 同款核心检查)
 python scripts/validate_skills.py
+python scripts/evaluate_skill_triggers.py
+python -m py_compile $(find . -path ./.git -prune -o -name '*.py' -print)
 ```
 
-每次 push / PR,GitHub Actions([validate-skills](.github/workflows/validate-skills.yml))自动校验所有 `SKILL.md` 的 frontmatter(`name`/`description` 合规、目录名一致、正文 ≤500 行、长引用文件需 `## Contents`)并编译内置 Python 脚本。
+每次 push / PR,GitHub Actions([validate-skills](.github/workflows/validate-skills.yml))自动校验所有 `SKILL.md` 的 frontmatter(`name`/`description` 合规、目录名一致、正文 ≤500 行、长引用文件需 `## Contents`),检查 `evals/trigger_cases.json` 的触发边界 goldens,并编译内置 Python 脚本。
+
+### Skill 触发健康
+
+`description` 是 Agent 在加载完整 `SKILL.md` 前能看到的主要触发信号。新增或改动 skill 时,同步维护 `evals/trigger_cases.json`:
+
+- 每个 skill 至少 2 条 `expected_skills` positive case。
+- 每个 skill 至少 2 条 `forbidden_skills` negative case。
+- 用相邻 skill 做 hard negative,例如论文审稿 vs 论文绘图、agent eval vs trace persistence。
+- 路径专用 skill 必须在 positive case 里出现路径、仓库或唯一站点信号,并在 negative case 里覆盖泛化场景。
+
+```bash
+python scripts/evaluate_skill_triggers.py
+
+# 如果有真实 agent/sub-agent trace,可用 JSONL 计算 precision/recall:
+python scripts/evaluate_skill_triggers.py --predictions /path/to/predictions.jsonl
+```
+
+`predictions.jsonl` 每行对应一个 case:
+
+```json
+{"id":"reviewing-academic-papers-positive-rebuttal","actual_skills":["reviewing-academic-papers"]}
+```
 
 ## 许可与致谢
 

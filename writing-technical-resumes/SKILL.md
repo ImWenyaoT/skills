@@ -1,6 +1,6 @@
 ---
 name: writing-technical-resumes
-description: Use when writing, editing, or reviewing a technical resume — turning task lists into quantified results-first bullets with strong action verbs, tailoring per role/JD, writing the skills and self-evaluation sections, and cutting to one page. Triggers on "review my resume", "rewrite this bullet", "tailor to this job", "make it one page", or any resume content work. Covers the content layer (what to write / how to phrase); leave layout and export to your resume tool.
+description: Use when writing, editing, or reviewing a technical/product/engineering resume — turning task lists into quantified results-first bullets with strong action verbs, tailoring per role/JD, writing skills and self-evaluation sections, and cutting to one page. Triggers on "review my resume", "rewrite this bullet", "tailor to this job", or resume content work. Do not use for academic paper bios, submission cover letters, or PDF-only export/layout.
 ---
 
 # Writing Technical Resumes
