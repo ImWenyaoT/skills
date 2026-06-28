@@ -1,0 +1,32 @@
+---
+name: running-adversarial-subagent-reviews
+description: Use when work is non-trivial, near completion, risky, delegated to sub-agents, or making claims about correctness, scope, or readiness — dispatch an independent sub-agent to challenge the assumptions before calling it done. Triggers on pre-completion review, adversarial verification, or "is this actually done".
+---
+
+# Running Adversarial Subagent Reviews
+
+Before calling non-trivial work done, dispatch an **independent, read-only sub-agent to attack the
+assumptions** — to surface what the doer rationalized past.
+
+## Rules
+
+- Keep collaboration **tree-shaped**: sub-agents report only to the controller, and only the
+  controller starts a reviewer.
+- The reviewer is **read-only**: it must not edit files, spawn its own sub-agents, contact other
+  sub-agents, or reimplement the work.
+- Task it to hunt **blockers, weak evidence, missed tests, scope drift, and overconfident claims** —
+  not to praise.
+- Give it concrete artifacts: files changed, commands run, known risks, and the intended acceptance
+  criteria.
+- The controller decides and integrates; unresolved P0/P1 findings **block completion**.
+- Don't recursively review the review process itself, unless you are changing this skill's rules.
+
+## Prompt shape
+
+```text
+You are a read-only grill reviewer. Do not edit files. Do not contact other sub-agents.
+Review: [scope]
+Artifacts: [files changed, commands run, outputs]
+Challenge assumptions around correctness, CI, cross-platform behavior, tests, docs, and scope.
+Return findings by severity. If no blockers, say so and list residual risks.
+```

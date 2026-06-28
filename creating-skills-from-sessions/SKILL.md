@@ -22,14 +22,16 @@ feeds them.
 | — guardian noise | `session_meta.payload.source.subagent.other == "guardian"` | **~70% of files**; safety-judge subagents whose base prompt is full of "retry/failed". Exclude them or friction counts are garbage (one real run showed `retry`≈26000, almost all guardian). |
 | Claude *pointers* (NOT transcripts) | `~/.claude/sessions/*.json` | only `pid`/`sessionId`/`cwd` — **no conversation**. Do not grep these for content. |
 | Claude transcripts (rich) | `~/.claude/projects/<slugified-cwd>/*.jsonl` | the real Claude history (dozens per project) |
-| User custom skills (codex / cross-runtime) | `tian_wenyao/.agents/skills/<name>/SKILL.md` | in scope |
-| User custom skills (Claude) | `tian_wenyao/.claude/skills/<name>/SKILL.md` | in scope |
-| Personal / plugin skills | `~/.claude/skills/`, plugin caches | **OFF-LIMITS — never edit** |
+| Codex skills (user scope) | `~/.agents/skills/<name>/SKILL.md` | cross-runtime user skills |
+| Codex skills (repo scope) | `$CWD/.agents/skills/`, `$REPO_ROOT/.agents/skills/` | project/org skills, scanned CWD→root |
+| Claude skills (user scope) | `~/.claude/skills/<name>/SKILL.md` | global user skills |
+| Claude skills (project scope) | `<project>/.claude/skills/<name>/SKILL.md` | per-project skills |
+| Installed/vendored packs | large third-party skill collections | **read-only — mine for patterns, never edit/republish** |
 
-Skills are **not** at `~/.codex/skills/` — probing that path is the single most-observed
-friction in real sessions (repeated `sed: can't read .../SKILL.md: No such file`). The
-custom-skill homes are the two `tian_wenyao` dirs above. `.skills_managed.json` is the
-defunct auto-sync ledger; leave hand-written skills **out** of it (keep it `[]`).
+**Verify the path before you grep — skill homes vary by runtime and version** (some installs
+also drop skills under `~/.codex/skills/`). Codex and Claude can't read each other's skill
+trees, so a skill meant for both is copied into each. Tell *authored* skills (yours, editable)
+apart from *installed* packs (third-party, read-only) before touching anything.
 
 ## Procedure
 
@@ -52,22 +54,19 @@ defunct auto-sync ledger; leave hand-written skills **out** of it (keep it `[]`)
   skill.
 - One-off solution → **neither**.
 - **Never resurrect an intentionally-deleted or archived skill.** A wiped skill is a
-  decision, not a gap to refill — confirm with the user first. (See workspace memory on
-  intentional deletions / "别复原".)
+  decision, not a gap to refill — confirm with the user first.
 
-## Placement & keeping both dirs in sync
+## Placement & keeping runtimes in sync
 
-- Both runtime dirs are kept **identical**: `tian_wenyao/.agents/skills/` (codex / cross-
-  runtime) and the **project-level** `tian_wenyao/.claude/skills/` (Claude Code project
-  skills — NOT global `~/.claude/skills`, which is off-limits). Claude can't read `.agents`
-  and codex can't read `.claude`, so the two real copies are structural, not waste.
-- **Convention, not machinery:** after adding or editing a skill in one dir, copy the whole
-  skill folder to the other so they match — `cp -r <skill> <other-skills-dir>/`. That's it:
-  no symlink, no sync script, no systemd timer (the old auto-sync infra was deliberately
-  removed, and a standalone sync tool was rejected as the awkward middle — a plain copy is
-  lighter for the same result). If you ever want it hands-off, wire the copy into a runtime
-  hook instead of carrying a tool.
-- One directory per skill: `creating-skills-from-sessions/SKILL.md` (+ tools alongside).
+- Pick scope by reach: a skill useful everywhere → user scope (`~/.agents/skills/` for Codex,
+  `~/.claude/skills/` for Claude); a skill only meaningful inside one repo → that repo's
+  `.agents/skills/` or `.claude/skills/`.
+- To serve **both** Codex and Claude, the skill folder must exist in each tree (they can't
+  read each other's). **Convention, not machinery:** after adding or editing a skill in one
+  tree, copy the whole folder to the other so they match — `cp -r <skill> <other-skills-dir>/`.
+  No symlink, no sync daemon needed; a plain copy is the lightest thing that works. If you
+  want it hands-off, wire that copy into a runtime hook rather than maintaining a sync tool.
+- One directory per skill, holding `SKILL.md` plus any tools/references alongside it.
 
 ## Common mistakes
 
@@ -77,7 +76,7 @@ defunct auto-sync ledger; leave hand-written skills **out** of it (keep it `[]`)
   `~/.claude/projects/`.
 - Mass-producing skills from a single session, or duplicating a live tool instead of
   pointing the skill at it.
-- Editing personal / plugin skills — scope is the two `tian_wenyao` dirs only.
+- Editing installed/vendored third-party packs instead of only your own authored skills.
 
 ## Scan tool
 
