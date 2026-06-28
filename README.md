@@ -8,7 +8,7 @@
 
 本仓库优先收录**原创**且**泛用**的 skill——默认剥离项目专有信息(代码路径、内部架构、个人身份),只留通用方法论。少量高频个人项目工作流也可收录,但必须在用途说明里明确目标路径和边界。
 
-## 目录(16 个)
+## 目录(17 个)
 
 ### 🤖 Agent 工程 (Agent Engineering)
 
@@ -30,6 +30,7 @@
 
 | Skill | 用途 |
 |-------|------|
+| [`reviewing-academic-papers`](reviewing-academic-papers) | 按顶会顶刊标准审稿/润色/审图:去 AI 味、逻辑自洽、图文联动、证据约束的数据分析、图表推荐、架构图 prompt;6 维度 + 8 输出模式 + P0/P1/P2 标签。 |
 | [`drawing-paper-figures`](drawing-paper-figures) | 为 Elsevier 风格期刊论文做图:先从参考语料推导字数/图数/配色预算,再用 figkit 画架构图、Ours-vs-baseline 散点、结果拼图(600 dpi)。 |
 | [`packaging-elsevier-submissions`](packaging-elsevier-submissions) | 把成稿 LaTeX 手稿打包成 Editorial Manager 投稿包:声明集顺序、硬性规格、扁平 ASCII 源码 zip、cover letter。 |
 
