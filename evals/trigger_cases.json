@@ -19,9 +19,9 @@
     {
       "id": "adopting-open-source-skills-negative-write-new",
       "prompt": "Create a brand new skill from my own workflow notes and add it to this repo.",
-      "expected_skills": ["creating-skills-from-sessions"],
+      "expected_skills": [],
       "forbidden_skills": ["adopting-open-source-skills"],
-      "notes": "Internal creation is not external adoption."
+      "notes": "Internal creation from notes is not external adoption and is not session mining."
     },
     {
       "id": "bridging-legacy-services-positive-adapter",
