@@ -1,6 +1,6 @@
 ---
 name: making-spec-first-changes
-description: Use when changing architecture, package boundaries, agent-loop behavior, runtime lanes, or memory/trace semantics in a docs-backed codebase — update the spec before the code. Triggers on architectural changes, package-boundary changes, vocabulary changes, or docs-backed product decisions.
+description: Enforces a spec-first workflow that updates the governing design docs before the code in a docs-backed codebase. Use when changing architecture, package boundaries, agent-loop behavior, runtime lanes, memory/trace semantics, or domain vocabulary — or when making docs-backed product decisions.
 ---
 
 # Making Spec-First Changes

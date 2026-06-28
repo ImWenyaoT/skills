@@ -6,6 +6,12 @@
 
 PDF 总数：41
 
+## Contents
+
+- 论文图表数量总览表（紧随其后，41 行，每篇一行的图数/表数）。
+- 逐篇 caption 明细：每篇一个 `## <年份 venue 论文名>` 小节，内含「图：」与「表：」两段原文 caption 列表。小节顺序与总览表一致，按年份 + venue 排序（2020 → 2026）。
+- 用法：先在总览表定位目标论文与图/表规模，再跳到同名 `##` 小节读具体 caption。
+
 | 论文 | 图数量 | 表数量 |
 | --- | ---: | ---: |
 | 2020 IF Object Fusion Tracking Based on Visible and Infrared Images A Comprehensive Review | 23 | 7 |

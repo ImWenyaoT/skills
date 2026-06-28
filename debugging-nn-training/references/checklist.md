@@ -2,6 +2,27 @@
 
 每条遵循统一结构：**症状 → 为什么会错 → 怎么查 → 怎么改**。代码以 PyTorch 为例，思路通用。
 
+## Contents
+
+- 经典 6 条（Karpathy 原推文）
+  - [1. 不先 overfit 单个 batch](#1-不先-overfit-单个-batch)
+  - [2. 忘记切换 `model.train()` / `model.eval()`](#2-忘记切换-modeltrain--modeleval)
+  - [3. 忘记 `optimizer.zero_grad()`](#3-忘记-optimizerzero_grad)
+  - [4. logits 与 softmax / 概率搞混](#4-logits-与-softmax--概率搞混)
+  - [5. BatchNorm 前面的层带了 bias](#5-batchnorm-前面的层带了-bias)
+  - [6. 用 `view` 当 `permute`（或反之）](#6-用-view-当-permute或反之)
+  - [排查流程图（口诀）](#排查流程图口诀)
+- 扩展 8 条（推文未列但同样高频，第 7~14 条）
+  - [7. 训练 DataLoader 没 `shuffle=True`](#7-训练-dataloader-没-shuffletrue)
+  - [8. loss 没对 batch 取平均 / reduction 不一致](#8-loss-没对-batch-取平均--reduction-不一致)
+  - [9. 学习率没 warmup / 没 scheduler / 量级离谱](#9-学习率没-warmup--没-scheduler--量级离谱)
+  - [10. 归一化统计量泄漏 / 推理忘了同样的归一化](#10-归一化统计量泄漏--推理忘了同样的归一化)
+  - [11. 没固定随机种子 → 不可复现](#11-没固定随机种子--不可复现)
+  - [12. 在 GPU 上累加 loss 不 `.item()` / `.detach()` → 显存泄漏](#12-在-gpu-上累加-loss-不-item--detach--显存泄漏)
+  - [13. `CrossEntropyLoss` 的 target 类型/形状不对](#13-crossentropyloss-的-target-类型形状不对)
+  - [14. weight decay 误加到 bias / BatchNorm / LayerNorm 参数上](#14-weight-decay-误加到-bias--batchnorm--layernorm-参数上)
+  - [扩展坑排查口诀](#扩展坑排查口诀)
+
 ---
 
 ## 1. 不先 overfit 单个 batch

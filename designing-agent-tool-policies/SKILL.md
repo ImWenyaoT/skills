@@ -1,6 +1,6 @@
 ---
 name: designing-agent-tool-policies
-description: Use when adding or modifying an agent's runtime tools, policies, or playbooks — a uniform tool interface, risk-tiered policy gating, approval-required hard stops, deterministic stubs, and POJO-validated playbooks. Triggers on tool registry, policy gate, approval gating, or runtime playbooks.
+description: Designs an agent's runtime tool layer — a uniform tool interface, risk-tiered policy gating, approval-required hard stops, deterministic stubs, and POJO-validated playbooks. Use when adding or modifying an agent's runtime tools, policies, or playbooks. Triggers on tool registry, policy gate, approval gating, or runtime playbooks.
 ---
 
 # Designing Agent Tool Policies

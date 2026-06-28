@@ -1,6 +1,6 @@
 ---
 name: bridging-legacy-services
-description: Use when integrating a legacy service or module behind a compatibility adapter instead of rewriting it — preserving old sanitization, templates, memory, or behavior while a new path is built. Triggers on legacy adapters, compatibility lanes, build-before-import ordering, or keeping a fallback alive during migration.
+description: Wraps a legacy service or module behind a compatibility adapter instead of rewriting it, preserving old sanitization, templates, memory, or behavior while a new path is built. Use when integrating legacy code during a migration, and on mentions of legacy adapters, compatibility lanes, build-before-import ordering, or keeping a fallback alive.
 ---
 
 # Bridging Legacy Services
