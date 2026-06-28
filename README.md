@@ -1,5 +1,7 @@
 # skills
 
+[![validate-skills](https://github.com/ImWenyaoT/skills/actions/workflows/validate-skills.yml/badge.svg)](https://github.com/ImWenyaoT/skills/actions/workflows/validate-skills.yml)
+
 > 田文耀的个人 Agent Skills 仓库 —— 用 GitHub 同步、**Codex / Claude 双端可用**的一组 [Agent Skills](https://agentskills.io)。
 
 每个 skill 是一个自包含文件夹,含一份 `SKILL.md`(元数据 + 指令)和可选的 `scripts/`、`references/`、`assets/`。Agent 按**渐进披露**(progressive disclosure)加载:启动时只读 `name` + `description`,任务匹配时才把完整 `SKILL.md` 读进上下文,执行时再按需调用脚本/引用文件。
@@ -75,6 +77,21 @@ git clone --depth 1 https://github.com/ImWenyaoT/skills.git /tmp/skills \
 - 全小写、连字符分隔;**动词/动名词开头**(`building-`、`running-`、`writing-`),描述「做什么动作」而非名词。
 - 目录名 == `SKILL.md` 的 `name:` 字段(部分 loader 强校验)。
 - `description` 第三人称、以触发条件为主(「何时用」),≤1024 字符。
+
+## 维护
+
+**本仓库是唯一源**(source of truth);本地的 skill 目录只是它的镜像。
+
+```bash
+# 一键同步到本地两个镜像(保留本地第三方 skill 不动)
+cp .sync-local.env.example .sync-local.env   # 首次:改成你机器的镜像路径(gitignored)
+./scripts/sync-to-local.sh                   # 无配置时默认 ~/.claude/skills + ~/.agents/skills
+
+# 提交前自查(与 CI 同款)
+python scripts/validate_skills.py
+```
+
+每次 push / PR,GitHub Actions([validate-skills](.github/workflows/validate-skills.yml))自动校验所有 `SKILL.md` 的 frontmatter(`name`/`description` 合规、目录名一致、正文 ≤500 行、长引用文件需 `## Contents`)并编译内置 Python 脚本。
 
 ## 许可与致谢
 

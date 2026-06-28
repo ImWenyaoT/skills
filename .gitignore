@@ -12,3 +12,6 @@ Thumbs.db
 # Build artifacts
 dist/
 *.zip
+
+# Local sync targets (machine-specific; see .sync-local.env.example)
+.sync-local.env
