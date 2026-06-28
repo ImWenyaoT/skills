@@ -1,6 +1,6 @@
 ---
 name: publishing-agent-notes
-description: Use when working on /Users/edward/Documents/intern/docs/notes, publishing agent paper or code reading notes, converting those notes to MkDocs, configuring GitHub Pages, or verifying the ImWenyaoT/notes site.
+description: Use only for the personal notes site rooted at /Users/edward/Documents/intern/docs/notes or the ImWenyaoT/notes repository: publishing agent paper/code reading notes, converting those notes to MkDocs, configuring that site's GitHub Pages, or verifying its artifact. Do not trigger for generic MkDocs, generic GitHub Pages, or unrelated blog/documentation sites.
 ---
 
 # Publishing Agent Notes

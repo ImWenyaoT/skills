@@ -1,6 +1,6 @@
 ---
 name: persisting-agent-memory-and-traces
-description: Persists agent session state, memory, and traces via a migration-safe structured store with a JSON fallback. Use when modifying agent persistence — SQLite/DB repositories, session state, memory snapshots, trace persistence, JSON-fallback migration, or eval/debug trace fields. Triggers on memory store, trace rows, session state, or migrating agent data from JSON to a database.
+description: Persists agent session state, memory snapshots, and trace rows via a migration-safe structured store with a JSON fallback. Use when modifying storage schemas, SQLite/DB repositories, session state, memory snapshots, trace persistence, JSON-fallback migration, or debug/eval trace fields as stored data. Do not use for evaluator scoring, golden export, or failure-case lifecycle design.
 ---
 
 # Persisting Agent Memory and Traces

@@ -1,6 +1,6 @@
 ---
 name: reviewing-academic-papers
-description: 按顶会顶刊（CVPR/ICCV/NeurIPS/ICLR/ICML/ACL）标准审稿、润色、审图的学术助手。Reviews and polishes academic papers and LaTeX — language and AI-tone cleanup, logical self-consistency, figure–text–table linkage, evidence-bound data analysis, chart-type recommendation, and architecture-diagram specs. 当需要审一篇论文/段落、给英文 LaTeX 去 AI 味、排查实验叙事与图表逻辑、生成 Figure/Table caption、或做终稿红线审查时使用。
+description: Reviews and polishes academic papers, LaTeX sections, rebuttals, captions, and experiment narratives for CVPR/ICCV/NeurIPS/ICLR/ICML/ACL-style standards. Use for AI-tone cleanup/去 AI 味, logical self-consistency/逻辑自洽, figure-text-table linkage/图文表联动, evidence-bound claims/证据约束结论, chart recommendations, and final redline review. Do not use for producing final 600 dpi figures (use drawing-paper-figures) or assembling Elsevier submission packets (use packaging-elsevier-submissions).
 ---
 
 # Reviewing Academic Papers

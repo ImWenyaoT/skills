@@ -1,6 +1,6 @@
 ---
 name: drawing-paper-figures
-description: Use when budgeting and drawing figures for an Elsevier-style journal paper — derive word-count / figure-count / palette budgets from a reference corpus, then draw architecture diagrams, Ours-vs-baseline scatters, result stitches and efficiency plots with a shared matplotlib base. Bundles parameterized stats scripts + the figkit drawing library.
+description: Use when budgeting or producing publication-quality academic paper figures, including Elsevier-style journal figures, CVPR/ICCV/NeurIPS appendix figures, architecture diagrams, Ours-vs-baseline scatters, result stitches, and efficiency plots. Can derive word/figure/palette budgets from references and draw with the bundled matplotlib figkit. Do not use for language review, caption-only edits, or submission packaging.
 ---
 
 # drawing-paper-figures

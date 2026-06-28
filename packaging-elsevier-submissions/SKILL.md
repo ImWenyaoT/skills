@@ -1,6 +1,6 @@
 ---
 name: packaging-elsevier-submissions
-description: Assembles a finished LaTeX manuscript into an Editorial Manager submission packet for an Elsevier journal. Use when packaging a paper for initial submission or revision. Covers the required statement set and its order (CRediT, declaration, acknowledgements, data availability), hard specs (abstract/highlights/graphical-abstract limits), single- vs double-column strategy, the flat ASCII source zip, cover letter, and the defensive-writing / self-citation gotchas seen on HGD-Net and CARETrack.
+description: Assembles a finished LaTeX manuscript into an Editorial Manager submission, revision, resubmission, or response-to-reviewers packet for an Elsevier journal. Covers statement order (CRediT, declarations, acknowledgements, data availability), abstract/highlights/graphical-abstract limits, single- vs double-column strategy, flat ASCII source zip, cover letter, and defensive writing/self-citation checks.
 ---
 
 # Packaging Elsevier Submissions
