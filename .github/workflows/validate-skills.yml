@@ -1,0 +1,27 @@
+name: validate-skills
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate SKILL.md frontmatter
+        run: python scripts/validate_skills.py
+
+      - name: Compile bundled Python scripts
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            python -m py_compile "$f" || fail=1
+          done < <(find . -path ./.git -prune -o -name '*.py' -print)
+          exit $fail
