@@ -8,7 +8,7 @@
 
 本仓库只收录**原创**且**泛用**的 skill——所有项目专有信息(代码路径、内部架构、个人身份)都已剥离,只留通用方法论。
 
-## 目录(14 个)
+## 目录(15 个)
 
 ### 🤖 Agent 工程 (Agent Engineering)
 
@@ -39,11 +39,12 @@
 |-------|------|
 | [`debugging-nn-training`](debugging-nn-training) | 神经网络训练常见错误自检清单:14 条静默失败的坑(overfit 单 batch、train/eval、zero_grad、logits-vs-softmax、view-vs-permute、shuffle、warmup…),每条「症状→为什么→怎么查→怎么改」+ 可运行脚本。 |
 
-### ✍️ 写作 (Writing)
+### ✍️ 写作 / 文档 (Writing & Docs)
 
 | Skill | 用途 |
 |-------|------|
 | [`writing-technical-resumes`](writing-technical-resumes) | 写/改/审技术简历的内容层:把任务流水账改成量化、成果导向、强动词的 bullet,按岗位裁剪,诚实红线。排版/导出交给你的简历工具。 |
+| [`converting-markdown-to-pdf`](converting-markdown-to-pdf) | 把 Markdown 转成可打印的精致 PDF:封面、自动目录、代码高亮、斑马纹表格、页码。 |
 
 ### 🛠️ 元 / 工作流 (Meta)
 
