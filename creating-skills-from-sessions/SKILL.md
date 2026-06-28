@@ -26,6 +26,7 @@ feeds them.
 | Codex skills (repo scope) | `$CWD/.agents/skills/`, `$REPO_ROOT/.agents/skills/` | project/org skills, scanned CWD→root |
 | Claude skills (user scope) | `~/.claude/skills/<name>/SKILL.md` | global user skills |
 | Claude skills (project scope) | `<project>/.claude/skills/<name>/SKILL.md` | per-project skills |
+| Legacy personal staging | `/Users/edward/Documents/.agents/skills/<name>/SKILL.md` | historical local staging area; migrate useful skills into the source repo, then remove duplicates |
 | Installed/vendored packs | large third-party skill collections | **read-only — mine for patterns, never edit/republish** |
 
 **Verify the path before you grep — skill homes vary by runtime and version** (some installs
@@ -41,10 +42,12 @@ apart from *installed* packs (third-party, read-only) before touching anything.
    "doesn't work" / "you keep"), reverts.
 2. **Cluster** by `cwd` + first-ask to surface the recurring task domains.
 3. **Triage** each candidate (table below).
-4. **Author** survivors via `superpowers:writing-skills` — and honor the user's
+4. **Merge before creating**: search the current skill library first and update the nearest
+   existing skill when the new pattern is a variant, not a new workflow.
+5. **Author** survivors via `superpowers:writing-skills` — and honor the user's
    `CLAUDE.md` / `AGENTS.md` (e.g. 中文对话, function-level comments, Python via `uv run`
    over new `.sh`, 替换而非叠加).
-5. **Report** what you made and *why*; explicitly flag what you deliberately did **not**
+6. **Report** what you made and *why*; explicitly flag what you deliberately did **not**
    make.
 
 ## Triage: skill, memory, or neither
@@ -53,11 +56,19 @@ apart from *installed* packs (third-party, read-only) before touching anything.
 - A **fact or preference** ("user dislikes X", "metric protocol is Y") → **memory**, not a
   skill.
 - One-off solution → **neither**.
+- Require real evidence: repeated mistakes, a user-corrected boundary/preference, a reusable
+  recovery path after tool failure, or a workflow with non-obvious verification steps.
 - **Never resurrect an intentionally-deleted or archived skill.** A wiped skill is a
   decision, not a gap to refill — confirm with the user first.
 
 ## Placement & keeping runtimes in sync
 
+- Keep the version-controlled skills repo as the source of truth. Do not write newly authored
+  skills into `~/.codex/skills`, `~/.claude/skills`, or `~/.agents/skills` unless the user
+  explicitly asks for an installed copy.
+- Treat `/Users/edward/Documents/.agents/skills` as a historical staging location, not a new
+  home. If a skill there is still useful, absorb it into the source repo and delete the duplicate.
+- Do not place a personal skill inside a project repo unless it is clearly project-specific.
 - Pick scope by reach: a skill useful everywhere → user scope (`~/.agents/skills/` for Codex,
   `~/.claude/skills/` for Claude); a skill only meaningful inside one repo → that repo's
   `.agents/skills/` or `.claude/skills/`.
