@@ -6,9 +6,9 @@
 
 每个 skill 是一个自包含文件夹,含一份 `SKILL.md`(元数据 + 指令)和可选的 `scripts/`、`references/`、`assets/`。Agent 按**渐进披露**(progressive disclosure)加载:启动时只读 `name` + `description`,任务匹配时才把完整 `SKILL.md` 读进上下文,执行时再按需调用脚本/引用文件。
 
-本仓库只收录**原创**且**泛用**的 skill——所有项目专有信息(代码路径、内部架构、个人身份)都已剥离,只留通用方法论。
+本仓库优先收录**原创**且**泛用**的 skill——默认剥离项目专有信息(代码路径、内部架构、个人身份),只留通用方法论。少量高频个人项目工作流也可收录,但必须在用途说明里明确目标路径和边界。
 
-## 目录(15 个)
+## 目录(16 个)
 
 ### 🤖 Agent 工程 (Agent Engineering)
 
@@ -51,6 +51,7 @@
 | Skill | 用途 |
 |-------|------|
 | [`creating-skills-from-sessions`](creating-skills-from-sessions) | 从历史 agent 会话挖掘反复出现的摩擦,沉淀成新/改进的 skill:讲清 Codex/Claude 的 transcript 与 skill 存放位置、过滤 guardian 噪声、skill-vs-memory 取舍。 |
+| [`publishing-agent-notes`](publishing-agent-notes) | 发布 `/Users/edward/Documents/intern/docs/notes` 下的 agent 读论文/读代码笔记:MkDocs 源目录、GitHub Pages artifact、严格构建和上线验证。 |
 
 ## 安装 / 同步
 
