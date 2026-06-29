@@ -83,8 +83,8 @@
       "id": "markdown-pdf-negative-doc-edit",
       "prompt": "Rewrite this Markdown section to make the argument clearer, but do not export anything.",
       "expected_skills": [],
-      "forbidden_skills": ["markdown-pdf"],
-      "notes": "Editing Markdown text is not PDF conversion."
+      "forbidden_skills": ["markdown-pdf", "writing-papers"],
+      "notes": "Generic Markdown prose editing — not PDF conversion, and not academic-paper writing/review."
     },
     {
       "id": "mining-sessions-positive-mine",
@@ -108,52 +108,52 @@
       "notes": "External adoption, not mining own sessions."
     },
     {
-      "id": "debugging-training-positive-loss",
+      "id": "training-models-positive-loss",
       "prompt": "My PyTorch model's loss is not decreasing and accuracy is stuck. Check the training loop for train/eval mode, zero_grad, logits, and shape bugs.",
-      "expected_skills": ["debugging-training"],
-      "forbidden_skills": ["reviewing-papers"],
+      "expected_skills": ["training-models"],
+      "forbidden_skills": ["writing-papers"],
       "notes": "Neural network training failure."
     },
     {
-      "id": "debugging-training-positive-overfit",
+      "id": "training-models-positive-overfit",
       "prompt": "Help me sanity-check this deep learning training code by overfitting one batch and checking gradients.",
-      "expected_skills": ["debugging-training"],
+      "expected_skills": ["training-models"],
       "forbidden_skills": ["agent-evals"],
       "notes": "Training sanity checks."
     },
     {
-      "id": "debugging-training-positive-zh-loss",
+      "id": "training-models-positive-zh-loss",
       "prompt": "我的 PyTorch 训练 loss 不下降，acc 卡住了，帮我检查 train/eval、zero_grad、梯度和 logits 这些训练循环问题。",
-      "expected_skills": ["debugging-training"],
+      "expected_skills": ["training-models"],
       "forbidden_skills": ["agent-evals"],
       "notes": "Chinese neural network training failure prompt."
     },
     {
-      "id": "debugging-training-negative-agent-eval",
+      "id": "training-models-negative-agent-eval",
       "prompt": "Set up an evaluator for agent turns and export golden failure cases.",
       "expected_skills": ["agent-evals"],
-      "forbidden_skills": ["debugging-training"],
+      "forbidden_skills": ["training-models"],
       "notes": "Agent eval, not neural training."
     },
     {
-      "id": "debugging-training-positive-recipe-setup",
+      "id": "training-models-positive-recipe-setup",
       "prompt": "I'm setting up a new image-classification training run from scratch — what disciplined order should I follow (verify loss at init, overfit one batch, input-independent baseline) so bugs are easy to catch?",
-      "expected_skills": ["debugging-training"],
+      "expected_skills": ["training-models"],
       "forbidden_skills": ["agent-evals"],
       "notes": "Karpathy recipe / from-scratch training setup methodology."
     },
     {
-      "id": "debugging-training-positive-recipe-zh",
+      "id": "training-models-positive-recipe-zh",
       "prompt": "从零搭一个神经网络训练 pipeline,按什么顺序做 sanity check(固定随机种子、验证 init loss、overfit 单 batch)才不容易踩坑?",
-      "expected_skills": ["debugging-training"],
+      "expected_skills": ["training-models"],
       "forbidden_skills": ["agent-evals"],
       "notes": "Chinese: from-scratch NN training recipe / sanity-check order."
     },
     {
-      "id": "debugging-training-negative-data-pipeline",
+      "id": "training-models-negative-data-pipeline",
       "prompt": "Set up a data ingestion pipeline that loads CSV files into a feature store on a daily schedule.",
       "expected_skills": [],
-      "forbidden_skills": ["debugging-training"],
+      "forbidden_skills": ["training-models"],
       "notes": "Generic data/ETL pipeline setup, not neural-network training correctness."
     },
     {
@@ -181,7 +181,7 @@
       "id": "drawing-figures-positive-figkit",
       "prompt": "For this Elsevier journal paper, derive a figure-count and palette budget from references, then draw architecture and Ours-vs-baseline plots.",
       "expected_skills": ["drawing-figures"],
-      "forbidden_skills": ["reviewing-papers"],
+      "forbidden_skills": ["writing-papers"],
       "notes": "Figure production workflow."
     },
     {
@@ -194,7 +194,7 @@
     {
       "id": "drawing-figures-negative-caption",
       "prompt": "Rewrite this Figure 3 caption and verify the text-table linkage.",
-      "expected_skills": ["reviewing-papers"],
+      "expected_skills": ["writing-papers"],
       "forbidden_skills": ["drawing-figures"],
       "notes": "Paper review/editing, not drawing a new figure."
     },
@@ -230,20 +230,20 @@
       "id": "elsevier-submissions-positive-revision",
       "prompt": "Prepare the revised Elsevier submission packet and check abstract, highlights, graphical abstract, and data availability limits.",
       "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["reviewing-papers"],
+      "forbidden_skills": ["writing-papers"],
       "notes": "Journal submission packaging."
     },
     {
       "id": "elsevier-submissions-positive-zh-revision",
       "prompt": "帮我把这篇 Elsevier 论文修回稿打包成 Editorial Manager 可提交的材料，包括声明、cover letter 和源码 zip。",
       "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["reviewing-papers"],
+      "forbidden_skills": ["writing-papers"],
       "notes": "Chinese Elsevier revision packaging prompt."
     },
     {
       "id": "elsevier-submissions-negative-review",
       "prompt": "Review the LaTeX introduction for AI-tone and logical self-consistency.",
-      "expected_skills": ["reviewing-papers"],
+      "expected_skills": ["writing-papers"],
       "forbidden_skills": ["elsevier-submissions"],
       "notes": "Paper review, not finished packet."
     },
@@ -269,39 +269,88 @@
       "notes": "Eval lifecycle, not persistence."
     },
     {
-      "id": "reviewing-papers-positive-rebuttal",
+      "id": "writing-papers-positive-rebuttal",
       "prompt": "Polish this NeurIPS rebuttal paragraph and remove AI-sounding phrasing without changing the technical claims.",
-      "expected_skills": ["reviewing-papers"],
+      "expected_skills": ["writing-papers"],
       "forbidden_skills": ["writing-resumes"],
       "notes": "Academic paper language polish."
     },
     {
-      "id": "reviewing-papers-positive-figure-table",
+      "id": "writing-papers-positive-figure-table",
       "prompt": "Check this paper's experiment narrative, Figure/Table captions, and evidence-bound conclusions for logical consistency.",
-      "expected_skills": ["reviewing-papers"],
+      "expected_skills": ["writing-papers"],
       "forbidden_skills": ["drawing-figures"],
       "notes": "Paper review and figure-text linkage."
     },
     {
-      "id": "reviewing-papers-positive-zh-polish",
+      "id": "writing-papers-positive-zh-polish",
       "prompt": "帮我润色这段 NeurIPS 论文 LaTeX，去掉 AI 味，但不要改变技术主张。",
-      "expected_skills": ["reviewing-papers"],
+      "expected_skills": ["writing-papers"],
       "forbidden_skills": ["writing-resumes"],
       "notes": "Chinese academic paper polishing prompt."
     },
     {
-      "id": "reviewing-papers-positive-zh-figures",
+      "id": "writing-papers-positive-zh-figures",
       "prompt": "检查这篇论文的实验叙事、图表 caption 和结论是否证据自洽。",
-      "expected_skills": ["reviewing-papers"],
+      "expected_skills": ["writing-papers"],
       "forbidden_skills": ["drawing-figures"],
       "notes": "Chinese paper narrative and caption review prompt."
     },
     {
-      "id": "reviewing-papers-negative-general-english",
+      "id": "writing-papers-negative-general-english",
       "prompt": "Make this business email sound more natural in English.",
       "expected_skills": [],
-      "forbidden_skills": ["reviewing-papers"],
-      "notes": "General English editing is not academic paper review."
+      "forbidden_skills": ["writing-papers"],
+      "notes": "General English editing is not academic paper writing or review."
+    },
+    {
+      "id": "writing-papers-positive-draft-intro",
+      "prompt": "I have experiment results for a new external-sort algorithm but haven't started writing. Help me draft the paper's introduction and structure the contributions.",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["drawing-figures"],
+      "notes": "From-scratch paper drafting / introduction structuring (Widom framework)."
+    },
+    {
+      "id": "writing-papers-positive-draft-structure",
+      "prompt": "I'm starting a technical paper from scratch — how should I organize the sections, what goes in the abstract vs the introduction, and should related work go before or after the body?",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["elsevier-submissions"],
+      "notes": "Manuscript structuring decisions, not submission packaging."
+    },
+    {
+      "id": "writing-papers-positive-zh-draft",
+      "prompt": "我要从零开始写一篇 CVPR 论文，帮我搭引言的五段式结构、摘要该写什么、相关工作放前面还是后面。",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["drawing-figures"],
+      "notes": "Chinese from-scratch paper drafting / structure decisions."
+    },
+    {
+      "id": "writing-papers-positive-zh-outline",
+      "prompt": "帮我起草这篇论文的 introduction 和 contributions bullet 列表。",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["writing-resumes"],
+      "notes": "Chinese introduction + contributions drafting."
+    },
+    {
+      "id": "writing-papers-negative-blog-draft",
+      "prompt": "Help me draft a blog post and a project README from scratch.",
+      "expected_skills": [],
+      "forbidden_skills": ["writing-papers"],
+      "notes": "Generic prose/doc drafting is not academic technical-paper writing."
+    },
+    {
+      "id": "writing-papers-positive-core-contribution",
+      "prompt": "Help me pin down the single core contribution of my paper and restructure the intro around it, instead of a laundry list of everything I did.",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["drawing-figures"],
+      "notes": "Karpathy paper-writing taste: single core contribution + anti laundry-list structure."
+    },
+    {
+      "id": "writing-papers-positive-zh-language",
+      "prompt": "帮我把论文里 study/investigate/pipeline/combine 这些词换成更像顶会的写法，并检查每段是否首句点题。",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["writing-resumes"],
+      "notes": "Chinese: good-vs-bad academic words + paragraph-first-sentence discipline."
     },
     {
       "id": "adversarial-review-positive-readiness",
@@ -342,13 +391,13 @@
       "id": "agent-evals-positive-thresholds",
       "prompt": "Add score thresholds, failure-case lifecycle, and regression harness reviews for agent responses.",
       "expected_skills": ["agent-evals"],
-      "forbidden_skills": ["debugging-training"],
+      "forbidden_skills": ["training-models"],
       "notes": "Agent regression evaluation."
     },
     {
       "id": "agent-evals-negative-model-training",
       "prompt": "Debug why this neural network training run has exploding gradients.",
-      "expected_skills": ["debugging-training"],
+      "expected_skills": ["training-models"],
       "forbidden_skills": ["agent-evals"],
       "notes": "ML training eval is not agent turn scoring."
     },
@@ -377,7 +426,7 @@
       "id": "writing-resumes-positive-bullet",
       "prompt": "Rewrite this technical resume bullet into a quantified results-first statement with stronger action verbs.",
       "expected_skills": ["writing-resumes"],
-      "forbidden_skills": ["reviewing-papers"],
+      "forbidden_skills": ["writing-papers"],
       "notes": "Resume content editing."
     },
     {
@@ -391,7 +440,7 @@
       "id": "writing-resumes-positive-zh-bullet",
       "prompt": "帮我把这条技术简历经历改成量化成果导向的 bullet，并按这个后端开发 JD 调整。",
       "expected_skills": ["writing-resumes"],
-      "forbidden_skills": ["reviewing-papers"],
+      "forbidden_skills": ["writing-papers"],
       "notes": "Chinese technical resume bullet prompt."
     },
     {
@@ -400,6 +449,41 @@
       "expected_skills": ["elsevier-submissions"],
       "forbidden_skills": ["writing-resumes"],
       "notes": "Academic submission cover letter, not resume."
+    },
+    {
+      "id": "apple-hig-positive-web-sheet-pattern",
+      "prompt": "I'm building a settings page and a modal sheet in my React web app. What is the Apple Human Interface Guidelines way to handle the navigation bar, sheet dismissal, and primary button placement so it feels like native iOS?",
+      "expected_skills": ["apple-hig"],
+      "forbidden_skills": ["drawing-figures"],
+      "notes": "HIG components and patterns applied to a web app (interaction/component/pattern focus)."
+    },
+    {
+      "id": "apple-hig-positive-interaction-audit",
+      "prompt": "Check my blog's buttons, lists, and tab bar against Apple's HIG — are the touch targets, focus states, and transition motion correct, and how do I map them to CSS and ARIA?",
+      "expected_skills": ["apple-hig"],
+      "forbidden_skills": ["adversarial-review"],
+      "notes": "Reviewing frontend interaction against HIG, not adversarial code review."
+    },
+    {
+      "id": "apple-hig-positive-zh-agent-ui",
+      "prompt": "我想让我的 agent 聊天界面真正符合 Apple HIG:确认危险操作的弹窗、加载和空状态、按钮的交互态,这些组件和模式该怎么做?",
+      "expected_skills": ["apple-hig"],
+      "forbidden_skills": ["agent-loops"],
+      "notes": "Chinese: HIG components/patterns for an agent chat UI (UI design, not agent control loop)."
+    },
+    {
+      "id": "apple-hig-negative-paper-figure",
+      "prompt": "Draw a publication-quality architecture diagram and a speed-accuracy scatter plot at 600 dpi for my CVPR paper.",
+      "expected_skills": ["drawing-figures"],
+      "forbidden_skills": ["apple-hig"],
+      "notes": "Academic figure drawing, not UI design — must not fire the HIG skill."
+    },
+    {
+      "id": "apple-hig-negative-android-material",
+      "prompt": "Style my Android Jetpack Compose screen with Material Design 3 dynamic color, a bottom app bar, and ripple feedback.",
+      "expected_skills": [],
+      "forbidden_skills": ["apple-hig"],
+      "notes": "Android Material Design is a different platform/design system; should abstain, not fire HIG."
     }
   ]
 }

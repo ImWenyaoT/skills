@@ -28,7 +28,7 @@
 本库 house style:
 
 - **两段式 `x-y`(单连字符)**、简短可扫读;名字要**具体可发现**,避免 `helper`/`utils`/`data`/`tools` 这类泛名。
-- 例:`debugging-training`、`reviewing-papers`、`agent-loops`、`markdown-pdf`。
+- 例:`training-models`、`writing-papers`、`agent-loops`、`markdown-pdf`。
 
 ## 描述 `description`(Anthropic SDO)
 
@@ -54,7 +54,7 @@
 
 工具与契约:
 
-- `evals/trigger_cases.json`:每个 skill **≥2 条 positive + ≥2 条 forbidden** 用例;用**相邻 skill 做 hard negative**(如 reviewing-papers vs drawing-figures、agent-evals vs persisting-traces);路径专用 skill 的 positive 必须带路径/仓库/唯一站点信号、negative 覆盖泛化场景。
+- `evals/trigger_cases.json`:每个 skill **≥2 条 positive + ≥2 条 forbidden** 用例;用**相邻 skill 做 hard negative**(如 writing-papers vs drawing-figures、agent-evals vs persisting-traces);路径专用 skill 的 positive 必须带路径/仓库/唯一站点信号、negative 覆盖泛化场景。
 - `scripts/evaluate_skill_triggers.py`:离线契约 + 元数据 smoke test;`--predictions <jsonl>` 进入真实指标模式(per-skill / macro / micro / weighted F1、abstain 假触发率、混淆矩阵、pass@k/pass^k、baseline 对比、selection-vs-outcome)。
 - `scripts/route_with_llm.py`:模型在环路由器(OpenAI 兼容,默认 DeepSeek,`DEEPSEEK_BASE_URL`/`DEEPSEEK_API_KEY`),把每条 prompt 的真实触发抓成 predictions JSONL 喂给上面打分。
 - **改了任何 `description` 后,重跑路由器确认不回退**(我们多次靠它发现/修复过度触发)。
