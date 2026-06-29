@@ -8,7 +8,7 @@
 
 本仓库优先收录**原创**且**泛用**的 skill——默认剥离项目专有信息(代码路径、内部架构、个人身份),只留通用方法论。少量高频个人项目工作流也可收录,但必须在用途说明里明确目标路径和边界。
 
-## 目录(16 个)
+## 目录(15 个)
 
 ### 🤖 Agent 工程 (Agent Engineering)
 
@@ -51,7 +51,6 @@
 | Skill | 用途 |
 |-------|------|
 | [`mining-sessions`](mining-sessions) | 从历史 agent 会话挖掘反复出现的摩擦,沉淀成新/改进的 skill:讲清 Codex/Claude 的 transcript 与 skill 存放位置、过滤 guardian 噪声、skill-vs-memory 取舍。 |
-| [`publishing-notes`](publishing-notes) | 发布 `ImWenyaoT/notes` 仓库(源在 `docs/notes` 下)的 agent 读论文/读代码笔记:MkDocs 源目录、GitHub Pages artifact、严格构建和上线验证。 |
 
 ## 安装 / 同步
 

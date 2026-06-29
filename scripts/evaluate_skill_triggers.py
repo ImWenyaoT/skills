@@ -170,36 +170,12 @@ def metadata_tokens(skill: Skill) -> set[str]:
 
 def similarity(prompt: str, skill: Skill) -> float:
     """Score how strongly one prompt resembles a skill's visible metadata."""
-    if is_path_scoped_without_signal(prompt, skill):
-        return 0.0
     prompt_tokens = tokenize(prompt)
     skill_tokens = metadata_tokens(skill)
     if not prompt_tokens or not skill_tokens:
         return 0.0
     overlap = len(prompt_tokens & skill_tokens)
     return overlap / math.sqrt(len(prompt_tokens) * len(skill_tokens))
-
-
-def is_path_scoped_without_signal(prompt: str, skill: Skill) -> bool:
-    """Return true when a repo/path-scoped skill lacks any matching prompt signal.
-
-    Scoping is detected from portable phrase signals in the description (repo slug,
-    relative path, "personal notes site") rather than any machine-absolute path, so
-    the check survives making skill descriptions portable across machines.
-    """
-    description_lower = skill.description.lower()
-    phrase_signals = [
-        "intern/docs/notes",
-        "imwenyaot/notes",
-        "that site's github pages",
-        "personal notes site",
-    ]
-    # Only repo/path-scoped skills gate on signals; everything else scores normally.
-    if not any(signal in description_lower for signal in phrase_signals):
-        return False
-    prompt_lower = prompt.lower()
-    repo_signals = re.findall(r"\b[a-z0-9_.-]+/[a-z0-9_.-]+\b", description_lower)
-    return not any(signal in prompt_lower for signal in repo_signals + phrase_signals)
 
 
 def rank_skills(prompt: str, skills: dict[str, Skill]) -> list[tuple[str, float]]:

@@ -269,48 +269,6 @@
       "notes": "Eval lifecycle, not persistence."
     },
     {
-      "id": "publishing-notes-positive-path",
-      "prompt": "Publish the notes under the intern/docs/notes folder of the ImWenyaoT/notes repo as a MkDocs site and verify GitHub Pages.",
-      "expected_skills": ["publishing-notes"],
-      "forbidden_skills": ["markdown-pdf"],
-      "notes": "Specific personal notes publishing workflow."
-    },
-    {
-      "id": "publishing-notes-positive-site",
-      "prompt": "Verify the ImWenyaoT/notes GitHub Pages artifact after converting the agent paper reading notes to MkDocs.",
-      "expected_skills": ["publishing-notes"],
-      "forbidden_skills": ["elsevier-submissions"],
-      "notes": "Notes site verification."
-    },
-    {
-      "id": "publishing-notes-negative-generic-mkdocs",
-      "prompt": "Set up a generic MkDocs site for a new open-source project.",
-      "expected_skills": [],
-      "forbidden_skills": ["publishing-notes"],
-      "notes": "Generic MkDocs should not trigger the personal notes workflow."
-    },
-    {
-      "id": "publishing-notes-negative-github-pages",
-      "prompt": "Explain how GitHub Pages deployment works for a generic documentation website.",
-      "expected_skills": [],
-      "forbidden_skills": ["publishing-notes"],
-      "notes": "Generic Pages explanation should not trigger the personal notes workflow."
-    },
-    {
-      "id": "publishing-notes-negative-reading-notes",
-      "prompt": "Publish my reading notes as a MkDocs site and verify GitHub Pages.",
-      "expected_skills": [],
-      "forbidden_skills": ["publishing-notes"],
-      "notes": "Generic reading notes are not the personal intern notes site."
-    },
-    {
-      "id": "publishing-notes-positive-zh-path",
-      "prompt": "把 ImWenyaoT/notes 仓库 intern/docs/notes 目录里的 agent 读论文笔记发布,并验证 GitHub Pages artifact。",
-      "expected_skills": ["publishing-notes"],
-      "forbidden_skills": ["markdown-pdf"],
-      "notes": "Chinese prompt with the personal notes path and repo."
-    },
-    {
       "id": "reviewing-papers-positive-rebuttal",
       "prompt": "Polish this NeurIPS rebuttal paragraph and remove AI-sounding phrasing without changing the technical claims.",
       "expected_skills": ["reviewing-papers"],
