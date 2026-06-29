@@ -4,7 +4,7 @@
 >
 > 本文件是这个 **Agent Skills 仓库**的开发规范,规则取自 Anthropic 与 OpenAI 官方文档(见末尾「参考」),并固化了本仓库的实战做法。
 
-> 这是一个**个人 Agent Skills 库**(源 = 本仓库,本地目录只是镜像),目前 16 个 skill,Codex 与 Claude 双端可用。
+> 这是一个**个人 Agent Skills 库**(源 = 本仓库,本地目录只是镜像),目前 15 个 skill,Codex 与 Claude 双端可用。
 > 每个 skill = 一个自包含文件夹(`SKILL.md` + 可选 `scripts/`/`references/`/`assets/`),按**渐进披露**加载:
 > 启动只读 `name`+`description`,匹配任务才读完整 `SKILL.md`,执行时再按需调脚本/引用文件。
 
