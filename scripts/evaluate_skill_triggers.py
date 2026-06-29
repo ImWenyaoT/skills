@@ -5,15 +5,25 @@ The default mode is an offline contract check: it verifies that every local skil
 has positive and negative coverage in evals/trigger_cases.json, then runs a small
 metadata-similarity smoke test to catch obviously overlapping descriptions.
 
-For real trigger metrics, pass --predictions JSONL with records like:
-  {"id": "case-id", "actual_skills": ["reviewing-academic-papers"]}
+For real trigger metrics, pass --predictions JSONL with one record PER RUN:
+  {"id": "case-id", "actual_skills": ["reviewing-papers"]}
+Repeat the same id across multiple lines to record multiple trials of one case;
+that unlocks pass@k / pass^k reliability metrics. A single line per id == 1 trial.
+
+The scorer answers two separable questions (Anthropic Claude Code guidance):
+  (A) ROUTING  — did the right skill TRIGGER and the wrong ones stay silent?
+                 -> per-skill / macro / micro / weighted precision-recall-F1,
+                    abstain false-trigger rate, confusion matrix, pass@k / pass^k.
+  (B) OUTCOME  — given a skill triggered, did following it produce a GOOD result?
+                 -> --outcomes JSONL of code-graded / LLM-judge assertion results.
+Pass --baseline-predictions (skills disabled) to confirm the skill is what changed
+behavior.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import math
-import os
 import re
 import sys
 from collections import Counter, defaultdict
@@ -24,6 +34,7 @@ from typing import Iterable
 ROOT = Path(__file__).resolve().parents[1]
 EVALS = ROOT / "evals" / "trigger_cases.json"
 SKIP = {"scripts", ".git", ".github", "evals"}
+NONE_LABEL = "<none>"  # explicit abstain class so "fire nothing" is first-class
 STOPWORDS = {
     "about",
     "after",
@@ -73,6 +84,11 @@ class Case:
     expected_skills: tuple[str, ...]
     forbidden_skills: tuple[str, ...]
     notes: str
+
+    @property
+    def is_abstain(self) -> bool:
+        """True when the right behavior is to fire no skill at all."""
+        return not self.expected_skills
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
@@ -136,7 +152,7 @@ def tokenize(text: str) -> set[str]:
         for token in re.findall(r"[a-z0-9][a-z0-9_]{2,}", lowered)
         if token not in STOPWORDS
     }
-    cjk_chars = re.findall(r"[\u4e00-\u9fff]", text)
+    cjk_chars = re.findall(r"[一-鿿]", text)
     cjk_grams = {"".join(cjk_chars[i : i + 2]) for i in range(max(0, len(cjk_chars) - 1))}
     return words | cjk_grams
 
@@ -165,20 +181,25 @@ def similarity(prompt: str, skill: Skill) -> float:
 
 
 def is_path_scoped_without_signal(prompt: str, skill: Skill) -> bool:
-    """Return true when an absolute-path skill lacks any matching prompt signal."""
-    if "/Users/" not in skill.description:
-        return False
-    prompt_lower = prompt.lower()
+    """Return true when a repo/path-scoped skill lacks any matching prompt signal.
+
+    Scoping is detected from portable phrase signals in the description (repo slug,
+    relative path, "personal notes site") rather than any machine-absolute path, so
+    the check survives making skill descriptions portable across machines.
+    """
     description_lower = skill.description.lower()
-    path_signals = re.findall(r"/users/[^\s,;:)]+", description_lower)
-    repo_signals = re.findall(r"\b[a-z0-9_.-]+/[a-z0-9_.-]+\b", description_lower)
     phrase_signals = [
         "intern/docs/notes",
         "imwenyaot/notes",
         "that site's github pages",
         "personal notes site",
     ]
-    return not any(signal in prompt_lower for signal in path_signals + repo_signals + phrase_signals)
+    # Only repo/path-scoped skills gate on signals; everything else scores normally.
+    if not any(signal in description_lower for signal in phrase_signals):
+        return False
+    prompt_lower = prompt.lower()
+    repo_signals = re.findall(r"\b[a-z0-9_.-]+/[a-z0-9_.-]+\b", description_lower)
+    return not any(signal in prompt_lower for signal in repo_signals + phrase_signals)
 
 
 def rank_skills(prompt: str, skills: dict[str, Skill]) -> list[tuple[str, float]]:
@@ -243,9 +264,14 @@ def smoke_test_metadata(cases: list[Case], skills: dict[str, Skill]) -> list[str
     return failures
 
 
-def load_predictions(path: Path) -> dict[str, tuple[str, ...]]:
-    """Load JSONL predictions from a real agent run or sub-agent harness."""
-    predictions: dict[str, tuple[str, ...]] = {}
+def load_predictions(path: Path) -> dict[str, list[tuple[str, ...]]]:
+    """Load JSONL predictions as id -> list of per-trial fired-skill tuples.
+
+    Each line is ONE trial: {"id": ..., "actual_skills": [...]}. Repeating an id
+    across lines records multiple trials of the same case (for pass@k / pass^k).
+    Back-compatible with the old one-line-per-id format (yields a 1-trial list).
+    """
+    predictions: dict[str, list[tuple[str, ...]]] = defaultdict(list)
     with path.open(encoding="utf-8") as handle:
         for line_no, line in enumerate(handle, start=1):
             stripped = line.strip()
@@ -256,53 +282,278 @@ def load_predictions(path: Path) -> dict[str, tuple[str, ...]]:
             actual = item.get("actual_skills", [])
             if not isinstance(case_id, str) or not isinstance(actual, list):
                 raise ValueError(f"{path}:{line_no}: expected id and actual_skills list")
-            predictions[case_id] = tuple(str(skill) for skill in actual)
-    return predictions
+            predictions[case_id].append(tuple(str(skill) for skill in actual))
+    return dict(predictions)
 
 
-def score_predictions(cases: list[Case], predictions: dict[str, tuple[str, ...]]) -> tuple[list[str], dict[str, float]]:
-    """Score real trigger predictions against the golden labels."""
-    failures: list[str] = []
-    true_positive = 0
-    false_positive = 0
-    false_negative = 0
+def load_outcomes(path: Path) -> dict[str, tuple[int, int]]:
+    """Load layer-(B) outcome grading as id -> (assertions_passed, assertions_total).
+
+    Accepts either explicit assertion counts
+      {"id": ..., "assertions_passed": 3, "assertions_total": 4}
+    or a boolean pass {"id": ..., "passed": true} (treated as 1/1).
+    """
+    outcomes: dict[str, tuple[int, int]] = {}
+    with path.open(encoding="utf-8") as handle:
+        for line_no, line in enumerate(handle, start=1):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            item = json.loads(stripped)
+            case_id = item.get("id")
+            if not isinstance(case_id, str):
+                raise ValueError(f"{path}:{line_no}: expected string id")
+            if "assertions_total" in item:
+                passed = int(item.get("assertions_passed", 0))
+                total = int(item["assertions_total"])
+            elif "passed" in item:
+                passed, total = (1, 1) if item["passed"] else (0, 1)
+            else:
+                raise ValueError(f"{path}:{line_no}: need assertions_total or passed")
+            outcomes[case_id] = (passed, total)
+    return outcomes
+
+
+def _prf(tp: int, fp: int, fn: int) -> tuple[float, float, float]:
+    """Return (precision, recall, f1) from a confusion tally; empty class -> 1.0."""
+    precision = tp / (tp + fp) if (tp + fp) else 1.0
+    recall = tp / (tp + fn) if (tp + fn) else 1.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+    return precision, recall, f1
+
+
+def pass_at_k(n: int, c: int, k: int) -> float | None:
+    """Probability >=1 of k sampled runs succeeds, given c successes in n runs."""
+    if k > n:
+        return None
+    if c == 0:
+        return 0.0
+    if n - c < k:  # fewer than k failures -> every k-subset contains a success
+        return 1.0
+    return 1.0 - math.comb(n - c, k) / math.comb(n, k)
+
+
+def pass_hat_k(n: int, c: int, k: int) -> float | None:
+    """Probability ALL k sampled runs succeed, given c successes in n runs."""
+    if k > n:
+        return None
+    if c < k:
+        return 0.0
+    return math.comb(c, k) / math.comb(n, k)
+
+
+def compute_routing_metrics(
+    cases: list[Case],
+    predictions: dict[str, list[tuple[str, ...]]],
+    skills: dict[str, Skill],
+    pass_k: int,
+) -> dict:
+    """Compute the full layer-(A) routing report over all (case, trial) samples.
+
+    Treats every trial of every case as one sample for precision/recall/F1, and
+    computes pass@k / pass^k per case across its trials. Returns a dict with
+    per-skill tallies, macro/micro/weighted F1, abstain (false-trigger) metrics,
+    selection accuracy, a confusion matrix, pass metrics, and per-case failures.
+    """
+    skill_names = sorted(skills)
+    # Per-skill confusion tallies summed over all (case, trial) samples.
+    tp: Counter[str] = Counter()
+    fp: Counter[str] = Counter()
+    fn: Counter[str] = Counter()
+    support: Counter[str] = Counter()  # gold-positive samples per skill (for weighting)
+
+    micro_tp = micro_fp = micro_fn = 0
     forbidden_hits = 0
-    expected_total = 0
-    actual_total = 0
+    selection_ok = 0
+    sample_total = 0
+
+    # Abstain ("fire nothing") as a first-class class.
+    none_tp = none_fp = none_fn = 0
+    abstain_runs = 0
+    abstain_false_fires = 0
+
+    confusion: Counter[tuple[str, str]] = Counter()  # (gold, predicted) for 1-expected cases
+    pass_at_k_vals: list[float] = []
+    pass_hat_k_vals: list[float] = []
+    failures: list[str] = []
 
     for case in cases:
+        runs = predictions.get(case.id)
+        if not runs:
+            failures.append(f"{case.id}: no prediction trials provided")
+            continue
         expected = set(case.expected_skills)
         forbidden = set(case.forbidden_skills)
-        actual = set(predictions.get(case.id, ()))
-        missing = expected - actual
-        extra = actual - expected
-        forbidden_actual = actual & forbidden
-        true_positive += len(expected & actual)
-        false_positive += len(extra)
-        false_negative += len(missing)
-        forbidden_hits += len(forbidden_actual)
-        expected_total += len(expected)
-        actual_total += len(actual)
 
-        if missing or extra or forbidden_actual:
-            failures.append(
-                f"{case.id}: missing={sorted(missing)} extra={sorted(extra)} "
-                f"forbidden_hits={sorted(forbidden_actual)} "
-                f"actual={sorted(actual)}"
-            )
+        successes = 0
+        for actual_tuple in runs:
+            actual = set(actual_tuple)
+            sample_total += 1
 
-    precision = true_positive / actual_total if actual_total else 1.0
-    recall = true_positive / expected_total if expected_total else 1.0
-    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
-    metrics = {
-        "precision": precision,
-        "recall": recall,
-        "f1": f1,
-        "false_positive": float(false_positive),
-        "false_negative": float(false_negative),
-        "forbidden_hits": float(forbidden_hits),
+            # Per-skill + micro confusion over the full skill vocabulary.
+            for name in skill_names:
+                gold_pos = name in expected
+                pred_pos = name in actual
+                if gold_pos:
+                    support[name] += 1
+                if gold_pos and pred_pos:
+                    tp[name] += 1
+                    micro_tp += 1
+                elif pred_pos and not gold_pos:
+                    fp[name] += 1
+                    micro_fp += 1
+                elif gold_pos and not pred_pos:
+                    fn[name] += 1
+                    micro_fn += 1
+
+            forbidden_hits += len(actual & forbidden)
+
+            # Abstain class bookkeeping.
+            gold_none = case.is_abstain
+            pred_none = not actual
+            if gold_none and pred_none:
+                none_tp += 1
+            elif pred_none and not gold_none:
+                none_fp += 1
+            elif gold_none and not pred_none:
+                none_fn += 1
+            if gold_none:
+                abstain_runs += 1
+                if actual:
+                    abstain_false_fires += 1
+
+            # Selection accuracy: needed skill(s) fired (abstain == fired nothing).
+            if (gold_none and pred_none) or (expected and expected.issubset(actual)):
+                selection_ok += 1
+
+            # Confusion matrix for single-expected cases.
+            if len(expected) == 1:
+                gold = next(iter(expected))
+                preds = sorted(actual) if actual else [NONE_LABEL]
+                for pred in preds:
+                    confusion[(gold, pred)] += 1
+
+            # Exact-set match defines a successful trial (abstain-respecting).
+            if actual == expected:
+                successes += 1
+
+            if (expected - actual) or (actual - expected) or (actual & forbidden):
+                failures.append(
+                    f"{case.id}: missing={sorted(expected - actual)} "
+                    f"extra={sorted(actual - expected)} "
+                    f"forbidden_hits={sorted(actual & forbidden)} actual={sorted(actual)}"
+                )
+
+        n = len(runs)
+        pak = pass_at_k(n, successes, pass_k)
+        phk = pass_hat_k(n, successes, pass_k)
+        if pak is not None:
+            pass_at_k_vals.append(pak)
+        if phk is not None:
+            pass_hat_k_vals.append(phk)
+
+    # Per-skill precision/recall/F1 + the three averaging schemes.
+    per_skill: dict[str, dict[str, float]] = {}
+    f1s: list[float] = []
+    weighted_num = 0.0
+    weighted_den = 0
+    for name in skill_names:
+        p, r, f1 = _prf(tp[name], fp[name], fn[name])
+        per_skill[name] = {
+            "precision": p,
+            "recall": r,
+            "f1": f1,
+            "support": support[name],
+            "tp": tp[name],
+            "fp": fp[name],
+            "fn": fn[name],
+        }
+        f1s.append(f1)
+        weighted_num += support[name] * f1
+        weighted_den += support[name]
+
+    micro_p, micro_r, micro_f1 = _prf(micro_tp, micro_fp, micro_fn)
+    macro_f1 = sum(f1s) / len(f1s) if f1s else 0.0
+    weighted_f1 = weighted_num / weighted_den if weighted_den else 0.0
+    none_p, none_r, none_f1 = _prf(none_tp, none_fp, none_fn)
+
+    return {
+        "per_skill": per_skill,
+        "precision": micro_p,
+        "recall": micro_r,
+        "f1": micro_f1,
+        "macro_f1": macro_f1,
+        "weighted_f1": weighted_f1,
+        "forbidden_hits": forbidden_hits,
+        "false_trigger_rate": (abstain_false_fires / abstain_runs) if abstain_runs else 0.0,
+        "abstain_runs": abstain_runs,
+        "none_precision": none_p,
+        "none_recall": none_r,
+        "none_f1": none_f1,
+        "selection_accuracy": (selection_ok / sample_total) if sample_total else 1.0,
+        "confusion": confusion,
+        "pass_at_k": (sum(pass_at_k_vals) / len(pass_at_k_vals)) if pass_at_k_vals else 1.0,
+        "pass_hat_k": (sum(pass_hat_k_vals) / len(pass_hat_k_vals)) if pass_hat_k_vals else 1.0,
+        "pass_k": pass_k,
+        "sample_total": sample_total,
+        "failures": failures,
     }
-    return failures, metrics
+
+
+def compute_outcome_metrics(cases: list[Case], outcomes: dict[str, tuple[int, int]]) -> dict:
+    """Compute layer-(B) outcome quality over cases that should trigger a skill."""
+    assertions_passed = assertions_total = 0
+    cases_full_pass = cases_graded = 0
+    missing: list[str] = []
+    for case in cases:
+        if case.is_abstain:
+            continue  # outcome grading only applies when a skill should run
+        if case.id not in outcomes:
+            missing.append(case.id)
+            continue
+        passed, total = outcomes[case.id]
+        assertions_passed += passed
+        assertions_total += total
+        cases_graded += 1
+        if total and passed == total:
+            cases_full_pass += 1
+    return {
+        "assertion_pass_rate": (assertions_passed / assertions_total) if assertions_total else 1.0,
+        "case_pass_rate": (cases_full_pass / cases_graded) if cases_graded else 1.0,
+        "cases_graded": cases_graded,
+        "missing": missing,
+    }
+
+
+def compare_baseline(
+    cases: list[Case],
+    predictions: dict[str, list[tuple[str, ...]]],
+    baseline: dict[str, list[tuple[str, ...]]],
+) -> dict:
+    """Diff with-skill vs skills-disabled fired behavior to prove the skill is the cause."""
+    changed = 0
+    compared = 0
+    examples: list[str] = []
+    for case in cases:
+        with_runs = predictions.get(case.id)
+        base_runs = baseline.get(case.id)
+        if not with_runs or not base_runs:
+            continue
+        compared += 1
+        with_set = set(with_runs[0])
+        base_set = set(base_runs[0])
+        if with_set != base_set:
+            changed += 1
+            if len(examples) < 8:
+                examples.append(
+                    f"{case.id}: baseline={sorted(base_set) or ['<none>']} -> with={sorted(with_set) or ['<none>']}"
+                )
+    return {
+        "compared": compared,
+        "changed": changed,
+        "change_rate": (changed / compared) if compared else 0.0,
+        "examples": examples,
+    }
 
 
 def print_summary(cases: list[Case], skills: dict[str, Skill]) -> None:
@@ -321,14 +572,59 @@ def print_summary(cases: list[Case], skills: dict[str, Skill]) -> None:
         )
 
 
+def print_routing_report(metrics: dict) -> None:
+    """Render the layer-(A) routing metrics block for humans and CI logs."""
+    print(
+        "\nRouting metrics (over {n} trials):".format(n=metrics["sample_total"])
+    )
+    print(
+        f"  micro    precision={metrics['precision']:.3f} recall={metrics['recall']:.3f} f1={metrics['f1']:.3f}"
+    )
+    print(f"  macro-F1={metrics['macro_f1']:.3f}  weighted-F1={metrics['weighted_f1']:.3f}")
+    print(
+        f"  abstain  false_trigger_rate={metrics['false_trigger_rate']:.3f} "
+        f"(over {metrics['abstain_runs']} abstain trials)  none-F1={metrics['none_f1']:.3f}"
+    )
+    print(
+        f"  selection_accuracy={metrics['selection_accuracy']:.3f}  forbidden_hits={metrics['forbidden_hits']}"
+    )
+    k = metrics["pass_k"]
+    print(f"  pass@{k}={metrics['pass_at_k']:.3f}  pass^{k}={metrics['pass_hat_k']:.3f}")
+
+    print("\nPer-skill routing (precision / recall / f1 / support):")
+    for name, row in sorted(metrics["per_skill"].items()):
+        print(
+            f"  {name:<38} P={row['precision']:.2f} R={row['recall']:.2f} "
+            f"F1={row['f1']:.2f} n={row['support']}"
+        )
+
+    off_diagonal = sorted(
+        ((g, p, c) for (g, p), c in metrics["confusion"].items() if g != p),
+        key=lambda item: -item[2],
+    )
+    if off_diagonal:
+        print("\nConfusion (gold -> wrongly fired, single-expected cases):")
+        for gold, pred, count in off_diagonal:
+            print(f"  {gold} -> {pred}: {count}")
+
+
 def main(argv: Iterable[str] | None = None) -> int:
-    """Run trigger-contract validation and optional prediction scoring."""
+    """Run trigger-contract validation and optional prediction/outcome scoring."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=EVALS, help="Path to trigger cases JSON")
-    parser.add_argument("--predictions", type=Path, help="Optional JSONL actual_skills predictions")
-    parser.add_argument("--min-precision", type=float, default=0.90, help="Minimum precision for --predictions")
-    parser.add_argument("--min-recall", type=float, default=0.90, help="Minimum recall for --predictions")
-    parser.add_argument("--min-f1", type=float, default=0.90, help="Minimum F1 for --predictions")
+    parser.add_argument("--predictions", type=Path, help="JSONL of actual_skills, one line per trial")
+    parser.add_argument("--baseline-predictions", type=Path, help="JSONL captured with skills disabled")
+    parser.add_argument("--outcomes", type=Path, help="JSONL of layer-(B) outcome grading results")
+    parser.add_argument("--pass-k", type=int, default=1, help="k for pass@k / pass^k reliability")
+    # Layer-(A) gates (only enforced when --predictions is given).
+    parser.add_argument("--min-precision", type=float, default=0.90, help="Min micro precision")
+    parser.add_argument("--min-recall", type=float, default=0.90, help="Min micro recall")
+    parser.add_argument("--min-f1", type=float, default=0.90, help="Min micro F1")
+    parser.add_argument("--min-macro-f1", type=float, default=0.0, help="Min macro-F1 (per-skill equal weight)")
+    parser.add_argument("--max-false-trigger-rate", type=float, default=1.0, help="Max abstain false-trigger rate")
+    parser.add_argument("--min-pass-hat-k", type=float, default=0.0, help="Min mean pass^k reliability")
+    # Layer-(B) gate (only enforced when --outcomes is given).
+    parser.add_argument("--min-outcome-pass-rate", type=float, default=0.0, help="Min outcome assertion pass rate")
     parser.add_argument(
         "--skip-smoke",
         action="store_true",
@@ -345,21 +641,50 @@ def main(argv: Iterable[str] | None = None) -> int:
         failures.extend(smoke_test_metadata(cases, skills))
 
     if args.predictions:
-        prediction_failures, metrics = score_predictions(cases, load_predictions(args.predictions))
-        failures.extend(prediction_failures)
-        print(
-            "Prediction metrics: "
-            f"precision={metrics['precision']:.3f} recall={metrics['recall']:.3f} "
-            f"f1={metrics['f1']:.3f} forbidden_hits={metrics['forbidden_hits']:.0f}"
-        )
+        predictions = load_predictions(args.predictions)
+        metrics = compute_routing_metrics(cases, predictions, skills, args.pass_k)
+        failures.extend(metrics["failures"])
+        print_routing_report(metrics)
+
+        # Layer-(A) threshold gates.
         if metrics["precision"] < args.min_precision:
-            failures.append(
-                f"prediction precision {metrics['precision']:.3f} below threshold {args.min_precision:.3f}"
-            )
+            failures.append(f"micro precision {metrics['precision']:.3f} below {args.min_precision:.3f}")
         if metrics["recall"] < args.min_recall:
-            failures.append(f"prediction recall {metrics['recall']:.3f} below threshold {args.min_recall:.3f}")
+            failures.append(f"micro recall {metrics['recall']:.3f} below {args.min_recall:.3f}")
         if metrics["f1"] < args.min_f1:
-            failures.append(f"prediction f1 {metrics['f1']:.3f} below threshold {args.min_f1:.3f}")
+            failures.append(f"micro f1 {metrics['f1']:.3f} below {args.min_f1:.3f}")
+        if metrics["macro_f1"] < args.min_macro_f1:
+            failures.append(f"macro-f1 {metrics['macro_f1']:.3f} below {args.min_macro_f1:.3f}")
+        if metrics["false_trigger_rate"] > args.max_false_trigger_rate:
+            failures.append(
+                f"false-trigger-rate {metrics['false_trigger_rate']:.3f} above {args.max_false_trigger_rate:.3f}"
+            )
+        if metrics["pass_hat_k"] < args.min_pass_hat_k:
+            failures.append(f"pass^{args.pass_k} {metrics['pass_hat_k']:.3f} below {args.min_pass_hat_k:.3f}")
+
+        if args.baseline_predictions:
+            baseline = load_predictions(args.baseline_predictions)
+            delta = compare_baseline(cases, predictions, baseline)
+            print(
+                f"\nBaseline delta: {delta['changed']}/{delta['compared']} cases changed "
+                f"(change_rate={delta['change_rate']:.3f})"
+            )
+            for example in delta["examples"]:
+                print(f"  {example}")
+
+    if args.outcomes:
+        outcome_metrics = compute_outcome_metrics(cases, load_outcomes(args.outcomes))
+        print(
+            f"\nOutcome metrics: assertion_pass_rate={outcome_metrics['assertion_pass_rate']:.3f} "
+            f"case_pass_rate={outcome_metrics['case_pass_rate']:.3f} "
+            f"(graded {outcome_metrics['cases_graded']} should-trigger cases)"
+        )
+        if outcome_metrics["missing"]:
+            print(f"  ungraded should-trigger cases: {len(outcome_metrics['missing'])}")
+        if outcome_metrics["assertion_pass_rate"] < args.min_outcome_pass_rate:
+            failures.append(
+                f"outcome pass-rate {outcome_metrics['assertion_pass_rate']:.3f} below {args.min_outcome_pass_rate:.3f}"
+            )
 
     if failures:
         print("\nTrigger health failures:")
