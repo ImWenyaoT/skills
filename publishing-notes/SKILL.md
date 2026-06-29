@@ -1,6 +1,6 @@
 ---
-name: publishing-agent-notes
-description: Use only for the personal notes site rooted at /Users/edward/Documents/intern/docs/notes or the ImWenyaoT/notes repository: publishing agent paper/code reading notes, converting those notes to MkDocs, configuring that site's GitHub Pages, or verifying its artifact. Do not trigger for generic MkDocs, generic GitHub Pages, or unrelated blog/documentation sites.
+name: publishing-notes
+description: Use ONLY when the ImWenyaoT/notes repository — its docs/notes source or the imwenyaot.github.io/notes site — is explicitly the target: publishing that personal agent paper-and-code reading-notes MkDocs site, converting those notes to MkDocs, configuring that site's GitHub Pages, or verifying its artifact. Do NOT trigger for any other notes/MkDocs/GitHub-Pages task — including a generic "publish my reading notes as MkDocs and verify GitHub Pages" — unless that specific repo or site is named.
 ---
 
 # Publishing Agent Notes
@@ -48,5 +48,5 @@ the MkDocs source and `docs/site` as generated output.
   static HTML.
 - If fewer files should be exposed under `docs/`, keep source files under `docs/notes` and
   configure MkDocs from there instead of flattening everything.
-- If a command scans `/Users/edward/Documents/intern` broadly, cap depth and output. That tree
-  has large archives and nested projects that can flood context.
+- If a command scans the notes repository (or any large notes tree) broadly, cap depth and
+  output. Such trees can hold large archives and nested projects that flood context.

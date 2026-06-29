@@ -1,16 +1,17 @@
 ---
-name: drawing-paper-figures
+name: drawing-figures
 description: Use when budgeting or producing publication-quality academic paper figures, including Elsevier-style journal figures, CVPR/ICCV/NeurIPS appendix figures, architecture diagrams, Ours-vs-baseline scatters, result stitches, and efficiency plots. Can derive word/figure/palette budgets from references and draw with the bundled matplotlib figkit. Do not use for language review, caption-only edits, or submission packaging.
 ---
 
-# drawing-paper-figures
+# drawing-figures
 
 A two-phase workflow for journal paper figures.
 
 - **Phase A — BUDGET**: run the stats scripts against a reference-paper corpus to learn what word counts / figure counts / palette colours are normal for your venue.
 - **Phase B — DRAW**: use figkit + diagram_primitives + stitch + measure_model + annotate_renders to produce publication-ready figures at 600 dpi.
 
-Reference conventions (RGB-T tracking journal papers) live in `references/`.
+Reference conventions (RGB-T tracking journal papers) live in `references/`. This skill only
+**produces** figures — language review and submission packaging are out of scope.
 
 ---
 

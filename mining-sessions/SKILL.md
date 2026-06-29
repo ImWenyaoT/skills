@@ -1,6 +1,6 @@
 ---
-name: creating-skills-from-sessions
-description: Use when asked to mine past Codex/Claude sessions for skill friction or recurring struggles and turn them into new or improved skills (the "auto-create skills from sessions" / "scan my sessions and update the skills" task). Covers where transcripts and custom skills actually live, filtering guardian-subagent noise, and skill-vs-memory triage.
+name: mining-sessions
+description: Use when asked to mine past Codex/Claude sessions for skill friction or recurring struggles and turn them into new or improved skills (the "auto-create skills from sessions" / "scan my sessions and update the skills" task). Covers where transcripts and custom skills actually live, filtering guardian-subagent noise, and skill-vs-memory triage. Do not trigger for importing an external/open-source skill, or for authoring a skill from scratch without mining past sessions.
 ---
 
 # Creating Skills From Sessions
@@ -10,9 +10,8 @@ description: Use when asked to mine past Codex/Claude sessions for skill frictio
 Periodically turn lived experience into skills: scan past agent sessions, find where a
 skill caused friction or where a task **recurs and struggles**, then create or improve a
 skill. Core principle: **a skill must earn its place from real, repeated evidence — not a
-hunch.** Authoring discipline lives in `superpowers:writing-skills` (RED-GREEN for docs)
-and `skill-creator`; this skill is the *session-mining + triage + placement* layer that
-feeds them.
+hunch.** Pair it with whatever skill-authoring discipline you use (e.g. a RED-GREEN docs-TDD
+workflow); this skill is the *session-mining + triage + placement* layer that feeds authoring.
 
 ## Where things actually live (verify before you grep — these paths bite)
 
@@ -26,7 +25,7 @@ feeds them.
 | Codex skills (repo scope) | `$CWD/.agents/skills/`, `$REPO_ROOT/.agents/skills/` | project/org skills, scanned CWD→root |
 | Claude skills (user scope) | `~/.claude/skills/<name>/SKILL.md` | global user skills |
 | Claude skills (project scope) | `<project>/.claude/skills/<name>/SKILL.md` | per-project skills |
-| Legacy personal staging | `/Users/edward/Documents/.agents/skills/<name>/SKILL.md` | historical local staging area; migrate useful skills into the source repo, then remove duplicates |
+| Legacy personal staging | a non-standard staging dir left from an earlier setup (historically under `~/Documents`) | historical local staging area; migrate useful skills into the source repo, then remove duplicates |
 | Installed/vendored packs | large third-party skill collections | **read-only — mine for patterns, never edit/republish** |
 
 **Verify the path before you grep — skill homes vary by runtime and version** (some installs
@@ -44,7 +43,7 @@ apart from *installed* packs (third-party, read-only) before touching anything.
 3. **Triage** each candidate (table below).
 4. **Merge before creating**: search the current skill library first and update the nearest
    existing skill when the new pattern is a variant, not a new workflow.
-5. **Author** survivors via `superpowers:writing-skills` — and honor the user's
+5. **Author** survivors with your skill-authoring workflow — and honor the user's
    `CLAUDE.md` / `AGENTS.md` (e.g. 中文对话, function-level comments, Python via `uv run`
    over new `.sh`, 替换而非叠加).
 6. **Report** what you made and *why*; explicitly flag what you deliberately did **not**
@@ -66,8 +65,9 @@ apart from *installed* packs (third-party, read-only) before touching anything.
 - Keep the version-controlled skills repo as the source of truth. Do not write newly authored
   skills into `~/.codex/skills`, `~/.claude/skills`, or `~/.agents/skills` unless the user
   explicitly asks for an installed copy.
-- Treat `/Users/edward/Documents/.agents/skills` as a historical staging location, not a new
-  home. If a skill there is still useful, absorb it into the source repo and delete the duplicate.
+- Treat any non-standard legacy staging dir (e.g. an old `~/Documents/.agents/skills`) as a
+  historical location, not a new home. If a skill there is still useful, absorb it into the
+  source repo and delete the duplicate.
 - Do not place a personal skill inside a project repo unless it is clearly project-specific.
 - Pick scope by reach: a skill useful everywhere → user scope (`~/.agents/skills/` for Codex,
   `~/.claude/skills/` for Claude); a skill only meaningful inside one repo → that repo's

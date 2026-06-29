@@ -1,6 +1,6 @@
 ---
-name: reviewing-academic-papers
-description: Reviews and polishes academic papers, LaTeX sections, rebuttals, captions, and experiment narratives for CVPR/ICCV/NeurIPS/ICLR/ICML/ACL-style standards. Use for AI-tone cleanup/去 AI 味, logical self-consistency/逻辑自洽, figure-text-table linkage/图文表联动, evidence-bound claims/证据约束结论, chart recommendations, and final redline review. Do not use for producing final 600 dpi figures (use drawing-paper-figures) or assembling Elsevier submission packets (use packaging-elsevier-submissions).
+name: reviewing-papers
+description: Reviews and polishes academic papers, LaTeX sections, rebuttals, captions, and experiment narratives for CVPR/ICCV/NeurIPS/ICLR/ICML/ACL-style standards. Use for AI-tone cleanup/去 AI 味, logical self-consistency/逻辑自洽, figure-text-table linkage/图文表联动, evidence-bound claims/证据约束结论, chart recommendations, and final redline review. Do not use for producing final 600 dpi figures or assembling Elsevier submission packets — this skill is text/figure/data critique only.
 ---
 
 # Reviewing Academic Papers
@@ -48,7 +48,7 @@ description: Reviews and polishes academic papers, LaTeX sections, rebuttals, ca
 
 - **6 个审查维度**（语言格式 / 逻辑自洽 / 图文联动 / 实验数据 / 图表推荐 / 架构图设计）：见 [references/review-dimensions.md](references/review-dimensions.md)。
 - **8 种输出模式**的具体格式（综合审查 / LaTeX 润色 / 去 AI 味 / 终稿红线 / 实验分析 / 图表推荐 / 标题 / 架构图 prompt）：见 [references/output-modes.md](references/output-modes.md)。
-- 真正动手**画**图（figkit、600 dpi、Ours-vs-baseline 散点、结果拼图）见 `drawing-paper-figures` skill；投稿打包见 `packaging-elsevier-submissions` skill。本 skill 只负责**审与荐**。
+- 真正动手**画**图（figkit、600 dpi、Ours-vs-baseline 散点、结果拼图）与投稿打包是另外的工作；本 skill 只负责**审与荐**。
 
 ## 严重程度标签
 

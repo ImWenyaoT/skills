@@ -1,5 +1,5 @@
 ---
-name: converting-markdown-to-pdf
+name: markdown-pdf
 description: Converts a Markdown source file into a polished, print-ready PDF — cover page, generated table of contents, syntax-highlighted code blocks, zebra-striped tables, and page-number footer. Use when the source is Markdown and the requested output is a presentable PDF/printable document/report. Do not use for resume content editing, non-Markdown conversions, or text-only Markdown edits.
 ---
 
