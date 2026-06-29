@@ -29,7 +29,7 @@
 
 | Skill | 用途 |
 |-------|------|
-| [`reviewing-papers`](reviewing-papers) | 按顶会顶刊标准审稿/润色/审图:去 AI 味、逻辑自洽、图文联动、证据约束的数据分析、图表推荐、架构图 prompt;6 维度 + 8 输出模式 + P0/P1/P2 标签。 |
+| [`writing-papers`](writing-papers) | 一个 skill 覆盖**起草 + 审阅**:起草按 Stanford InfoLab/Widom 框架搭结构(标题、五段式引言、相关工作位置、正文两条 Guideline、实验、结论、未来工作、引用、附录);审阅做去 AI 味、逻辑自洽、图文联动、证据约束的数据分析、图表推荐、架构图 prompt(6 维度 + 8 输出模式 + P0/P1/P2 标签)。 |
 | [`drawing-figures`](drawing-figures) | 为 Elsevier 风格期刊论文做图:先从参考语料推导字数/图数/配色预算,再用 figkit 画架构图、Ours-vs-baseline 散点、结果拼图(600 dpi)。 |
 | [`elsevier-submissions`](elsevier-submissions) | 把成稿 LaTeX 手稿打包成 Editorial Manager 投稿包:声明集顺序、硬性规格、扁平 ASCII 源码 zip、cover letter。 |
 
@@ -37,7 +37,7 @@
 
 | Skill | 用途 |
 |-------|------|
-| [`debugging-training`](debugging-training) | 神经网络训练常见错误自检清单:14 条静默失败的坑(overfit 单 batch、train/eval、zero_grad、logits-vs-softmax、view-vs-permute、shuffle、warmup…),每条「症状→为什么→怎么查→怎么改」+ 可运行脚本。 |
+| [`training-models`](training-models) | 把神经网络训练做对的全流程:Karpathy《训练配方》6 阶段(读数据→搭骨架+笨baseline→过拟合→正则→调参→榨干)+ 14 条静默失败自检(overfit 单 batch、train/eval、zero_grad、logits-vs-softmax、view-vs-permute、shuffle、warmup…),每条「症状→为什么→怎么查→怎么改」;默认 Python+PyTorch(uv/ruff/ty)栈,含可运行脚本。 |
 
 ### ✍️ 写作 / 文档 (Writing & Docs)
 
@@ -68,7 +68,7 @@ cp -r /tmp/skills/agent-loops ~/.claude/skills/    # 或 ~/.agents/skills/
 
 # 只装一个
 git clone --depth 1 https://github.com/ImWenyaoT/skills.git /tmp/skills \
-  && cp -r /tmp/skills/debugging-training ~/.claude/skills/
+  && cp -r /tmp/skills/training-models ~/.claude/skills/
 ```
 
 > Codex 与 Claude 互相读不到对方的 skill 树;要两端都用,就把 skill 文件夹各拷一份(`cp -r`)。
@@ -115,7 +115,7 @@ python scripts/evaluate_skill_triggers.py --predictions /path/to/predictions.jso
 `predictions.jsonl` 每行对应一个 case:
 
 ```json
-{"id":"reviewing-papers-positive-rebuttal","actual_skills":["reviewing-papers"]}
+{"id":"writing-papers-positive-rebuttal","actual_skills":["writing-papers"]}
 ```
 
 ## 许可与致谢

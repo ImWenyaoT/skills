@@ -1,11 +1,11 @@
 ---
-name: debugging-training
-description: Debugs neural network/deep learning training failures and silent convergence bugs in PyTorch/JAX/TF, and structures a new training run to prevent them. Use when loss does not decrease, train/eval metrics disagree, gradients explode/vanish, accuracy is stuck, inference is wrong, a model cannot overfit one batch, or when setting up / sanity-checking a training pipeline from scratch; also for training-loop code review. Covers Karpathy's full "Recipe for Training Neural Networks" (6 stages) plus an extended engineering checklist, minimal reproductions, and fixes.
+name: training-models
+description: Engineers neural-network/deep-learning training end-to-end and debugs its silent failures — the full Karpathy lifecycle (inspect data, build an end-to-end skeleton with dumb baselines, overfit, regularize, tune, squeeze). Default stack Python + PyTorch with uv/ruff/ty/pytest; also JAX/TF. Use when loss does not decrease, train/eval metrics disagree, gradients explode/vanish, accuracy is stuck, inference is wrong, a model cannot overfit one batch, or when setting up / sanity-checking / structuring a training run from scratch; also for training-loop code review. Covers Karpathy's full "Recipe for Training Neural Networks" (6 stages) plus an extended engineering checklist, minimal reproductions, and fixes.
 ---
 
-# 神经网络训练常见错误自检
+# 神经网络训练:配方 + 错误自检
 
-训练神经网络会**静默失败**。Karpathy 在《A Recipe for Training Neural Networks》里点出两个根因:① 它是 **leaky abstraction**——`backprop + SGD` 不会自动让网络 work,一旦偏离标准任务(如 ImageNet 分类),隐藏的复杂度就冒出来;② 它**不报错地失败**——语法全对、照常训练,只是悄悄学错(翻转的标签、off-by-one、初始化不当)。对策是他那句方法论:**从简单到复杂地搭,对每一步保持偏执、用可视化验证;最终成败最相关的是耐心与对细节的执着。**
+训练神经网络会**静默失败**。Karpathy 在《A Recipe for Training Neural Networks》里点出两个根因:① 它是 **leaky abstraction**——`backprop + SGD` 不会自动让网络 work,一旦偏离标准任务(如 ImageNet 分类),隐藏的复杂度就冒出来;② 它**不报错地失败**——语法全对、照常训练,只是悄悄学错(翻转的标签、off-by-one、初始化不当)。对策是他那句方法论:**从简单到复杂地搭,保持 thorough/defensive/paranoid、对几乎每一件事都痴迷可视化;suffering 是自然的,但能靠这些品质缓解——与成功最相关的是耐心与对细节的执着。**
 
 本 skill 因此分两半,配合使用:
 - **训练配方(6 阶段)**——预防并定位 bug 的**搭建顺序**(下一节)。很多 bug 其实是**跳过了某个阶段**。
@@ -13,22 +13,34 @@ description: Debugs neural network/deep learning training failures and silent co
 
 > 用法:从零搭训练用「训练配方」按阶段推进;现场"训练不对劲"则跳到「自检清单」逐条排查——多数收敛类问题命中前 3 条,多数"结果错乱/精度怪"命中后 3 条。
 
+## 技术栈约定
+
+本 skill 默认 **Python ML/DL 栈**(示例、脚本、修复都按此):
+
+- **语言/框架**:Python + **PyTorch**(主);JAX/TF 仅在个别 tip 处做 API 旁注。
+- **工程工具**:`uv`(依赖/虚拟环境)、`ruff`(lint + format)、`ty`(类型检查)、`pytest`(测试);跑脚本优先 `uv run`,提交前 `ruff check` + `ty` 应过。
+
+> 这是 ML/DL/AI 域的栈;web 域(TypeScript + Node/Bun)是另一回事,不在本 skill。
+
 ## 训练配方:从简单到复杂(Karpathy 6 阶段)
 
-> 核心纪律:**别一上来就堆复杂度。** 每个阶段先建立一个"可信赖的状态",再小步加复杂度——这样一旦指标变坏,你立刻知道是刚加的那一步。逐 tip 的「为什么 + 怎么做」详解见 [references/karpathy-recipe.md](references/karpathy-recipe.md)。
+> 核心纪律:**别一上来就堆复杂度。** 每个阶段先建立一个"可信赖的状态",再小步加复杂度;**每加一步前先写下"具体假设"(预期会发生什么),再用实验验证或调查到找到问题**——这样一旦指标变坏,你立刻知道是刚加的那一步。逐 tip 的「为什么 + 怎么做」详解见 [references/karpathy-recipe.md](references/karpathy-recipe.md)。
 
 **阶段 1 · 与数据合二为一(become one with the data)**
-- 写代码前先**人肉看几千个样本**:分布、模式、类别不平衡、标签质量、离群点。
-- 写脚本去搜索 / 过滤 / 可视化分布与异常值。很多 bug 一开始就藏在数据里。
+- 写代码前先**人肉看几千个样本**:分布、模式、类别不平衡、标签质量、离群点、重复/损坏样本。
+- 写脚本去搜索 / 过滤 / 可视化分布与异常值——**离群点几乎总能直接暴露数据/预处理 bug**(最高性价比探针)。
+- **留意"你自己怎么人工分类"→ 暗示该用什么架构/预处理**(局部 vs 全局特征、空间位置是否重要、能下采样多少、标签多吵)。
+- **网络=数据集的压缩版**:训练后回看 mispredictions 与数据对照,把"看数据"做成贯穿训练前后的闭环。
 
 **阶段 2 · 搭端到端骨架 + 拿到"笨 baseline"(skeleton + dumb baselines)** —— sanity check 最密集的一阶段:
 - **固定随机种子**(可复现)。
 - **先简化**:关掉数据增强等一切花活。
 - **eval 加足有效位**,并在整个测试集上评(别只看一个 batch)。
-- **验证 init 时的 loss**:如 n 类 softmax 在初始化时 CrossEntropy 应 ≈ `log(n)`,对不上就是初始化/末层 bias 不对。
-- **init well**:把末层 bias 设成合理先验(不平衡分类按基频),省得前几百步只在"学先验"。
+- **验证 init 时的 loss**:n 类 softmax 在 init 时 CrossEntropy 应 ≈ `log(n)`(回归 L2 ≈ 标签方差、Huber 同理可推),对不上就是初始化/末层 bias 不对。
+- **init well**:把末层 bias 设成合理先验(回归设为标签均值、不平衡分类按基频),省得前几百步只在"学先验"。
+- **human baseline**:评估你自己的人类准确率作为目标上限,或把测试集标两遍(一份当预测、一份当 ground truth)估人类水平。
 - **input-independent baseline**:把输入置零再训,若 loss 仍能降到和真实输入差不多 → 模型根本没在用输入(信息泄漏/记忆标签)。
-- **overfit 一个 batch**:压到接近 0,证明前向/反向/优化器/loss 链路是通的(本 skill 的第一性检查)。
+- **overfit 一个 batch**:压到接近 0,证明前向/反向/优化器/loss 链路是通的(本 skill 的第一性检查);**同图叠画 label 与 prediction,确认最低 loss 时逐点对齐**,不齐=有 bug、别进下一步。
 - **验证训练 loss 随容量增加而下降**。
 - **在"喂进网络前一刻"可视化**真正进网络的 `x`/`y`(不是 dataset 里的,是 `y_hat = model(x)` 那一刻的张量)。
 - **可视化预测的动态**:固定一批测试样本,看训练过程中预测怎么演化——抖得厉害说明不稳定。
@@ -42,10 +54,11 @@ description: Debugs neural network/deep learning training failures and silent co
 - **别照搬别领域的 lr decay 默认值**:衰减常和数据集大小绑定,照抄会过早衰减。
 
 **阶段 4 · 正则化(regularize)** —— 牺牲一点训练拟合换泛化,大致优先级:
-- **拿更多真实数据(最有效)** → 数据增强 → 预训练 → 降输入维度 → 减小模型 → 减小 batch → **dropout** → 调大 **weight decay** → **early stopping**;early stopping 之后可再试更大的模型。
+- **拿更多真实数据(最有效)** → 数据增强 → 预训练 → **坚持监督学习**(无监督在 CV 至今无强结果,NLP/BERT 例外)→ 降输入维度 → 减小模型 → 减小 batch → **dropout**(ConvNet 用 `dropout2d`,且与 BN 不太合)→ 调大 **weight decay** → **early stopping**;之后可再试更大的模型(其 early-stopped 性能常优于小模型)。
+- **收尾确认**:可视化第一层权重(应有合理边缘,像噪声=有问题)、查内部 activations 有无怪异 artifact。
 
 **阶段 5 · 调参(tune)**
-- **随机搜索 > 网格搜索**;必要时上贝叶斯等超参优化工具。
+- **随机搜索 > 网格搜索**(网络对某些超参远比另一些敏感)。贝叶斯超参优化工具有人用得好,但 Karpathy 本人更靠人工经验——别当银弹。
 
 **阶段 6 · 榨干余量(squeeze out the juice)**
 - **模型集成**几乎稳赚 ~2%;**让模型训练得比你以为的更久**(常常还在涨)。

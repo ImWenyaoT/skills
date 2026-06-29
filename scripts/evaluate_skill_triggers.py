@@ -6,7 +6,7 @@ has positive and negative coverage in evals/trigger_cases.json, then runs a smal
 metadata-similarity smoke test to catch obviously overlapping descriptions.
 
 For real trigger metrics, pass --predictions JSONL with one record PER RUN:
-  {"id": "case-id", "actual_skills": ["reviewing-papers"]}
+  {"id": "case-id", "actual_skills": ["writing-papers"]}
 Repeat the same id across multiple lines to record multiple trials of one case;
 that unlocks pass@k / pass^k reliability metrics. A single line per id == 1 trial.
 
