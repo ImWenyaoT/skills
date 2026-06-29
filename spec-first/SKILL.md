@@ -1,5 +1,5 @@
 ---
-name: making-spec-first-changes
+name: spec-first
 description: Enforces a spec-first workflow in a codebase with governing specs, PRDs, or architecture docs. Use when a change alters code behavior, public interfaces, architecture/package boundaries, agent-loop contracts, runtime lanes, memory/trace semantics, or domain vocabulary that those docs define. Do not trigger for ordinary README edits, typo fixes, or projects without governing docs.
 ---
 

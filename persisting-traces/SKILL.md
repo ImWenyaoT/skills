@@ -1,5 +1,5 @@
 ---
-name: persisting-agent-memory-and-traces
+name: persisting-traces
 description: Persists agent session state, memory snapshots, and trace rows via a migration-safe structured store with a JSON fallback. Use when modifying storage schemas, SQLite/DB repositories, session state, memory snapshots, trace persistence, JSON-fallback migration, or debug/eval trace fields as stored data. Do not use for evaluator scoring, golden export, or failure-case lifecycle design.
 ---
 
@@ -15,6 +15,8 @@ first, a JSON fallback until the new write path is proven.
 - Put evidence and debugging detail in **traces**, not long-term memory — don't promote transient
   retrieval evidence into durable customer memory by default.
 - Trace rows should retain event / action / input / output / toolCalls / references when available.
+- Scoring/evaluating those traces is a separate concern — this skill owns **storage** only, not the
+  evaluator/scoring lifecycle.
 
 ## Workflow
 

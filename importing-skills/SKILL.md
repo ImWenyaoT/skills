@@ -1,6 +1,6 @@
 ---
-name: adopting-open-source-skills
-description: Vets and imports external skills into your own library — checking provenance and license, deciding use-as-is vs adapt vs clean-room rewrite, and recording attribution. Use when considering external, community, open-source, copied, forked, or upgraded skills for your workflows, when importing or forking a skill, or when adapting someone else's workflow into your own.
+name: importing-skills
+description: Vets and imports external skills into your own library — checking provenance and license, deciding use-as-is vs adapt vs clean-room rewrite, and recording attribution. Use when considering external, community, open-source, copied, forked, or upgraded skills for your workflows, when importing or forking a skill, or when adapting someone else's workflow into your own. Do not trigger for mining your own past agent sessions for skill ideas, or for authoring a brand-new skill from scratch.
 ---
 
 # Adopting Open Source Skills
@@ -26,4 +26,4 @@ over copying a broad skill, and never blur provenance.
 3. Decide: use as-is, adapt, or clean-room rewrite.
 4. Keep the `SKILL.md` concise and scoped to your need.
 5. Add a `## Provenance` section for any external idea, copy, fork, or adaptation.
-6. Run an adversarial review (see the `running-adversarial-subagent-reviews` skill) before accepting it.
+6. Run an independent, read-only adversarial review before accepting it.

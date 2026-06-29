@@ -1,5 +1,5 @@
 ---
-name: packaging-elsevier-submissions
+name: elsevier-submissions
 description: Assembles a finished LaTeX manuscript into an Editorial Manager submission, revision, resubmission, or response-to-reviewers packet for an Elsevier journal. Covers statement order (CRediT, declarations, acknowledgements, data availability), abstract/highlights/graphical-abstract limits, single- vs double-column strategy, flat ASCII source zip, cover letter, and defensive writing/self-citation checks.
 ---
 
@@ -12,7 +12,8 @@ and the actual `.tex` are authored elsewhere — this is the **last-mile packagi
 right statements, right order, right specs, a clean flat source zip. Done for HGD-Net
 (Information Sciences, accepted) and CARETrack (Information Fusion). The reusable playbook,
 templates, CLI and a single-column `example.tex` survive under
-`docs/_archive/paper-pipeline/` (archived 2026-06-27) — **point to them, don't rewrite.**
+`docs/_archive/paper-pipeline/` (archived 2026-06-27) — **point to them, don't rewrite.** This is
+the submission-packaging step only; narrative authoring and figure production happen elsewhere.
 
 ## Authoritative sources (read these first)
 
