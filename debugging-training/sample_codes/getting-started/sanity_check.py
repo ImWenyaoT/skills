@@ -1,13 +1,16 @@
 """一键训练自检脚本。
 
-用途：把你的 model、一个 batch、loss 丢进 run_sanity_checks()，
-自动跑 Karpathy 6 条坑里最易自动化的前 4 条（overfit 单 batch、train/eval、
-zero_grad、logits 契约），快速判断"链路是否正确"。
+用途：把你的 model、一个 batch、loss 丢进 run_sanity_checks()，自动跑：
+  - 链路 4 条（overfit 单 batch、train/eval、zero_grad、logits 契约），判断"链路是否正确"；
+  - Karpathy 配方「阶段 2」的两条 sanity check：验证 init loss、input-independent baseline。
 
 依赖：torch（PyTorch）。运行：python sanity_check.py
 """
 
 from __future__ import annotations
+
+import copy
+import math
 
 import torch
 import torch.nn as nn
@@ -105,14 +108,79 @@ def check_logits_contract(model, xb, criterion):
     }
 
 
+def verify_loss_at_init(model, xb, yb, criterion, *, expected=None):
+    """配方阶段2:验证初始化时的 loss 是否落在理论先验附近。
+
+    参数:
+        model: 未训练的 nn.Module（保持 init 状态调用本函数）。
+        xb, yb: 一个小 batch。
+        criterion: 损失函数。
+        expected: 期望 init loss；为 None 且用 CrossEntropyLoss 时自动按 log(类别数) 估计。
+    返回:
+        dict: 实测 init loss、期望值、是否接近。
+    说明:
+        n 类均匀 softmax 的 CrossEntropy 在 init 应 ≈ -log(1/n)=log(n)。
+        偏离过大通常意味着初始化或末层 bias 不当（见 'init well'）。
+    """
+    model.eval()
+    with torch.no_grad():
+        out = model(xb)
+        loss = criterion(out, yb).item()
+    note = "无参考期望，仅打印实测值"
+    if expected is None and isinstance(criterion, nn.CrossEntropyLoss):
+        n_classes = out.shape[-1]
+        expected = math.log(n_classes)
+        note = f"CrossEntropy@init 理论 ≈ log({n_classes}) = {expected:.4f}"
+    close = expected is not None and abs(loss - expected) <= 0.5
+    return {"loss_at_init": loss, "expected": expected, "close_to_prior": bool(close), "note": note}
+
+
+def input_independent_baseline(model, xb, yb, criterion, *, steps=100, lr=1e-2):
+    """配方阶段2:input-independent baseline —— 验证模型真的在用输入。
+
+    参数:
+        model: nn.Module（内部各拷贝一份独立训练，不改动传入模型）。
+        xb, yb: 一个小 batch。
+        criterion: 损失函数。
+        steps, lr: overfit 迭代步数与学习率。
+    返回:
+        dict: 真实输入 vs 置零输入各自 overfit 后的 last_loss，及是否在用输入。
+    说明:
+        把输入置零后再训：健康模型因看不到输入、无法区分不同标签，loss 应明显更差；
+        若置零后 loss 仍能降到与真实输入相近 → 模型没在用输入（信息泄漏 / 记忆标签 / 标签穿越）。
+    """
+    real = copy.deepcopy(model)
+    zeroed = copy.deepcopy(model)
+    _, real_last = overfit_single_batch(real, xb, yb, criterion, steps=steps, lr=lr)
+    _, zero_last = overfit_single_batch(zeroed, torch.zeros_like(xb), yb, criterion, steps=steps, lr=lr)
+    uses_input = zero_last > real_last * 1.2
+    return {
+        "real_input_last_loss": real_last,
+        "zeroed_input_last_loss": zero_last,
+        "uses_input_signal": bool(uses_input),
+        "note": "zeroed 不明显更差 → 模型可能没在用输入（信息泄漏 / 记忆标签）。",
+    }
+
+
 def run_sanity_checks(model, xb, yb, criterion):
-    """汇总跑前 4 条自检并打印报告。
+    """汇总跑链路 4 条 + 配方阶段2 两条自检并打印报告。
 
     参数:
         model: nn.Module。
         xb, yb: 一个固定小 batch。
         criterion: 损失函数。
+    说明:
+        loss@init 与 input-independent baseline 需在"未训练"的初始模型上看才有意义，
+        故放在会改变权重的 overfit 检查之前运行。
     """
+    print("=" * 56)
+    print("[阶段2] 验证 init loss（应接近理论先验）")
+    print(verify_loss_at_init(model, xb, yb, criterion))
+
+    print("=" * 56)
+    print("[阶段2] input-independent baseline（置零输入应明显更差）")
+    print(input_independent_baseline(model, xb, yb, criterion))
+
     print("=" * 56)
     print("[第4条] logits 契约检查")
     print(check_logits_contract(model, xb, criterion))
