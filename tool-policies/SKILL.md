@@ -1,6 +1,6 @@
 ---
 name: tool-policies
-description: Designs an agent's runtime tool layer — a uniform tool interface, risk-tiered policy gating, approval-required hard stops, deterministic stubs, and POJO-validated playbooks. Use when adding or modifying an agent's runtime tools, policies, or playbooks. Triggers on tool registry, policy gate, approval gating, or runtime playbooks.
+description: Runtime tool policies for agents: uniform tool interface, tool registry, risk-tiered policy gates, approval-required hard stops, deterministic stubs, and POJO-validated playbooks. Use when adding or changing runtime tools, policies, approval gates, or playbooks.
 ---
 
 # Designing Agent Tool Policies
@@ -32,7 +32,8 @@ side effects stay controlled and high-risk actions can't fire unapproved.
 1. Read your tools/knowledge spec and the tool-interface type first.
 2. TDD: register a tool, invoke a read-only one, assert a high-risk tool throws approval-required.
 3. Register the tool in the default registry and export it.
-4. Verify the core package tests + typecheck.
+4. Verify the core package tests + typecheck. Done means low/medium/high/closed policy outcomes are
+   covered by tests or explicit fixtures.
 
 ## Don't
 

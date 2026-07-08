@@ -1,6 +1,6 @@
 ---
 name: mining-sessions
-description: Use when asked to mine past Codex/Claude sessions for skill friction or recurring struggles and turn them into new or improved skills (the "auto-create skills from sessions" / "scan my sessions and update the skills" task). Covers where transcripts and custom skills actually live, filtering guardian-subagent noise, and skill-vs-memory triage. Do not trigger for importing an external/open-source skill, or for authoring a skill from scratch without mining past sessions.
+description: Session mining for recurring skill friction: scan past Codex/Claude transcripts, filter guardian-subagent noise, triage skill-vs-memory candidates, and turn repeated struggles into new or improved skills. Trigger on "auto-create skills from sessions" or "scan my sessions and update skills". Do not use for external skill imports or from-scratch authoring without session evidence.
 ---
 
 # Creating Skills From Sessions
@@ -47,7 +47,8 @@ apart from *installed* packs (third-party, read-only) before touching anything.
    `CLAUDE.md` / `AGENTS.md` (e.g. 中文对话, function-level comments, Python via `uv run`
    over new `.sh`, 替换而非叠加).
 6. **Report** what you made and *why*; explicitly flag what you deliberately did **not**
-   make.
+   make. Done means every created/updated skill cites repeated session evidence, and every rejected
+   candidate is classified as skill, memory, or neither.
 
 ## Triage: skill, memory, or neither
 

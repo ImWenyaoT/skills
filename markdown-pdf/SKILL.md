@@ -1,6 +1,6 @@
 ---
 name: markdown-pdf
-description: Converts a Markdown source file into a polished, print-ready PDF — cover page, generated table of contents, syntax-highlighted code blocks, zebra-striped tables, and page-number footer. Use when the source is Markdown and the requested output is a presentable PDF/printable document/report. Do not use for resume content editing, non-Markdown conversions, or text-only Markdown edits.
+description: Markdown-to-PDF conversion for presentable printable documents/reports: cover page, generated table of contents, syntax-highlighted code, styled tables, and page-number footer. Use only when the source is Markdown and the requested output is PDF. Do not use for resume content editing, non-Markdown conversion, or text-only Markdown edits.
 ---
 
 # Converting Markdown to PDF
@@ -23,7 +23,8 @@ Turn a Markdown file into a polished, PDF-ready document.
 5. Syntax-highlight fenced code blocks.
 6. Render pipe tables as HTML tables with alternating row backgrounds.
 7. Save a self-contained HTML artifact.
-8. Export/print the artifact to PDF with a page-number footer.
+8. Export/print the artifact to PDF with a page-number footer. Done means both the HTML artifact and
+   final PDF exist, and the PDF opens with headings, code blocks, tables, and footer intact.
 
 ## Failure behavior
 

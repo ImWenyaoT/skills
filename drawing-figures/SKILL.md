@@ -1,6 +1,6 @@
 ---
 name: drawing-figures
-description: Use when budgeting or producing publication-quality academic paper figures, including Elsevier-style journal figures, CVPR/ICCV/NeurIPS appendix figures, architecture diagrams, Ours-vs-baseline scatters, result stitches, and efficiency plots. Can derive word/figure/palette budgets from references and draw with the bundled matplotlib figkit. Do not use for language review, caption-only edits, or submission packaging.
+description: Publication figure budgeting and production for academic papers: reference-derived word/figure/palette budgets, Elsevier/CVPR/ICCV/NeurIPS figures, architecture diagrams, Ours-vs-baseline scatters, result stitches, efficiency plots, and bundled matplotlib figkit outputs. Do not use for language review, caption-only edits, or submission packaging.
 ---
 
 # drawing-figures
@@ -30,7 +30,9 @@ All figures produced by this skill follow these non-negotiable rules:
 
 ## Phase A — Budget
 
-Run these four scripts in order against your reference corpus. All scripts use `uv run` with zero or minimal extra deps.
+Run these four scripts in order against your reference corpus. All scripts use `uv run` with zero or
+minimal extra deps. Done means the budget output records section word counts, figure/table counts,
+palette, and caption patterns, or explicitly marks any missing corpus artifact.
 
 ### 1. Section word-count budget
 
@@ -318,3 +320,7 @@ uv run --with pillow scripts/stitch.py \
 # 3. QA
 uv run --with pillow --with matplotlib scripts/annotate_renders.py --config qa_spec.json
 ```
+
+Done means each final figure has the requested source artifact, a 600 dpi raster or vector export as
+appropriate, fonts/palette checked against the design system, and a caption/finding that matches the
+paper text.

@@ -1,6 +1,6 @@
 ---
 name: agent-evals
-description: Builds or modifies an agent evaluation/regression loop — evaluator interface, async fire-and-forget turn scoring, golden-case export, failure-case lifecycle, regression harness, score thresholds, and review of low-scoring turns. Use for agent scoring/eval workflows. Do not use for storage schema or persistence-only trace fields — that is a storage concern, not eval.
+description: Agent eval loops for scoring turns and preventing regressions: evaluator interfaces, async fire-and-forget scoring, golden-case export, failure-case lifecycle, thresholds, harnesses, and low-score review. Do not use for storage schema or persistence-only trace fields.
 ---
 
 # Running Agent Eval Loops
@@ -31,6 +31,8 @@ Status flips via a simple UPDATE; no auto-archival. Pick an explicit score thres
 2. TDD: extend the matching test, run it red, then implement.
 3. Reuse check: confirm the scoring/extraction isn't already in the legacy service before adding it.
 4. Verify at package level (storage, core), then typecheck; if you touched the web layer, build it.
+   Done means the scoring path is non-blocking, the lifecycle statuses are covered, and golden export
+   matches the known-good sample.
 
 ## Don't
 

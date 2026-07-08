@@ -1,6 +1,6 @@
 ---
 name: agent-loops
-description: Designing an agent loop inside a stateless request handler that advances one bounded step per request — capping internal turns, modeling terminality/handoff states, continuing after tools, intent-routing retrieval vs cheap paths — and wiring a vendor agent SDK (e.g. the OpenAI Agents SDK) behind the loop's provider boundary. Use when implementing or modifying such a loop or its step contract, facing "one step per request" / terminality / handoff semantics, or integrating an agent-SDK runner / multi-provider config behind a single import site.
+description: Bounded agent loops in stateless request handlers: one step per request, capped internal turns, terminality/handoff states, post-tool continuation, cheap-vs-retrieval intent routing, and vendor agent SDK runners behind one provider boundary. Use for loop/step-contract changes, "one step per request", terminality, handoff semantics, or single-import SDK integration.
 ---
 
 # Building Bounded Agent Loops
@@ -26,6 +26,8 @@ never run an open-ended conversation loop that could spin unbounded.
 2. Implement the smallest loop change that passes.
 3. Keep the loop package depending on provider *interfaces*, not SDK internals.
 4. Verify at the package level, then the smallest integration build that exercises a route handler.
+   Done means one request cannot exceed the configured turn cap, every step returns an explicit terminal
+   state, and cheap intents skip retrieval/tools.
 
 ## Don't
 

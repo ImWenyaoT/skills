@@ -1,6 +1,6 @@
 ---
 name: bridging-legacy
-description: Wraps a legacy service or module behind a compatibility adapter instead of rewriting it, preserving old sanitization, templates, memory, or behavior while a new path is built. Use when integrating legacy code during a migration, and on mentions of legacy adapters, compatibility lanes, build-before-import ordering, or keeping a fallback alive.
+description: Compatibility adapters for legacy services during migration: preserve old sanitization, templates, memory, behavior, build-before-import ordering, and fallback lanes while a new path is built. Do not use for greenfield rewrites.
 ---
 
 # Bridging Legacy Services
@@ -23,3 +23,4 @@ The old code is the proven lane until the new path is fully validated.
 3. Add regression coverage in the package where behavior changes.
 4. Build the legacy package; if a new-path layer imports or wraps it, build that too.
 5. If the change also alters the agent loop's behavior, re-verify that bounded-step design separately.
+   Done means the adapter path and fallback path are both tested or explicitly verified.

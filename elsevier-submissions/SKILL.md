@@ -1,6 +1,6 @@
 ---
 name: elsevier-submissions
-description: Assembles a finished LaTeX manuscript into an Editorial Manager submission, revision, resubmission, or response-to-reviewers packet for an Elsevier journal. Covers statement order (CRediT, declarations, acknowledgements, data availability), abstract/highlights/graphical-abstract limits, single- vs double-column strategy, flat ASCII source zip, cover letter, and defensive writing/self-citation checks.
+description: Elsevier Editorial Manager packaging for a finished LaTeX manuscript: initial submission, revision, resubmission, response-to-reviewers packet, statement order, highlights/abstract/graphical-abstract limits, single-vs-double-column strategy, flat ASCII source zip, cover letter, and defensive-writing/self-citation checks.
 ---
 
 # Packaging Elsevier Submissions
@@ -80,7 +80,8 @@ with zero undefined references. Marked-diff PDF for revisions: `make-marked-pdf.
 ## Final check
 
 Walk `docs/_archive/paper-pipeline/knowledge-work-half/submission/checklist_initial.md`
-(initial) or `checklist_revision.md` (revision) line by line before declaring ready.
+(initial) or `checklist_revision.md` (revision) line by line before declaring ready. Done means the
+packet matches the current EM step, not just the generic author guide.
 
 ## 投稿材料 md → EM DOCX
 

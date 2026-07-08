@@ -1,6 +1,6 @@
 ---
 name: spec-first
-description: Enforces a spec-first workflow in a codebase with governing specs, PRDs, or architecture docs. Use when a change alters code behavior, public interfaces, architecture/package boundaries, agent-loop contracts, runtime lanes, memory/trace semantics, or domain vocabulary that those docs define. Do not trigger for ordinary README edits, typo fixes, or projects without governing docs.
+description: Spec-first changes in docs-backed codebases: update governing specs, PRDs, or architecture docs before behavior, public-interface, package-boundary, runtime-lane, agent-loop, memory/trace, or domain-vocabulary changes. Do not use for ordinary README edits, typo fixes, or projects without governing docs.
 ---
 
 # Making Spec-First Changes
@@ -15,7 +15,8 @@ architecture, or vocabulary, **update the docs before the code.**
 3. If it alters behavior, state, architecture, or vocabulary → update the spec/docs first, then code.
 4. Keep domain vocabulary stable; don't rename established runtime concepts casually.
 5. Add or update focused tests for the package you changed.
-6. Verify package-level first, then the smallest root-level check that proves integration.
+6. Verify package-level first, then the smallest root-level check that proves integration. Done means
+   the governing doc and code describe the same behavior and vocabulary.
 
 ## Don't
 

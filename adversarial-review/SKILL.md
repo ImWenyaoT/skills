@@ -1,12 +1,12 @@
 ---
 name: adversarial-review
-description: Dispatches an independent, read-only sub-agent to attack a piece of work's assumptions and surface blockers. Use when the user explicitly asks for adversarial verification, an independent reviewer, "is this actually done", high-risk release/readiness checks, or validation of sub-agent results. Do not trigger for ordinary implementation, normal test runs, or routine completion summaries.
+description: Adversarial review for explicitly requested independent verification: read-only reviewer, "is this actually done", high-risk readiness/release checks, blocker hunting, or validation of sub-agent results. Do not use for ordinary implementation, routine tests, or normal completion summaries.
 ---
 
 # Running Adversarial Subagent Reviews
 
-Before calling non-trivial work done, dispatch an **independent, read-only sub-agent to attack the
-assumptions** — to surface what the doer rationalized past.
+Before calling non-trivial work done, dispatch an **independent, read-only sub-agent** to attack
+assumptions and surface blockers the doer may have rationalized past.
 
 ## Rules
 
@@ -18,7 +18,8 @@ assumptions** — to surface what the doer rationalized past.
   not to praise.
 - Give it concrete artifacts: files changed, commands run, known risks, and the intended acceptance
   criteria.
-- The controller decides and integrates; unresolved P0/P1 findings **block completion**.
+- The controller decides and integrates; unresolved P0/P1 findings **block completion**. Done means
+  every P0/P1 is either fixed, explicitly accepted by the user, or still listed as blocking.
 - Don't recursively review the review process itself, unless you are changing this skill's rules.
 
 ## Prompt shape

@@ -1,6 +1,6 @@
 ---
 name: training-models
-description: Engineers neural-network/deep-learning training end-to-end and debugs its silent failures — the full Karpathy lifecycle (inspect data, build an end-to-end skeleton with dumb baselines, overfit, regularize, tune, squeeze). Default stack Python + PyTorch with uv/ruff/ty/pytest; also JAX/TF. Use when loss does not decrease, train/eval metrics disagree, gradients explode/vanish, accuracy is stuck, inference is wrong, a model cannot overfit one batch, or when setting up / sanity-checking / structuring a training run from scratch; also for training-loop code review. Covers Karpathy's full "Recipe for Training Neural Networks" (6 stages) plus an extended engineering checklist, minimal reproductions, and fixes.
+description: Neural-network training discipline and silent-failure debugging: Karpathy lifecycle, PyTorch training-loop review, loss not decreasing, stuck accuracy, train/eval mismatch, exploding/vanishing gradients, wrong inference, failed one-batch overfit, init-loss checks, dumb baselines, and from-scratch training pipeline setup. Default stack is Python + PyTorch with uv/ruff/ty/pytest; JAX/TF are secondary.
 ---
 
 # 神经网络训练:配方 + 错误自检
@@ -11,7 +11,7 @@ description: Engineers neural-network/deep-learning training end-to-end and debu
 - **训练配方(6 阶段)**——预防并定位 bug 的**搭建顺序**(下一节)。很多 bug 其实是**跳过了某个阶段**。
 - **bug 自检清单(14 条)**——已经出事时的**反向排查**(再下面),每条「症状 → 为什么 → 怎么查 → 怎么改」。
 
-> 用法:从零搭训练用「训练配方」按阶段推进;现场"训练不对劲"则跳到「自检清单」逐条排查——多数收敛类问题命中前 3 条,多数"结果错乱/精度怪"命中后 3 条。
+> 用法:从零搭训练用「训练配方」按阶段推进;现场"训练不对劲"则跳到「自检清单」逐条排查——多数收敛类问题命中前 3 条,多数"结果错乱/精度怪"命中后 3 条。完成标准:能给出最小复现、关键 sanity check 结果、命中的陷阱和对应修复,或明确说明哪一步仍未通过。
 
 ## 技术栈约定
 

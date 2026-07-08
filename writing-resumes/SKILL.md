@@ -1,6 +1,6 @@
 ---
 name: writing-resumes
-description: Use when writing, editing, or reviewing a technical/product/engineering resume — turning task lists into quantified results-first bullets with strong action verbs, tailoring per role/JD, writing skills and self-evaluation sections, and cutting to one page. Triggers on "review my resume", "rewrite this bullet", "tailor to this job", or resume content work. Do not use for academic paper bios, submission cover letters, or PDF-only export/layout.
+description: Technical/product/engineering resume writing and review: results-first quantified bullets, strong action verbs, role/JD tailoring, skills and self-evaluation sections, one-page cuts, "review my resume", "rewrite this bullet", and "tailor to this job". Do not use for academic paper bios, submission cover letters, or PDF-only export/layout.
 ---
 
 # Writing Technical Resumes
@@ -88,3 +88,5 @@ layers: **what it is / how you did it / quantified result**.
 Run the full resume through [references/checklist.md](references/checklist.md) when done. Layout
 principles (tool-agnostic): [references/layout.md](references/layout.md). Verb standard:
 [references/verb-list.md](references/verb-list.md). Worked examples: [references/writing-method.md](references/writing-method.md).
+Done means every edited bullet is honest, non-duplicative, role-relevant, and either quantified or
+explicitly left unquantified because no defensible metric exists.

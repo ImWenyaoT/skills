@@ -1,6 +1,6 @@
 ---
 name: apple-hig
-description: Use when building, refining, or reviewing the interaction, components, and patterns of a frontend — web app, blog, dashboard, or agent/chat UI — so it genuinely follows Apple's Human Interface Guidelines (HIG). Covers HIG components (navigation bar, tab bar, buttons, lists, sheets, alerts, forms, pickers, search, menus), interaction (touch targets, gestures, focus, states, feedback, motion), and patterns (modality, onboarding, loading/empty/error states, settings, data entry, confirmation), and maps each HIG rule to web HTML/CSS/ARIA; also answers native iOS/iPadOS/macOS/watchOS/tvOS/visionOS HIG questions. 触发词:让我的 blog/网页/agent 界面符合 Apple HIG、苹果设计规范、组件交互模式、像原生一样、HIG 审查。Do not use for Android or Material Design, generic chart/figure/diagram drawing, or non-UI backend logic.
+description: Apple HIG review and implementation for frontend interaction, components, and patterns: web apps, blogs, dashboards, agent/chat UI, and native Apple platforms. Trigger on Apple HIG, 苹果设计规范, 像原生一样, HIG 审查, touch targets, focus states, sheets, alerts, tab bars, onboarding, loading/empty/error states, or web HTML/CSS/ARIA mappings. Do not use for Android/Material, chart/figure drawing, or backend logic.
 ---
 
 # apple-hig
@@ -24,7 +24,8 @@ Android/Material Design, and does not write backend logic.
    Read only the file(s) you need.
 4. **Answer with the rule + the concrete mapping** (e.g. "≥44×44 pt → `min-height/min-width: 44px`"),
    and cite the official HIG page from the routing index for anything beyond this bundle.
-5. **For "is my UI compliant?" requests**, switch to Review mode (below).
+5. **For "is my UI compliant?" requests**, switch to Review mode (below). Done means every reported
+   finding states the HIG rule, the violated location, and the concrete web/native fix.
 
 ## The HIG mindset (apply before any specific rule)
 
@@ -114,7 +115,8 @@ When asked to audit/grade an existing frontend:
    walk interaction → components → patterns → foundations and report each finding as
    **rule → where it's violated → the fix (with the web mapping)**, citing the official HIG page.
 
-3. Summarize as a short scorecard (pass / needs-work per area) plus the prioritized fixes.
+3. Summarize as a short scorecard (pass / needs-work per area) plus the prioritized fixes. Done
+   means the mechanical findings and judgment findings are reconciled, not reported as separate truths.
 
 ## Sources & attribution
 
