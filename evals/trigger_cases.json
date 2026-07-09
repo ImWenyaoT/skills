@@ -80,6 +80,13 @@
       "notes": "Generic Markdown PDF conversion."
     },
     {
+      "id": "markdown-pdf-positive-zh-export",
+      "prompt": "把这个 Markdown 报告导出成适合打印和分享的 PDF，需要目录、代码高亮和页码。",
+      "expected_skills": ["markdown-pdf"],
+      "forbidden_skills": ["writing-resumes"],
+      "notes": "Chinese Markdown-to-PDF conversion prompt."
+    },
+    {
       "id": "markdown-pdf-negative-doc-edit",
       "prompt": "Rewrite this Markdown section to make the argument clearer, but do not export anything.",
       "expected_skills": [],
@@ -192,11 +199,25 @@
       "notes": "Drawing paper figures, not submission packaging."
     },
     {
+      "id": "drawing-figures-positive-zh-architecture",
+      "prompt": "帮我给这篇 CVPR 论文画方法架构图和 Ours-vs-baseline 散点图，要求 600 dpi、配色统一、可直接放进 LaTeX。",
+      "expected_skills": ["drawing-figures"],
+      "forbidden_skills": ["writing-papers"],
+      "notes": "Chinese publication figure production prompt."
+    },
+    {
       "id": "drawing-figures-negative-caption",
       "prompt": "Rewrite this Figure 3 caption and verify the text-table linkage.",
       "expected_skills": ["writing-papers"],
       "forbidden_skills": ["drawing-figures"],
       "notes": "Paper review/editing, not drawing a new figure."
+    },
+    {
+      "id": "drawing-figures-negative-zh-caption-only",
+      "prompt": "只帮我重写 Figure 2 的 caption，并检查正文里对这张图的引用是否逻辑自洽，不要画新图。",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["drawing-figures"],
+      "notes": "Chinese caption-only hard negative for figure drawing."
     },
     {
       "id": "spec-first-positive-architecture",
@@ -246,6 +267,20 @@
       "expected_skills": ["writing-papers"],
       "forbidden_skills": ["elsevier-submissions"],
       "notes": "Paper review, not finished packet."
+    },
+    {
+      "id": "elsevier-submissions-negative-generic-cover-letter",
+      "prompt": "Write a cover letter for this software engineering job application.",
+      "expected_skills": [],
+      "forbidden_skills": ["elsevier-submissions"],
+      "notes": "Generic cover letter, not Elsevier Editorial Manager packaging."
+    },
+    {
+      "id": "elsevier-submissions-negative-author-guidelines",
+      "prompt": "Compare these two academic venue websites and summarize their scope, deadlines, and formatting links so I can decide where to submit later.",
+      "expected_skills": [],
+      "forbidden_skills": ["elsevier-submissions"],
+      "notes": "Academic-adjacent venue research without a finished Elsevier submission packet."
     },
     {
       "id": "persisting-traces-positive-sqlite",
@@ -337,6 +372,20 @@
       "expected_skills": [],
       "forbidden_skills": ["writing-papers"],
       "notes": "Generic prose/doc drafting is not academic technical-paper writing."
+    },
+    {
+      "id": "writing-papers-negative-latex-invoice",
+      "prompt": "Fix the LaTeX template for this invoice so the totals align and the company logo stays in the header.",
+      "expected_skills": [],
+      "forbidden_skills": ["writing-papers"],
+      "notes": "Non-paper LaTeX formatting should not trigger academic paper writing."
+    },
+    {
+      "id": "writing-papers-negative-academic-admin",
+      "prompt": "Summarize the department seminar schedule and turn it into an email announcement for grad students.",
+      "expected_skills": [],
+      "forbidden_skills": ["writing-papers"],
+      "notes": "Academic-adjacent admin writing is not manuscript drafting or review."
     },
     {
       "id": "writing-papers-positive-core-contribution",
@@ -449,6 +498,13 @@
       "expected_skills": ["elsevier-submissions"],
       "forbidden_skills": ["writing-resumes"],
       "notes": "Academic submission cover letter, not resume."
+    },
+    {
+      "id": "writing-resumes-negative-pdf-layout-only",
+      "prompt": "My resume content is final in Markdown; just export it as a one-page PDF with better margins, fonts, and page breaks.",
+      "expected_skills": ["markdown-pdf"],
+      "forbidden_skills": ["writing-resumes"],
+      "notes": "Resume PDF/layout-only work belongs to Markdown PDF conversion, not resume content editing."
     },
     {
       "id": "apple-hig-positive-web-sheet-pattern",

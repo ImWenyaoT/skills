@@ -1,6 +1,6 @@
 ---
 name: elsevier-submissions
-description: Elsevier Editorial Manager packaging for a finished LaTeX manuscript: initial submission, revision, resubmission, response-to-reviewers packet, statement order, highlights/abstract/graphical-abstract limits, single-vs-double-column strategy, flat ASCII source zip, cover letter, and defensive-writing/self-citation checks.
+description: Elsevier Editorial Manager packaging for a finished LaTeX manuscript: initial submission, revision, resubmission, response-to-reviewers packet, statement order, highlights/abstract/graphical-abstract limits, single-vs-double-column strategy, flat ASCII source zip, manuscript submission letter, and defensive-writing/self-citation checks.
 ---
 
 # Packaging Elsevier Submissions
