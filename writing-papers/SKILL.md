@@ -1,6 +1,6 @@
 ---
 name: writing-papers
-description: Academic-paper work across four branches: structure or draft a technical paper's sections, abstract, introduction, related work, and core contribution (从零开始写论文/搭五段式结构/摘要/相关工作); review argument, logical consistency, evidence-bound conclusions, experiments, captions, and figure-text linkage (审稿/逻辑自洽/图文表联动); polish paper-specific LaTeX, AI-tone, technical claims, academic word choice such as study/investigate/pipeline/combine, and paragraph first sentences (润色论文/去 AI 味/保留技术主张); write a rebuttal or run a final redline (回复审稿意见/终稿红线). Do not use for generic English editing, blog or README drafting, non-paper LaTeX, standalone figure production, or submission packaging.
+description: Academic-paper work across four branches. Use to draft or structure a technical paper's abstract, introduction, related work, and core contribution (从零开始写论文/摘要/相关工作); review experiment narrative, captions, figure-text linkage, evidence-bound conclusions, and logical consistency (审稿/图文表联动/逻辑自洽); polish manuscript LaTeX, AI tone, technical claims, academic word choice such as study/investigate/pipeline/combine, and paragraph first-sentence discipline (论文润色/去 AI 味/保留技术主张/首句点题); or write a rebuttal or final redline (回复审稿意见/终稿红线). Do not use for generic English editing, blog or README drafting, non-paper LaTeX, standalone figure production, or submission packaging.
 ---
 
 # Writing Academic Papers

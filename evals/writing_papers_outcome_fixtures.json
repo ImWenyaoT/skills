@@ -1,11 +1,16 @@
 {
   "skill": "writing-papers",
   "status": "prepared-for-grader",
+  "verification": {
+    "offline_trigger_before": "passed: 17 skills, 83 cases",
+    "offline_trigger_after": "passed: 17 skills, 83 cases",
+    "llm_router": "skipped: credentials were present, but approval to transmit repository skill descriptions and prompts to the external router was not granted"
+  },
   "fixtures": [
     {
       "id": "latex-polish-preserves-technical-markup",
       "mode": "latex-polish",
-      "input_contract": "A paper paragraph containing \\cite{smith2024}, \\ref{fig:overview}, an inline formula, and \\label{sec:method}.",
+      "input": "Polish this LaTeX without changing its technical meaning: As shown in \\ref{fig:overview}, our score is $s=x^T y$ \\cite{smith2024}. \\label{sec:method}",
       "required_outcomes": [
         "Preserves every citation, reference, formula, and label exactly",
         "Preserves the technical claim while improving paper prose"
@@ -14,7 +19,7 @@
     {
       "id": "final-redline-clean-pass",
       "mode": "final-redline",
-      "input_contract": "A coherent final paper excerpt with no substantive correctness, consistency, or clarity defect.",
+      "input": "Run the final redline on this internally consistent excerpt: We evaluate both methods on the same held-out test set. Method A reaches 82.1% accuracy and Method B reaches 80.4%, so Method A is higher by 1.7 percentage points.",
       "required_outcomes": [
         "Returns [检测通过，无实质性问题]",
         "Does not invent stylistic findings merely to produce feedback"
@@ -23,7 +28,7 @@
     {
       "id": "experiment-analysis-is-data-bounded",
       "mode": "experiment-analysis",
-      "input_contract": "A table containing a bounded set of methods, metrics, and numeric results.",
+      "input": "Analyze only this supplied table: Method A: Accuracy 82.1, F1 79.0. Method B: Accuracy 80.4, F1 80.2. Do not infer causes or unreported experiments.",
       "required_outcomes": [
         "Every reported number and trend is supported by the supplied table",
         "Does not invent baselines, significance, causes, experiments, or conclusions"
@@ -32,7 +37,7 @@
     {
       "id": "review-findings-are-actionable",
       "mode": "manuscript-review",
-      "input_contract": "A paper excerpt containing at least one substantive evidence or consistency defect.",
+      "input": "Review this excerpt: Section 3 says the model uses no external data, but Section 4 reports pretraining on Dataset X without explanation. Report substantive findings by priority.",
       "required_outcomes": [
         "Every P0 or P1 finding identifies its location",
         "Every P0 or P1 finding states the risk",
