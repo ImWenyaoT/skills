@@ -1,0 +1,7 @@
+{
+  "panel.png": {
+    "title": "Figure QA fixture",
+    "anchors": [[0.5, 0.5, "1"]],
+    "fixes": [["1", "复核", "Check the center marker"]]
+  }
+}
