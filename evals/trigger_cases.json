@@ -244,7 +244,7 @@
       "id": "elsevier-submissions-positive-editorial",
       "prompt": "Package this finished LaTeX manuscript for Elsevier Editorial Manager with CRediT, declarations, cover letter, and flat source zip.",
       "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["drawing-figures"],
+      "forbidden_skills": ["drawing-figures", "elsevier-articles"],
       "notes": "Submission packet assembly."
     },
     {
@@ -260,6 +260,48 @@
       "expected_skills": ["elsevier-submissions"],
       "forbidden_skills": ["writing-papers"],
       "notes": "Chinese Elsevier revision packaging prompt."
+    },
+    {
+      "id": "elsevier-articles-positive-scaffold",
+      "prompt": "Scaffold a local Elsevier elsarticle manuscript and explain whether I should use preprint, review, 1p, 3p, or 5p with single-column or twocolumn output.",
+      "expected_skills": ["elsevier-articles"],
+      "forbidden_skills": ["elsevier-submissions", "writing-papers"],
+      "notes": "Elsevier article template and class-option setup, not prose authoring or EM packaging."
+    },
+    {
+      "id": "elsevier-articles-positive-compile",
+      "prompt": "My elsarticle paper fails under latexmk -pdf after adding natbib and a BibTeX bibliography; diagnose the local pdflatex build.",
+      "expected_skills": ["elsevier-articles"],
+      "forbidden_skills": ["elsevier-submissions"],
+      "notes": "Local elsarticle runtime and bibliography failure."
+    },
+    {
+      "id": "elsevier-articles-positive-zh-layout",
+      "prompt": "帮我用 elsarticle 搭一个 Elsevier 论文模板，本地要能编译，并说明单栏 preprint 和 3p,twocolumn 双栏怎么选。",
+      "expected_skills": ["elsevier-articles"],
+      "forbidden_skills": ["elsevier-submissions", "writing-papers"],
+      "notes": "Chinese Elsevier template and local compile setup."
+    },
+    {
+      "id": "elsevier-articles-negative-finished-packet",
+      "prompt": "The manuscript is finished. Build the Elsevier Editorial Manager revision packet with statements, highlights DOCX, cover letter, and the requested source zip.",
+      "expected_skills": ["elsevier-submissions"],
+      "forbidden_skills": ["elsevier-articles"],
+      "notes": "Mature-manuscript submission packaging, not article setup."
+    },
+    {
+      "id": "elsevier-articles-negative-paper-prose",
+      "prompt": "Draft and rewrite the introduction, contribution paragraphs, and evidence-backed experiment narrative of my technical paper.",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["elsevier-articles", "elsevier-submissions"],
+      "notes": "Academic prose work without Elsevier template or runtime changes."
+    },
+    {
+      "id": "elsevier-articles-negative-generic-latex",
+      "prompt": "Fix the margins, totals, company logo, and page numbers in this generic LaTeX invoice.",
+      "expected_skills": [],
+      "forbidden_skills": ["elsevier-articles", "writing-papers"],
+      "notes": "Generic non-paper LaTeX formatting must abstain."
     },
     {
       "id": "elsevier-submissions-negative-review",

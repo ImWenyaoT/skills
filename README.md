@@ -8,7 +8,7 @@
 
 本仓库优先收录**原创**且**泛用**的 skill——默认剥离项目专有信息(代码路径、内部架构、个人身份),只留通用方法论。少量高频个人项目工作流也可收录,但必须在用途说明里明确目标路径和边界。
 
-## 目录(15 个)
+## 目录(17 个)
 
 ### 🤖 Agent 工程 (Agent Engineering)
 
@@ -31,6 +31,7 @@
 |-------|------|
 | [`writing-papers`](writing-papers) | 一个 skill 覆盖**起草 + 审阅**:起草按 Stanford InfoLab/Widom 框架搭结构(标题、五段式引言、相关工作位置、正文两条 Guideline、实验、结论、未来工作、引用、附录);审阅做去 AI 味、逻辑自洽、图文联动、证据约束的数据分析、图表推荐、架构图 prompt(6 维度 + 8 输出模式 + P0/P1/P2 标签)。 |
 | [`drawing-figures`](drawing-figures) | 为 Elsevier 风格期刊论文做图:先从参考语料推导字数/图数/配色预算,再用 figkit 画架构图、Ours-vs-baseline 散点、结果拼图(600 dpi)。 |
+| [`elsevier-articles`](elsevier-articles) | 从本地 `elsarticle` 模板开始并维护 Elsevier 手稿:frontmatter、单双栏 class options、BibTeX/natbib、`pdflatex`/`latexmk` 编译诊断与 smoke。 |
 | [`elsevier-submissions`](elsevier-submissions) | 把成稿 LaTeX 手稿打包成 Editorial Manager 投稿包:声明集顺序、硬性规格、扁平 ASCII 源码 zip、cover letter。 |
 
 ### 🧠 机器学习 (Machine Learning)
