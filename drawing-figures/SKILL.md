@@ -8,7 +8,7 @@ description: Publication figure budgeting and production for academic papers: re
 A two-phase workflow for journal paper figures.
 
 - **Phase A — BUDGET**: run the stats scripts against a reference-paper corpus to learn what word counts / figure counts / palette colours are normal for your venue.
-- **Phase B — DRAW**: use figkit + diagram_primitives + stitch + measure_model + annotate_renders to produce publication-ready figures at 600 dpi.
+- **Phase B — DRAW**: use figkit + diagram_primitives + stitch + measure_model + annotate_renders to produce publication-ready figures at the target venue's required format and resolution.
 
 Reference conventions (RGB-T tracking journal papers) live in `references/`. This skill only
 **produces** figures — language review and submission packaging are out of scope.
@@ -21,8 +21,15 @@ All figures produced by this skill follow these non-negotiable rules:
 
 - **White background** (`#ffffff`) — no grey panels, no dark themes.
 - **Vivid multi-color palette** — use the `color_pick` palette from `figkit/palette_base.py`. Pick distinct, saturated hues; never use the matplotlib default cycle.
+- **CARE-Track reference palette** — when matching the CARE-Track `color_pick` look or
+  choosing from its extracted swatches, import
+  `figkit.caretrack_palette.CARETRACK_COLORPICK`; the bundled module is the canonical source,
+  so no external palette sheet is required.
 - **Fonts** — Arial or Helvetica for sans-serif elements (axes, labels, legends); Times New Roman for any serif annotation. Never use DejaVu or Computer Modern in final figures.
-- **Resolution** — export at 600 dpi, rounded to integer pixel dimensions. Use `save_fig(fig, out, dpi=600)`.
+- **Resolution** — read [references/publication-artwork.md](references/publication-artwork.md)
+  when a venue guide or submission target is known. Use the required minimum for the artwork
+  class; 600 dpi is the fallback for raster output, not a universal guarantee. Prefer PDF for
+  vector-native plots and diagrams.
 - **High density** — pack information; do not shrink font sizes to fit. Open a small canvas so text is naturally large, then scale in the paper.
 - **Journal figure types** — framework diagrams, module-detail diagrams, PR/SR curves, attribute radars, speed-accuracy scatter/bubble charts, qualitative tracking panels, efficiency tables (as figures when trends matter).
 
@@ -140,7 +147,9 @@ save_diagram(fig, 'figures/framework')
 # -> figures/framework.pdf + figures/framework.png
 ```
 
-Deps: `matplotlib`. The `save_diagram` call writes `.pdf` + `.png` (600 dpi) with the same stem.
+Deps: `matplotlib`. The `save_diagram` call writes `.pdf` + `.png` (600 dpi) with the same
+stem. If the journal requires a higher raster minimum for line art, keep the PDF as the
+canonical vector output and raise the PNG export DPI for the upload copy.
 
 For a new paper, copy the coordinate layout section from an existing diagram file, replace labels and `SEMANTIC` keys, and call `save_diagram` with a new stem. Never rewrite the primitives themselves.
 
@@ -160,10 +169,14 @@ sys.path.insert(0, '/path/to/paper-figures/scripts')
 
 import matplotlib.pyplot as plt
 from figkit.palette_base import with_modules
+from figkit.caretrack_palette import family_colors
 from figkit.plot_helpers  import save_fig, style_axes, scatter_ours_vs_base
 
 # Build a per-paper palette (merges shared base colours with paper-specific module colours):
 palette = with_modules(GCM_FILL="#D4E8EB", GCM_STROKE="#2A6478")
+
+# Reuse the complete CARE-Track sheet by color family, ordered by source weight:
+caretrack_blues = family_colors("blue")
 
 fig, ax = plt.subplots(figsize=(5, 4))
 

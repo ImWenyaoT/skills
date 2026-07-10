@@ -17,15 +17,19 @@ runtime; this skill only diagnoses the commands and packages its bundled templat
 
 1. Read [references/elsarticle-authoring.md](references/elsarticle-authoring.md) before
    choosing class options or changing frontmatter, bibliography, or image formats.
-2. Copy `assets/minimal-article/` into the paper workspace. Keep `main.tex` and
+2. When the user supplies a Guide for Authors PDF, saved web page, or URL, read
+   [references/guide-for-authors.md](references/guide-for-authors.md). Extract the current
+   journal profile before changing the manuscript; keep journal-specific limits in the
+   paper workspace rather than treating them as publisher-wide defaults.
+3. Copy `assets/minimal-article/` into the paper workspace. Keep `main.tex` and
    `references.bib` together until the project has a reason to introduce directories.
-3. Choose one deliberate class configuration. Default to `preprint` for a readable
+4. Choose one deliberate class configuration. Default to `preprint` for a readable
    submission draft; use `review` for increased line spacing; use `1p`, `3p`, or `5p`
    only when the target journal asks for that model. Add `twocolumn` only where the model
    supports it and the journal requests it.
-4. Replace every placeholder in the frontmatter. Preserve `frontmatter` ordering and keep
+5. Replace every placeholder in the frontmatter. Preserve `frontmatter` ordering and keep
    author-affiliation keys stable while editing.
-5. Run the bundled smoke before building on the template:
+6. Run the bundled smoke before building on the template:
 
 ```bash
 python scripts/smoke_template.py
@@ -50,6 +54,8 @@ as failures. Delete generated files with `latexmk -C`, not manuscript sources.
 ## Done
 
 - The selected class options match the target journal's current author guide.
+- The journal profile records every applicable limit and distinguishes verified journal
+  requirements from reusable Elsevier conventions.
 - All frontmatter placeholders are replaced and affiliations resolve correctly.
 - The local build exits zero with no undefined references or citations.
 - The PDF uses the intended column strategy and every figure is legible.

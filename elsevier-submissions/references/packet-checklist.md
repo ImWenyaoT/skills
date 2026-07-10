@@ -1,5 +1,13 @@
 # Editorial Manager Packet Checklist
 
+## Contents
+
+- Record current requirements
+- Required manuscript backmatter order
+- Live limits and side materials
+- Extract a supplied Guide for Authors
+- Source archive when requested
+
 ## Record current requirements
 
 Before generating files, open the target journal's live Guide for Authors and the current
@@ -59,6 +67,32 @@ uv run --with python-docx scripts/md_to_docx.py highlights.md cover-letter.md --
 
 Open every generated DOCX and inspect text, author names, journal name, line wrapping, and
 page breaks. A file's existence is not a content review.
+
+## Extract a supplied Guide for Authors
+
+When a guide is supplied as a PDF, saved page, or URL, build the manifest from it instead of
+copying prose into the packet. Separate reusable publisher conventions from journal-specific
+requirements and current submission-screen requests. Record the journal, guide source,
+access date, article type, and source page or heading for every limit.
+
+Extract these categories when present:
+
+- editable manuscript and source-file requirements;
+- article-type-specific manuscript, abstract, keyword, reference, and highlights limits;
+- required declarations and their ordering or exact wording;
+- separate artwork, graphical abstract, supplement, video, and research-data files;
+- cover letter, title page, anonymized manuscript, response letter, and clean/marked revision;
+- permissions, preprint, authorship-change, competing-interest, funding, CRediT, data, and
+  generative-AI requirements.
+
+Do not retain a journal's special cover-letter questions, scope language, article types, or
+numeric limits as general Elsevier instructions. Keep those values only in the target
+packet's dated manifest. When the live submission screen disagrees with the guide about
+which files are requested now, follow the screen and preserve the discrepancy as evidence.
+
+Before deleting the supplied guide, verify that every applicable requirement is either in
+the packet manifest, represented by a checked upload artifact, or intentionally excluded as
+journal-specific material irrelevant to the current reusable skill.
 
 ## Source archive when requested
 
