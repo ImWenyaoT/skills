@@ -2,10 +2,10 @@
 """扫描 Codex / Claude 会话记录，为「从会话里提炼 skill」提供证据。
 
 用法:
-    uv run python scan_sessions.py                 # 盘点 codex+claude，过滤 guardian
-    uv run python scan_sessions.py --codex         # 只看 codex
-    uv run python scan_sessions.py --claude        # 只看 claude 真实 transcript
-    uv run python scan_sessions.py --dump <子串>   # 打印某个会话的干净对话（按文件名子串匹配）
+    uv run python mining-sessions/scripts/scan_sessions.py                 # 盘点 codex+claude，过滤 guardian
+    uv run python mining-sessions/scripts/scan_sessions.py --codex         # 只看 codex
+    uv run python mining-sessions/scripts/scan_sessions.py --claude        # 只看 claude 真实 transcript
+    uv run python mining-sessions/scripts/scan_sessions.py --dump <子串>   # 打印某个会话的干净对话（按文件名子串匹配）
 
 设计要点:
     - 只依赖标准库（无需联网/安装）。

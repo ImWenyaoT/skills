@@ -35,7 +35,7 @@ apart from *installed* packs (third-party, read-only) before touching anything.
 
 ## Procedure
 
-1. **Scan** both transcript trees with `scan_sessions.py` (guardian-filtered). Collect per
+1. **Scan** both transcript trees with `scripts/scan_sessions.py` (guardian-filtered). Collect per
    session: `cwd` + first real user ask; skill mentions; friction signals — ENOENT on a
    `SKILL.md`, repeated retries on one command, user corrections (`不对` / `重来` / `又错` /
    "doesn't work" / "you keep"), reverts.
@@ -46,9 +46,24 @@ apart from *installed* packs (third-party, read-only) before touching anything.
 5. **Author** survivors with your skill-authoring workflow — and honor the user's
    `CLAUDE.md` / `AGENTS.md` (e.g. 中文对话, function-level comments, Python via `uv run`
    over new `.sh`, 替换而非叠加).
-6. **Report** what you made and *why*; explicitly flag what you deliberately did **not**
-   make. Done means every created/updated skill cites repeated session evidence, and every rejected
-   candidate is classified as skill, memory, or neither.
+6. **Report** every candidate using the final report schema below. Done means every
+   created/updated skill cites repeated session evidence, and every rejected candidate is
+   classified as skill, memory, or neither.
+
+## Final report schema
+
+Report one row per candidate with all of these fields:
+
+| Field | Required content |
+|---|---|
+| Candidate | Short, stable name for the recurring friction or workflow. |
+| Evidence | Evidence count and the contributing session IDs. |
+| Decision | `skill`, `memory`, or `neither`. |
+| Action taken | Created/updated skill path, recorded memory action, or `none`. |
+| Rejected reason | Why no skill was created; use `not rejected` for accepted skill candidates. |
+
+Do not collapse rejected candidates into a summary count: each rejection needs its own
+evidence, decision, action, and reason so another agent can audit the triage.
 
 ## Triage: skill, memory, or neither
 
@@ -92,6 +107,7 @@ apart from *installed* packs (third-party, read-only) before touching anything.
 
 ## Scan tool
 
-`scan_sessions.py` (stdlib only) — guardian-filtered inventory of codex + claude
+`scripts/scan_sessions.py` (stdlib only) — guardian-filtered inventory of codex + claude
 transcripts with friction & skill-mention tallies, plus `--dump <id>` to print one clean
-transcript. Run `uv run python scan_sessions.py --help`.
+transcript. From the repository root, run
+`uv run python mining-sessions/scripts/scan_sessions.py --help`.
