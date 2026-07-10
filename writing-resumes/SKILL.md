@@ -1,6 +1,6 @@
 ---
 name: writing-resumes
-description: Technical/product/engineering resume writing and review: results-first quantified bullets, strong action verbs, role/JD tailoring, skills and self-evaluation sections, one-page cuts, "review my resume", "rewrite this bullet", and "tailor to this job". Do not use for academic paper bios, submission cover letters, or PDF-only export/layout.
+description: Technical/product/engineering resume content writing and review, including 中文简历/技术简历, role or JD tailoring（岗位/JD 匹配）, resume experience bullet rewriting（经历 bullet 改写）, results-first quantified achievements（量化成果）, strong action verbs, skills and self-evaluation sections, and one-page cuts. Trigger for requests such as "review my resume", "rewrite this bullet", "tailor to this job", or "按 JD 优化简历". Do not use for academic paper bios, submission cover letters, or PDF-only export/layout.
 ---
 
 # Writing Technical Resumes
