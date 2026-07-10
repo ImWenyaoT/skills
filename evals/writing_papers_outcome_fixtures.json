@@ -1,0 +1,43 @@
+{
+  "skill": "writing-papers",
+  "status": "prepared-for-grader",
+  "fixtures": [
+    {
+      "id": "latex-polish-preserves-technical-markup",
+      "mode": "latex-polish",
+      "input_contract": "A paper paragraph containing \\cite{smith2024}, \\ref{fig:overview}, an inline formula, and \\label{sec:method}.",
+      "required_outcomes": [
+        "Preserves every citation, reference, formula, and label exactly",
+        "Preserves the technical claim while improving paper prose"
+      ]
+    },
+    {
+      "id": "final-redline-clean-pass",
+      "mode": "final-redline",
+      "input_contract": "A coherent final paper excerpt with no substantive correctness, consistency, or clarity defect.",
+      "required_outcomes": [
+        "Returns [检测通过，无实质性问题]",
+        "Does not invent stylistic findings merely to produce feedback"
+      ]
+    },
+    {
+      "id": "experiment-analysis-is-data-bounded",
+      "mode": "experiment-analysis",
+      "input_contract": "A table containing a bounded set of methods, metrics, and numeric results.",
+      "required_outcomes": [
+        "Every reported number and trend is supported by the supplied table",
+        "Does not invent baselines, significance, causes, experiments, or conclusions"
+      ]
+    },
+    {
+      "id": "review-findings-are-actionable",
+      "mode": "manuscript-review",
+      "input_contract": "A paper excerpt containing at least one substantive evidence or consistency defect.",
+      "required_outcomes": [
+        "Every P0 or P1 finding identifies its location",
+        "Every P0 or P1 finding states the risk",
+        "Every P0 or P1 finding proposes a concrete executable fix"
+      ]
+    }
+  ]
+}

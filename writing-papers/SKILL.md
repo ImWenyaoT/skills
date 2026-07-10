@@ -1,6 +1,6 @@
 ---
 name: writing-papers
-description: Academic paper drafting and review: manuscript structure, title/abstract/introduction/body/experiments/conclusion/citations, Widom framework, single core contribution, anti-laundry-list intros, Karpathy good-vs-bad academic words (propose/develop vs study/investigate/pipeline/combine), paragraph first-sentence discipline, AI-tone cleanup/去 AI 味, logical self-consistency/逻辑自洽, figure-text-table linkage/图文表联动, evidence-bound claims/证据约束结论, LaTeX polish, captions, rebuttals, and final redline. Trigger on 起草论文, 搭结构, 写引言, 写摘要, contributions, 审稿, 润色, 去AI味, 终稿红线. Do not use for 600 dpi figure production or Elsevier submission packaging.
+description: Academic-paper work across four branches: structure or draft a technical paper's sections, abstract, introduction, related work, and core contribution (从零开始写论文/搭五段式结构/摘要/相关工作); review argument, logical consistency, evidence-bound conclusions, experiments, captions, and figure-text linkage (审稿/逻辑自洽/图文表联动); polish paper-specific LaTeX, AI-tone, technical claims, academic word choice such as study/investigate/pipeline/combine, and paragraph first sentences (润色论文/去 AI 味/保留技术主张); write a rebuttal or run a final redline (回复审稿意见/终稿红线). Do not use for generic English editing, blog or README drafting, non-paper LaTeX, standalone figure production, or submission packaging.
 ---
 
 # Writing Academic Papers
@@ -27,7 +27,12 @@ description: Academic paper drafting and review: manuscript structure, title/abs
 - **压缩/删减是审阅(后期)的默认,不是起草(前期)的默认**:起草时该把话说全,别用"微调只动 5–15 词"的尺子卡自己。
 - **结构性 bullet(Summary of Contributions、Future Work)是 Widom 认可的写法,审阅时不要抹平成段落**;审阅里"别把段落改成列表"只针对**分析性散文**(如实验分析段),不针对这类结构性枚举。
 
-完成标准:起草时所有缺失事实用 `[作者补充]` 标出;审阅时每个 P0/P1 都指出证据位置、风险和可执行修复。
+完成标准按模式验收:
+
+- **起草**:所有缺失事实用 `[作者补充]` 标出,实验叙述中的数字和趋势只来自用户提供的数据。
+- **LaTeX 润色**:保留 `\cite`、`\ref`、公式、标签和原有技术含义。
+- **终稿红线**:只报告实质性问题;没有实质性问题时输出 `[检测通过，无实质性问题]`。
+- **审阅**:每个 P0/P1 都给出证据位置、风险和可执行修复。
 
 ## 起草模式(drafting from scratch)
 
