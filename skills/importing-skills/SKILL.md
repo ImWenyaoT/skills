@@ -1,6 +1,6 @@
 ---
 name: importing-skills
-description: External skill adoption: vet community/open-source/copied/forked skills, check provenance and license, choose use-as-is vs adapt vs clean-room rewrite, and record attribution. Do not use for mining your own sessions or authoring a brand-new skill from scratch.
+description: 'External skill adoption: vet community/open-source/copied/forked skills, check provenance and license, choose use-as-is vs adapt vs clean-room rewrite, and record attribution. Do not use for mining your own sessions or authoring a brand-new skill from scratch.'
 ---
 
 # Adopting Open Source Skills

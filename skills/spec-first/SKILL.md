@@ -1,6 +1,6 @@
 ---
 name: spec-first
-description: Spec-first changes in docs-backed codebases: update governing specs, PRDs, or architecture docs before behavior, public-interface, package-boundary, runtime-lane, agent-loop, memory/trace, or domain-vocabulary changes. Do not use for ordinary README edits, typo fixes, or projects without governing docs.
+description: 'Spec-first changes in docs-backed codebases: update governing specs, PRDs, or architecture docs before behavior, public-interface, package-boundary, runtime-lane, agent-loop, memory/trace, or domain-vocabulary changes. Do not use for ordinary README edits, typo fixes, or projects without governing docs.'
 ---
 
 # Making Spec-First Changes

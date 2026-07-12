@@ -1,6 +1,6 @@
 ---
 name: markdown-pdf
-description: Markdown-to-PDF conversion for presentable printable documents/reports: cover page, generated table of contents, syntax-highlighted code, styled tables, and page-number footer. Use only when the source is Markdown and the requested output is PDF. Do not use for resume content editing, non-Markdown conversion, or text-only Markdown edits.
+description: 'Markdown-to-PDF conversion for presentable printable documents/reports: cover page, generated table of contents, syntax-highlighted code, styled tables, and page-number footer. Use only when the source is Markdown and the requested output is PDF. Do not use for resume content editing, non-Markdown conversion, or text-only Markdown edits.'
 ---
 
 # Converting Markdown to PDF

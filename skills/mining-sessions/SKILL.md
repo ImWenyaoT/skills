@@ -1,6 +1,6 @@
 ---
 name: mining-sessions
-description: Session mining for recurring skill friction: scan past Codex/Claude transcripts, filter guardian-subagent noise, triage skill-vs-memory candidates, and turn repeated struggles into new or improved skills. Trigger on "auto-create skills from sessions" or "scan my sessions and update skills". Do not use for external skill imports or from-scratch authoring without session evidence.
+description: 'Session mining for recurring skill friction: scan past Codex/Claude transcripts, filter guardian-subagent noise, triage skill-vs-memory candidates, and turn repeated struggles into new or improved skills. Trigger on "auto-create skills from sessions" or "scan my sessions and update skills". Do not use for external skill imports or from-scratch authoring without session evidence.'
 ---
 
 # Creating Skills From Sessions

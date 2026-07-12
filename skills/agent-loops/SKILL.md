@@ -1,6 +1,6 @@
 ---
 name: agent-loops
-description: Bounded agent loops in stateless request handlers: one step per request, capped internal turns, explicit terminality/handoff states, post-tool continuation, cheap-vs-retrieval intent routing, and vendor agent SDK runners behind a single-import provider boundary. Use when changing a loop contract, handoff semantics, or single-import SDK integration.
+description: 'Bounded agent loops in stateless request handlers: one step per request, capped internal turns, explicit terminality/handoff states, post-tool continuation, cheap-vs-retrieval intent routing, and vendor agent SDK runners behind a single-import provider boundary. Use when changing a loop contract, handoff semantics, or single-import SDK integration.'
 ---
 
 # Building Bounded Agent Loops

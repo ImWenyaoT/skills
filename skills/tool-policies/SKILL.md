@@ -1,6 +1,6 @@
 ---
 name: tool-policies
-description: Runtime tool policies for agents: uniform tool interface, tool registry, risk-tiered policy gates, approval-required hard stops, deterministic stubs, and POJO-validated playbooks. Use when adding or changing runtime tools, policies, approval gates, or playbooks.
+description: 'Runtime tool policies for agents: uniform tool interface, tool registry, risk-tiered policy gates, approval-required hard stops, deterministic stubs, and POJO-validated playbooks. Use when adding or changing runtime tools, policies, approval gates, or playbooks.'
 ---
 
 # Designing Agent Tool Policies

@@ -1,6 +1,6 @@
 ---
 name: adversarial-review
-description: Adversarial review for explicitly requested independent verification: read-only reviewer, "is this actually done", high-risk readiness/release checks, blocker hunting, or validation of sub-agent results. Do not use for ordinary implementation, routine tests, or normal completion summaries.
+description: 'Adversarial review for explicitly requested independent verification: read-only reviewer, "is this actually done", high-risk readiness/release checks, blocker hunting, or validation of sub-agent results. Do not use for ordinary implementation, routine tests, or normal completion summaries.'
 ---
 
 # Running Adversarial Subagent Reviews

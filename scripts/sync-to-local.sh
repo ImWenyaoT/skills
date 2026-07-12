@@ -19,7 +19,7 @@ AGENTS_SKILLS_DIR="${AGENTS_SKILLS_DIR:-$HOME/.agents/skills}"
 sync_one() {
   local target="$1" n=0
   mkdir -p "$target"
-  for d in "$REPO"/*/; do
+  for d in "$REPO"/skills/*/; do
     [ -f "${d}SKILL.md" ] || continue   # 只同步 skill 目录(跳过 scripts/ 等)
     local name; name="$(basename "$d")"
     rm -rf "${target:?}/$name"

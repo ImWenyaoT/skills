@@ -16,7 +16,8 @@ import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.join(REPO_ROOT, "skills")
 NAME_RE = re.compile(r"^[a-z0-9-]+$")
 RESERVED = ("anthropic", "claude")
 SKIP = {"scripts", ".git", ".github"}
@@ -56,6 +57,13 @@ def main() -> int:
             continue  # 非 skill 目录
         count += 1
         text = open(skill_md, encoding="utf-8").read()
+        for line_no, line in enumerate(text.splitlines(), start=1):
+            if line.startswith("description: "):
+                value = line.removeprefix("description: ").strip()
+                if ": " in value and not value.startswith(("'", '"')):
+                    errors.append(
+                        f"{name}:{line_no}: description 含冒号时必须加 YAML 引号"
+                    )
         fm = parse_frontmatter(text)
         nm, desc = fm.get("name", ""), fm.get("description", "")
 

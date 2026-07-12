@@ -1,6 +1,6 @@
 ---
 name: agent-evals
-description: Agent eval loops for scoring turns and preventing regressions: evaluator interfaces, async fire-and-forget scoring, golden-case export, failure-case lifecycle, thresholds, harnesses, and low-score review. Do not use for storage schema or persistence-only trace fields.
+description: 'Agent eval loops for scoring turns and preventing regressions: evaluator interfaces, async fire-and-forget scoring, golden-case export, failure-case lifecycle, thresholds, harnesses, and low-score review. Do not use for storage schema or persistence-only trace fields.'
 ---
 
 # Running Agent Eval Loops

@@ -1,6 +1,6 @@
 ---
 name: persisting-traces
-description: Trace and memory persistence for agent sessions: migration-safe structured store, JSON fallback, storage schemas, SQLite/DB repositories, session state, memory snapshots, trace rows, and debug/eval fields as stored data. Do not use for evaluator scoring, golden export, or failure-case lifecycle design.
+description: 'Trace and memory persistence for agent sessions: migration-safe structured store, JSON fallback, storage schemas, SQLite/DB repositories, session state, memory snapshots, trace rows, and debug/eval fields as stored data. Do not use for evaluator scoring, golden export, or failure-case lifecycle design.'
 ---
 
 # Persisting Agent Memory and Traces

@@ -1,6 +1,6 @@
 ---
 name: apple-hig
-description: Apple HIG review and implementation for frontend interaction, components, and patterns: web apps, blogs, dashboards, agent/chat UI, and native Apple platforms. Trigger on Apple HIG, 苹果设计规范, 像原生一样, HIG 审查, touch targets, focus states, sheets, alerts, tab bars, onboarding, loading/empty/error states, or web HTML/CSS/ARIA mappings. Do not use for Android/Material, chart/figure drawing, or backend logic.
+description: 'Apple HIG review and implementation for frontend interaction, components, and patterns: web apps, blogs, dashboards, agent/chat UI, and native Apple platforms. Trigger on Apple HIG, 苹果设计规范, 像原生一样, HIG 审查, touch targets, focus states, sheets, alerts, tab bars, onboarding, loading/empty/error states, or web HTML/CSS/ARIA mappings. Do not use for Android/Material, chart/figure drawing, or backend logic.'
 ---
 
 # apple-hig

@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
+SKILLS_ROOT = ROOT / "skills"
 EVALS = ROOT / "evals" / "trigger_cases.json"
 SKIP = {"scripts", ".git", ".github", "evals"}
 NONE_LABEL = "<none>"  # explicit abstain class so "fire nothing" is first-class
@@ -73,6 +74,7 @@ class Skill:
     name: str
     path: Path
     description: str
+    user_invoked: bool
 
 
 @dataclass(frozen=True)
@@ -113,7 +115,7 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 def load_skills() -> dict[str, Skill]:
     """Load all local skill names and descriptions from first-level folders."""
     skills: dict[str, Skill] = {}
-    for child in sorted(ROOT.iterdir()):
+    for child in sorted(SKILLS_ROOT.iterdir()):
         if not child.is_dir() or child.name in SKIP or child.name.startswith("."):
             continue
         skill_md = child / "SKILL.md"
@@ -123,7 +125,12 @@ def load_skills() -> dict[str, Skill]:
         name = metadata.get("name", "")
         description = metadata.get("description", "")
         if name:
-            skills[name] = Skill(name=name, path=skill_md, description=description)
+            skills[name] = Skill(
+                name=name,
+                path=skill_md,
+                description=description,
+                user_invoked=metadata.get("disable-model-invocation", "").lower() == "true",
+            )
     return skills
 
 
@@ -180,7 +187,14 @@ def similarity(prompt: str, skill: Skill) -> float:
 
 def rank_skills(prompt: str, skills: dict[str, Skill]) -> list[tuple[str, float]]:
     """Rank skills by deterministic metadata similarity for smoke testing."""
-    scored = [(name, similarity(prompt, skill)) for name, skill in skills.items()]
+    normalized_prompt = prompt.lower().replace("_", "-")
+    scored = [
+        (name, similarity(prompt, skill))
+        for name, skill in skills.items()
+        if not skill.user_invoked
+        or name in normalized_prompt
+        or name.replace("-", " ") in normalized_prompt
+    ]
     return sorted(scored, key=lambda item: (-item[1], item[0]))
 
 
@@ -219,6 +233,8 @@ def smoke_test_metadata(cases: list[Case], skills: dict[str, Skill]) -> list[str
     """Run a cheap metadata-only overlap smoke test to flag broad descriptions."""
     failures: list[str] = []
     for case in cases:
+        if any(skills[name].user_invoked for name in case.expected_skills):
+            continue
         ranked = rank_skills(case.prompt, skills)
         top_name, top_score = ranked[0]
         expected = set(case.expected_skills)

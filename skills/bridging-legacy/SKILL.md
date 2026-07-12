@@ -1,6 +1,6 @@
 ---
 name: bridging-legacy
-description: Compatibility adapters for legacy services during migration: preserve old sanitization, templates, memory, behavior, build-before-import ordering, and fallback lanes while a new path is built. Do not use for greenfield rewrites.
+description: 'Compatibility adapters for legacy services during migration: preserve old sanitization, templates, memory, behavior, build-before-import ordering, and fallback lanes while a new path is built. Do not use for greenfield rewrites.'
 ---
 
 # Bridging Legacy Services
