@@ -1,17 +1,54 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyd
 *.egg-info/
+.python-version
 .venv/
 venv/
 env/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.hypothesis/
+.tox/
+.nox/
 .coverage
+.coverage.*
+coverage.xml
 htmlcov/
 
-# OS / editor
+# JavaScript / package managers
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local caches and temporary files
+.cache/
+.tmp/
+tmp/
+temp/
+*.tmp
+*.log
+
+# Build and generated artifacts
+build/
+dist/
+site/
+*.zip
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+.sync-local.env
+
+# OS and editors
 .DS_Store
 Thumbs.db
 *.swp
@@ -20,9 +57,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Build artifacts
-dist/
-*.zip
-
-# Local sync targets (machine-specific; see .sync-local.env.example)
-.sync-local.env
+# Agent-local state; distributable skills live under skills/
+.claude/
+.codex/
+.agents/

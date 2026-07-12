@@ -21,15 +21,13 @@ transcript locations, editable skill homes, cross-runtime placement, and common 
 
 1. **Scan** both transcript trees with `scripts/scan_sessions.py` (guardian-filtered). Collect per
    session: `cwd` + first real user ask; skill mentions; friction signals — ENOENT on a
-   `SKILL.md`, repeated retries on one command, user corrections (`不对` / `重来` / `又错` /
-   "doesn't work" / "you keep"), reverts.
+   `SKILL.md`, repeated retries on one command, user corrections, and reverts.
 2. **Cluster** by `cwd` + first-ask to surface the recurring task domains.
 3. **Triage** each candidate (table below).
 4. **Merge before creating**: search the current skill library first and update the nearest
    existing skill when the new pattern is a variant, not a new workflow.
-5. **Author** survivors with your skill-authoring workflow — and honor the user's
-   `CLAUDE.md` / `AGENTS.md` (e.g. 中文对话, function-level comments, Python via `uv run`
-   over new `.sh`, 替换而非叠加).
+5. **Author** survivors with your skill-authoring workflow and honor the repository's
+   `CLAUDE.md` / `AGENTS.md`, language, tool, and replacement conventions.
 6. **Report** every candidate using the final report schema below. Done means every
    created/updated skill cites repeated session evidence, and every rejected candidate is
    classified as skill, memory, or neither.

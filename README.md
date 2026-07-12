@@ -1,8 +1,10 @@
 # Agent Skills
 
+[简体中文](README.md) | [English](README.en.md)
+
 [![validate-skills](https://github.com/ImWenyaoT/skills/actions/workflows/validate-skills.yml/badge.svg)](https://github.com/ImWenyaoT/skills/actions/workflows/validate-skills.yml)
 
-Tian Wenyao 维护的一组可组合 Agent Skills，适用于 Codex、Claude Code 及其他兼容
+由 Tian Wenyao 维护的一组可组合 Agent Skills，适用于 Codex、Claude Code 及其他兼容
 [Agent Skills](https://agentskills.io) 的工具。
 
 这些 skills 来自真实工作流，强调可预测的过程、明确的完成标准和渐进披露。仓库采用两层设计：
@@ -97,10 +99,18 @@ docs/research/             # 设计审计与研究记录
 ## 维护
 
 ```bash
-python3 scripts/validate_skills.py
-python3 scripts/evaluate_skill_triggers.py
-python3 -m py_compile $(find . -path ./.git -prune -o -name '*.py' -print)
+# 与 CI 相同的完整检查（需要 matplotlib 和 Pillow）
+./scripts/ci.sh
+
+# 核心仓库脚本 branch coverage，最低 70%
+./scripts/coverage.sh
+
+# 官方安装器 discovery
+npx skills@latest add . --list
 ```
+
+GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
+上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 18 个 skills。
 
 如需继续维护本地镜像，可运行 `./scripts/sync-to-local.sh`。仓库仍是唯一源，本地安装目录只是镜像。
 

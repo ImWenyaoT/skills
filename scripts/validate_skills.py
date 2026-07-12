@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from pathlib import Path
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT = os.path.join(REPO_ROOT, "skills")
@@ -56,7 +57,7 @@ def main() -> int:
         if not os.path.isfile(skill_md):
             continue  # 非 skill 目录
         count += 1
-        text = open(skill_md, encoding="utf-8").read()
+        text = Path(skill_md).read_text(encoding="utf-8")
         for line_no, line in enumerate(text.splitlines(), start=1):
             if line.startswith("description: "):
                 value = line.removeprefix("description: ").strip()
@@ -93,7 +94,7 @@ def main() -> int:
             for rf in sorted(os.listdir(refdir)):
                 if not rf.endswith(".md"):
                     continue
-                rtext = open(os.path.join(refdir, rf), encoding="utf-8").read()
+                rtext = Path(refdir, rf).read_text(encoding="utf-8")
                 if rtext.count("\n") + 1 > 100 and "## Contents" not in rtext:
                     warnings.append(f"{name}/references/{rf}: >100 行但无 '## Contents' 目录")
 
