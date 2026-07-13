@@ -18,6 +18,12 @@ regressions into a golden set — **without slowing or breaking the user-facing 
   so it never blocks or fails the user turn; only run it when both storage and an evaluator exist.
 - **Golden export is zero-dependency and schema-stable.** Hand-write the golden format and match the
   existing golden schema exactly — compare against a known-good sample before changing it.
+- Split **deterministic product assertions** from judge-only quality signals. Run contains/action/
+  schema checks without invoking a judge; only scenarios that declare a score threshold pay for one.
+- Report scenario start, completion, and elapsed time. A multi-turn scenario can legitimately outlive
+  one request timeout; diagnose against the scenario deadline before calling the runner hung.
+- Treat provider timeouts and model variance as evidence, not prompt-edit instructions. Stabilize
+  deterministic regressions and stop before the prompt is overfit to a single golden run.
 
 ## Failure-case lifecycle
 
@@ -30,9 +36,13 @@ Status flips via a simple UPDATE; no auto-archival. Pick an explicit score thres
 1. Read the eval plan/spec and the existing evaluator + golden samples first.
 2. TDD: extend the matching test, run it red, then implement.
 3. Reuse check: confirm the scoring/extraction isn't already in the legacy service before adding it.
-4. Verify at package level (storage, core), then typecheck; if you touched the web layer, build it.
+4. Run the deterministic lane first. Before the model/judge lane, declare its repeat count, request
+   timeout, scenario deadline, and spend/time budget; stop at that bound and classify remaining
+   variation instead of extending the run ad hoc.
+5. Verify at package level (storage, core), then typecheck; if you touched the web layer, build it.
    Done means the scoring path is non-blocking, the lifecycle statuses are covered, and golden export
-   matches the known-good sample.
+   matches the known-good sample without making judge availability a prerequisite for deterministic
+   pass/fail evidence.
 
 ## Don't
 

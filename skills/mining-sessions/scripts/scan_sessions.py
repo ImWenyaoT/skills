@@ -19,6 +19,7 @@ import argparse
 import glob
 import json
 import os
+import re
 from collections import Counter, defaultdict
 
 CODEX_GLOB = os.path.expanduser("~/.codex/sessions/**/*.jsonl")
@@ -33,6 +34,28 @@ FRICTION = [
 ]
 # skill 关注词：用于发现哪些 skill 被用、是否伴随报错
 SKILL_KW = ["skill", "skill.md", ".agents/skills", ".claude/skills", "superpowers"]
+
+RUNTIME_BLOCK_PREFIX_RE = re.compile(
+    r"^<(environment_context|user_instructions|recommended_plugins)(?:\s[^>]*)?>"
+    r".*?</\1>\s*",
+    re.DOTALL | re.IGNORECASE,
+)
+AGENTS_PREAMBLE_RE = re.compile(
+    r"^# AGENTS\.md instructions.*?(?:</INSTRUCTIONS>|</environment_context>)\s*",
+    re.DOTALL | re.IGNORECASE,
+)
+
+
+def strip_runtime_preamble(text: str) -> str:
+    """只剥离消息开头连续的运行时注入块，保留正文中的同名标签。"""
+    text = text.strip()
+    while text:
+        cleaned = RUNTIME_BLOCK_PREFIX_RE.sub("", text, count=1)
+        cleaned = AGENTS_PREAMBLE_RE.sub("", cleaned, count=1).strip()
+        if cleaned == text:
+            break
+        text = cleaned
+    return text
 
 
 def iter_lines(path):
@@ -89,8 +112,8 @@ def first_user_ask(lines: list[dict]) -> str:
                     text += seg.get("text", "")
         elif isinstance(content, str):
             text = content
-        text = text.strip()
-        if not text or text.startswith(("<environment_context>", "<user_instructions>", "#")):
+        text = strip_runtime_preamble(text)
+        if not text or text.startswith("#"):
             continue
         if "My request for Codex:" in text:
             text = text.split("My request for Codex:")[-1].strip()

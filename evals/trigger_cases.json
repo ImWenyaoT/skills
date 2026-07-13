@@ -66,6 +66,13 @@
       "notes": "Legacy integration, not SDK abstraction."
     },
     {
+      "id": "bridging-legacy-positive-delete-proven-fallback",
+      "prompt": "The replacement lane now owns production and passes deterministic plus integration baselines. Migrate still-valid behavior contracts, then remove the unused legacy fallback, parser, switches, and legacy-only tests without widening scope.",
+      "expected_skills": ["bridging-legacy"],
+      "forbidden_skills": ["agent-loops"],
+      "notes": "A compatibility migration includes a deletion gate, not permanent fallback retention."
+    },
+    {
       "id": "bridging-legacy-negative-greenfield",
       "prompt": "Build a new stateless agent loop from scratch with terminal states and bounded turns.",
       "expected_skills": ["agent-loops"],
@@ -367,6 +374,13 @@
       "notes": "Trace/memory storage boundary."
     },
     {
+      "id": "persisting-traces-positive-ui-hydration",
+      "prompt": "The agent messages are present in SQLite, but they disappear when I switch conversations or restart the Next.js dev server. Close the UI-to-API-to-database hydration loop and keep tests isolated.",
+      "expected_skills": ["persisting-traces"],
+      "forbidden_skills": ["agent-evals"],
+      "notes": "Stored rows are incomplete until the product can read and hydrate them."
+    },
+    {
       "id": "persisting-traces-negative-golden",
       "prompt": "Export golden cases from low-scoring agent turns and set score thresholds.",
       "expected_skills": ["agent-evals"],
@@ -486,6 +500,13 @@
       "notes": "Readiness challenge."
     },
     {
+      "id": "adversarial-review-positive-remote-delivery",
+      "prompt": "Local tests are green and the branch was pushed. Before release, independently inspect the remote CI conclusion, failed-step logs, annotations, and ahead-behind state for blockers.",
+      "expected_skills": ["adversarial-review"],
+      "forbidden_skills": ["agent-evals"],
+      "notes": "High-risk release readiness needs remote evidence, not local self-attestation."
+    },
+    {
       "id": "adversarial-review-negative-normal-work",
       "prompt": "Implement the requested feature and run the normal unit tests.",
       "expected_skills": [],
@@ -512,6 +533,13 @@
       "expected_skills": ["agent-evals"],
       "forbidden_skills": ["training-models"],
       "notes": "Agent regression evaluation."
+    },
+    {
+      "id": "agent-evals-positive-deterministic-before-judge",
+      "prompt": "Our golden suite fails whenever the LLM judge times out even though action and contains assertions pass. Separate deterministic product checks from judge-only score thresholds and report per-scenario timing.",
+      "expected_skills": ["agent-evals"],
+      "forbidden_skills": ["training-models"],
+      "notes": "Judge availability must not erase deterministic regression evidence."
     },
     {
       "id": "agent-evals-negative-model-training",

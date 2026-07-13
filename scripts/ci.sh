@@ -10,7 +10,7 @@ python3 -m unittest discover -s skills/elsevier-submissions/tests -p 'test_*.py'
 
 while IFS= read -r file; do
   python3 -m py_compile "$file"
-done < <(find . -path ./.git -prune -o -name '*.py' -print)
+done < <(find . \( -path ./.git -o -path ./.cache \) -prune -o -name '*.py' -print)
 
 bash -n scripts/ci.sh scripts/sync-to-local.sh
 git diff --check

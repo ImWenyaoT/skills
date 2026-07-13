@@ -21,7 +21,8 @@ transcript locations, editable skill homes, cross-runtime placement, and common 
 
 1. **Scan** both transcript trees with `scripts/scan_sessions.py` (guardian-filtered). Collect per
    session: `cwd` + first real user ask; skill mentions; friction signals — ENOENT on a
-   `SKILL.md`, repeated retries on one command, user corrections, and reverts.
+   `SKILL.md`, repeated retries on one command, user corrections, and reverts. Treat injected blocks
+   such as plugin recommendations and environment metadata as runtime noise, not user asks.
 2. **Cluster** by `cwd` + first-ask to surface the recurring task domains.
 3. **Triage** each candidate (table below).
 4. **Merge before creating**: search the current skill library first and update the nearest
