@@ -1,0 +1,6 @@
+interface:
+  display_name: "Offer Magic"
+  short_description: "串联岗位理解、简历交付与面试准备，同时保持各审查角色的输入边界"
+  default_prompt: "使用 $offer-magic 从目标岗位、简历一直准备到面试回答。"
+policy:
+  allow_implicit_invocation: false

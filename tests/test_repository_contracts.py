@@ -23,7 +23,7 @@ class RepositoryContractTests(unittest.TestCase):
             capture_output=True,
         )
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
-        self.assertIn("Loaded 18 skills", completed.stdout)
+        self.assertIn("Loaded 19 skills", completed.stdout)
 
     def test_repository_skills_pass_structure_validation(self) -> None:
         completed = subprocess.run(
@@ -33,7 +33,7 @@ class RepositoryContractTests(unittest.TestCase):
             capture_output=True,
         )
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
-        self.assertIn("18 个 skill", completed.stdout)
+        self.assertIn("19 个 skill", completed.stdout)
 
 
 if __name__ == "__main__":

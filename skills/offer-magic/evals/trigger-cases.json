@@ -1,0 +1,112 @@
+[
+  {
+    "query": "$offer-magic 帮我从岗位判断一直走到简历和行为面试准备",
+    "expected_skill": "offer-magic",
+    "invocation": "explicit"
+  },
+  {
+    "query": "这是岗位描述，帮我拆出硬条件、实际工作和团队环境",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "这个职位值得投吗？我的经历和要求有哪些直接匹配与缺口？",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "根据这份 JD 预测最可能追问的技术和产品主题，但先不要改简历",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "把这个从招聘网页复制下来的 txt JD 清理成一岗一份的标准 Markdown",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "review my resume，只给初筛意见，不要修改文件",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "把我的简历针对这个岗位重写，并核对每个数字和 ownership",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "保持内容不变，把简历排成一页 A4 并导出 PDF 和打码预览",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "这份 HTML 简历底部空白太大、顶部又太挤，请像前端页面一样调整 CSS 并验证 PDF",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "根据我的简历和已有材料建立一份稳定的候选人画像，缺信息再问我",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "把我的论文、个人特点和长期方向浓缩成三句话，但先不要放进简历",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "把这段真实经历整理成一个 90 秒 STAR 答案",
+    "expected_skill": "grill-interview",
+    "invocation": "implicit"
+  },
+  {
+    "query": "根据简历 bullet 帮我准备三分钟项目介绍和追问证据",
+    "expected_skill": "grill-interview",
+    "invocation": "implicit"
+  },
+  {
+    "query": "结合这份简历、题库和两次真实面经，分析面试官会如何沿项目 bullet 深挖",
+    "expected_skill": "grill-interview",
+    "invocation": "implicit"
+  },
+  {
+    "query": "模拟一轮行为面试，每次只问一道题，并把真实故事存进故事库",
+    "expected_skill": "grill-interview",
+    "invocation": "implicit"
+  },
+  {
+    "query": "这份简历已经改了很多轮，现在还有必须微调的地方吗，还是应该冻结？",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "分别检查两份目标 JD 的匹配度、关键词和整体是否 solid",
+    "expected_skill": "grill-resume",
+    "invocation": "implicit"
+  },
+  {
+    "query": "把普通产品说明书 PDF 转成三张 PNG",
+    "expected_skill": null,
+    "invocation": "implicit"
+  },
+  {
+    "query": "把这篇论文摘要浓缩成三句话",
+    "expected_skill": null,
+    "invocation": "implicit"
+  },
+  {
+    "query": "帮我准备 Python、数据库和操作系统技术面试题",
+    "expected_skill": "grill-interview",
+    "invocation": "implicit"
+  },
+  {
+    "query": "这个 Python 程序运行时报错，帮我定位并修复",
+    "expected_skill": null,
+    "invocation": "implicit"
+  },
+  {
+    "query": "分析这个产品为什么失败，给我商业模式建议",
+    "expected_skill": null,
+    "invocation": "implicit"
+  }
+]

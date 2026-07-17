@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grill Resume"
+  short_description: "先按目标岗位拷打，再完成简历写作、审查、排版、导出与验证"
+  default_prompt: "使用 $grill-resume 根据目标岗位拷打并优化我的简历。"

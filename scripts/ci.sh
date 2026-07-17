@@ -3,6 +3,9 @@ set -euo pipefail
 
 python3 scripts/validate_skills.py
 python3 scripts/evaluate_skill_triggers.py
+python3 skills/offer-magic/scripts/validate-bundle.py
+python3 skills/offer-magic/grill-resume/scripts/test-prepare-review-packet.py
+python3 skills/offer-magic/grill-resume/scripts/test-validate-review-report.py
 python3 -W error::ResourceWarning -m unittest discover -s tests -v
 python3 -m unittest discover -s skills/drawing-figures/tests -p 'test_*.py' -v
 python3 -m unittest discover -s skills/elsevier-articles/tests -p 'test_*.py' -v

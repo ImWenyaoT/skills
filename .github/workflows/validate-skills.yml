@@ -68,4 +68,4 @@ jobs:
           output="$(npx --yes skills@latest add . --list)"
           printf '%s\n' "$output"
           clean="$(printf '%s' "$output" | sed -E $'s/\\x1B\\[[0-9;?]*[ -/]*[@-~]//g')"
-          grep -F 'Found 18 skills' <<<"$clean"
+          grep -F 'Found 19 skills' <<<"$clean"

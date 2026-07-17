@@ -570,10 +570,24 @@
       "notes": "Tool policy, not vendor SDK wiring."
     },
     {
+      "id": "offer-magic-positive-end-to-end",
+      "prompt": "$offer-magic 帮我从岗位判断、简历改写一直准备到行为面试回答。",
+      "expected_skills": ["offer-magic"],
+      "forbidden_skills": ["writing-resumes"],
+      "notes": "Explicit end-to-end job application orchestration belongs to Offer Magic."
+    },
+    {
+      "id": "offer-magic-positive-english",
+      "prompt": "Use $offer-magic to evaluate this role, tailor my resume, and prepare defensible interview answers.",
+      "expected_skills": ["offer-magic"],
+      "forbidden_skills": ["writing-resumes"],
+      "notes": "English explicit invocation of the end-to-end application workflow."
+    },
+    {
       "id": "writing-resumes-positive-bullet",
       "prompt": "Rewrite this technical resume bullet into a quantified results-first statement with stronger action verbs.",
       "expected_skills": ["writing-resumes"],
-      "forbidden_skills": ["writing-papers"],
+      "forbidden_skills": ["writing-papers", "offer-magic"],
       "notes": "Resume content editing."
     },
     {
@@ -587,7 +601,7 @@
       "id": "writing-resumes-positive-zh-bullet",
       "prompt": "帮我把这条技术简历经历改成量化成果导向的 bullet，并按这个后端开发 JD 调整。",
       "expected_skills": ["writing-resumes"],
-      "forbidden_skills": ["writing-papers"],
+      "forbidden_skills": ["writing-papers", "offer-magic"],
       "notes": "Chinese technical resume bullet prompt."
     },
     {

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "stable_harness_profile",
+    "resume": "28 届电子信息硕士。二作发表 HGD-Net 于 Information Sciences。Luup：构建可评测、可恢复的 Multi-Agent 科研 Harness，完成 125 道题交付。Chatty：构建单 Agent 客服 Harness，用 14 个标准场景验证任务闭环与风险边界。",
+    "jd": "招聘 Agent 应用开发实习生，负责 Agent Harness、任务编排、工具调用、评测与失败恢复。",
+    "expect": {
+      "profile_terms": ["Harness"],
+      "allowed_recommendations": ["advance", "hold"]
+    }
+  },
+  {
+    "id": "unsupported_seniority",
+    "resume": "团队负责人设计系统架构；候选人负责部署和接口联调。候选人主导设计全部系统并领导项目从零落地。未提供决策范围、代码、测试或交付依据。",
+    "jd": "招聘后端开发实习生，参与接口实现、联调和测试。",
+    "expect": {
+      "required_categories": ["distinctiveness"],
+      "allowed_recommendations": ["hold", "reject"]
+    }
+  },
+  {
+    "id": "grounded_design",
+    "resume": "从零设计客服任务状态机，明确补充信息、工具执行、人工接管三类终点；本人负责状态转换和风险边界，并用 14 个标准场景验证，失败样本可复现。",
+    "jd": "招聘 Agent 工程实习生，负责对话任务闭环、工具安全和评测。",
+    "expect": {
+      "profile_terms": ["14"],
+      "allowed_recommendations": ["advance", "hold"]
+    }
+  },
+  {
+    "id": "common_work_bloat",
+    "resume": "项目介绍：完成服务部署、接口实现、数据库接入和日志接入。要点一：实现服务部署。要点二：实现接口。要点三：集成数据库。要点四：接入日志。要点五：完成联调。",
+    "jd": "招聘软件开发实习生，要求能实现、测试并维护后端服务。",
+    "expect": {
+      "required_categories": ["selection"],
+      "allowed_recommendations": ["hold", "reject"]
+    }
+  },
+  {
+    "id": "coherent_distinct_bullets",
+    "resume": "面向客服任务构建 Agent Harness。任务闭环：限定工具、轮次与完成条件。风险边界：区分直接允许、审批和拒绝。评测恢复：用独立样本定位失败并保存检查点。",
+    "jd": "招聘 Agent 应用开发实习生，关注任务编排、工具风险与评测。",
+    "expect": {
+      "forbidden_categories": ["selection", "narrative_alignment"],
+      "allowed_recommendations": ["advance", "hold"]
+    }
+  },
+  {
+    "id": "split_narrative",
+    "resume": "经历一：训练低光增强视觉模型。经历二：运营校园短视频账号。经历三：分析股票因子。其他信息：希望同时申请算法研究、内容运营与量化交易岗位。",
+    "jd": "招聘 Agent 应用开发实习生，负责工具调用和任务编排。",
+    "expect": {
+      "required_categories": ["narrative_alignment"],
+      "allowed_recommendations": ["hold", "reject"]
+    }
+  },
+  {
+    "id": "first_internship_calibration",
+    "resume": "28 届硕士，正在寻找第一份实习。课程项目中构建 Agent 工具调用、状态恢复和 20 个测试场景；明确记录个人实现范围和未完成部分。",
+    "jd": "招聘 Agent 开发实习生，接受在校生，要求有相关项目和测试意识。",
+    "expect": {
+      "forbidden_categories": ["confusion", "narrative_alignment"],
+      "allowed_recommendations": ["advance", "hold"]
+    }
+  },
+  {
+    "id": "general_review_without_jd",
+    "resume": "电子信息硕士。二作发表论文。持续构建 Agent Harness 项目，覆盖任务编排、工具边界与评测恢复。",
+    "jd": "[No target JD provided; perform a general resume review.]",
+    "expect": {
+      "profile_terms": ["Agent Harness"],
+      "allowed_recommendations": ["advance", "hold"]
+    }
+  }
+]

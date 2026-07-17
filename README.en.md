@@ -67,6 +67,7 @@ npx skills add . --skill paper-workflow
 | Skill | Purpose |
 |---|---|
 | [`training-models`](skills/training-models) | Build, review, and debug neural-network training workflows. |
+| [`offer-magic`](skills/offer-magic) | Orchestrate a job application from role decision and resume delivery through interview preparation. |
 | [`writing-resumes`](skills/writing-resumes) | Write results-oriented technical and product resumes. |
 | [`markdown-pdf`](skills/markdown-pdf) | Convert Markdown into a polished printable PDF. |
 | [`apple-hig`](skills/apple-hig) | Review and implement interactions against Apple HIG. |
@@ -114,7 +115,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions runs repository and bundled skill tests on Python 3.11 and 3.13, enforces branch
-coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 18 skills.
+coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 19 skills.
 
 Run `./scripts/sync-to-local.sh` if you still maintain local mirrors. This repository remains the
 single source of truth; installed directories are mirrors.

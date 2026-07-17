@@ -66,6 +66,7 @@ npx skills add . --skill paper-workflow
 | Skill | 用途 |
 |---|---|
 | [`training-models`](skills/training-models) | 搭建、审查和诊断神经网络训练流程。 |
+| [`offer-magic`](skills/offer-magic) | 从岗位判断、简历交付一路编排到面试准备。 |
 | [`writing-resumes`](skills/writing-resumes) | 编写成果导向的技术或产品简历。 |
 | [`markdown-pdf`](skills/markdown-pdf) | 将 Markdown 转为适合打印的 PDF。 |
 | [`apple-hig`](skills/apple-hig) | 审查并实现符合 Apple HIG 的交互。 |
@@ -110,7 +111,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
-上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 18 个 skills。
+上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 19 个 skills。
 
 如需继续维护本地镜像，可运行 `./scripts/sync-to-local.sh`。仓库仍是唯一源，本地安装目录只是镜像。
 
