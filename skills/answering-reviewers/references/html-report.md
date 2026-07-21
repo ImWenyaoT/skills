@@ -65,7 +65,13 @@ concrete evidence" and "provide evidence" translate to nearly the same sentence,
 a reviewer who has already decided your evidence is thin.
 
 So in the verbatim English, bold the words that carry force. In the translation, keep the English
-word in parentheses at the matching place, because that is the part the Chinese cannot carry.
+word in parentheses at the matching place.
+
+The parenthesis is a backstop, not a licence to translate loosely. Spend the most care on exactly
+these words: reach for the Chinese that carries the same temperature (`确凿的证据`, not `具体的
+证据`, for **concrete evidence**), then put the English beside it for the residue that no
+translation carries. A flat translation with an English word bolted on still reads as a neutral
+request, which is the failure this whole section exists to prevent.
 
 Five families are usually worth marking:
 
@@ -126,6 +132,18 @@ author under pressure forgets exists.
 Mark one option as recommended and say why in one clause. A page that recommends nothing pushes
 the whole decision back to the reader, which is the work the page exists to reduce.
 
+**The options are a starting set, not the whole space.** They exist to cut the cost of deciding,
+by showing the routes that are already understood and what each one costs. The author knows
+things the page does not — a colleague with the dataset, a reviewer's known preference, an idea
+that arrived this morning. So every card carries a fourth choice, `另议`, with a free-text field,
+and picking it is a legitimate outcome rather than a failure to decide. When it is chosen, the
+next move is a conversation, and the page records what came out of that conversation.
+
+Write the options as a recommendation with its reasoning attached, never as a verdict. The
+difference shows in one word: *"B is recommended — the two colour spaces R1 named cost 3 GPU days
+and CIECAM02 can be addressed in prose"* invites disagreement on the reasoning; *"Choose B"*
+does not.
+
 An option that answers no comment id does not belong here at all. Unasked work is a new attack
 surface paid for with the hours the asked-for work needed.
 
@@ -141,19 +159,34 @@ A fixed bar at the bottom shows how many comments have a decision, and holds one
 copies a compact digest to the clipboard:
 
 ```
-KNOSYS-D-26-06552 · 2026-07-21
-R1-1 doing            R1-2 done
-R1-3 todo  → B (Lab+Luv only, CIECAM02 explained in letter)
-R1-4 todo  → A
-...
+KNOSYS-D-26-06552 · 2026-07-21 · 决策 7/11
+R1-1 done
+R1-2 doing
+R1-3 todo  → B  Lab+Luv only, CIECAM02 explained in letter
+R1-4 todo  → 另议  先问问同组有没有 LLIV-Phone 的镜像
 ```
 
-Plain text, because it has to survive a paste into any agent — some never render a chooser and
-some run headless. Offer a JSON download beside it for the letter generator to consume.
+Plain text and nothing else. It has to survive a paste into any agent, and some never render a
+chooser while others run headless. Keep it short enough to paste without scrolling: ids,
+statuses, choices, and one clause of reasoning each.
 
-This is the one place where the page is an application rather than a document. Everything else
-stays static: no framework, no router, no build step. The interaction exists because the
-alternative is the reader reciting fifteen decisions into a chat box and mistyping one.
+This is the one place where the page behaves as an application rather than a document. Everything
+else stays static — no framework, no router, no build step. The interaction exists because the
+alternative is the author reciting fifteen decisions into a chat box and mistyping one.
+
+### Anchors the generator reads
+
+The digest carries decisions; the letter needs content. Rather than export a second file that can
+drift from the page, the letter generator parses the page itself, so give it stable hooks:
+
+- each card is `<article class="comment-card" data-comment-id="R1-3" data-status="todo">`
+- the fields carry fixed class names: `.verbatim`, `.translation`, `.status-now`, `.evidence`,
+  `.response-draft`, `.manuscript-change`, `.location`
+- the chosen option sits on the card as `data-choice="B"`
+- document order equals letter order
+
+One file holds the truth, and the parser fails loudly when a hook is missing rather than emitting
+a letter with a silent gap.
 
 ## Header, roll-up, and evidence
 
@@ -185,6 +218,18 @@ map onto it directly:
 
 Generate the skeleton once the verbatim text and the ids are settled — the comment blocks carry
 no risk, because they are quotations. Fill responses in as they become true.
+
+[`../scripts/render_letter.py`](../scripts/render_letter.py) does the mechanical half: it reads
+the page, escapes the LaTeX specials, and writes one file per reviewer plus the substituted
+metadata. Escaping a reviewer's `%` or `&` by hand is exactly the work that should never depend
+on attention.
+
+```bash
+python3 scripts/render_letter.py .reports/revision-<id>.html --out paper/response_letter
+```
+
+It refuses to write a card whose verbatim text is missing, because a silently empty
+`reviewercomment` is a response letter that answers a question the reviewer never sees.
 
 The order of the environments in each `Reviewers/*.tex` sets the printed numbering, so emit them
 in the letter's own order and never sort them by status or by how finished they are.
