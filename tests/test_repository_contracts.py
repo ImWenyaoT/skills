@@ -9,6 +9,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def skill_count() -> int:
+    """统计仓库内实际存在的 skill 数量(每个 skill 目录恰有一份 SKILL.md)。
+
+    契约测试断言校验脚本覆盖了全部 skill;数量从文件系统推导而非写死,
+    这样新增 skill 不会让本文件失效。
+    """
+    return len(list((ROOT / "skills").glob("*/SKILL.md")))
+
+
 class RepositoryContractTests(unittest.TestCase):
     def test_readme_language_switches_resolve(self) -> None:
         for name in ("README.md", "README.en.md"):
@@ -23,7 +32,7 @@ class RepositoryContractTests(unittest.TestCase):
             capture_output=True,
         )
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
-        self.assertIn("Loaded 19 skills", completed.stdout)
+        self.assertIn(f"Loaded {skill_count()} skills", completed.stdout)
 
     def test_repository_skills_pass_structure_validation(self) -> None:
         completed = subprocess.run(
@@ -33,7 +42,7 @@ class RepositoryContractTests(unittest.TestCase):
             capture_output=True,
         )
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
-        self.assertIn("19 个 skill", completed.stdout)
+        self.assertIn(f"{skill_count()} 个 skill", completed.stdout)
 
 
 if __name__ == "__main__":
