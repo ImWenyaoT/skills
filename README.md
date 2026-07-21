@@ -57,6 +57,7 @@ npx skills add . --skill paper-workflow
 |---|---|
 | [`paper-workflow`](skills/paper-workflow) | 用户调用的论文流程编排入口。 |
 | [`writing-papers`](skills/writing-papers) | 起草、审阅和润色技术论文。 |
+| [`answering-reviewers`](skills/answering-reviewers) | 把审稿意见当 spec 逐条实现,并渲染修回看板。 |
 | [`drawing-figures`](skills/drawing-figures) | 规划并制作出版级论文图表。 |
 | [`elsevier-articles`](skills/elsevier-articles) | 维护可复现编译的 `elsarticle` 手稿。 |
 | [`elsevier-submissions`](skills/elsevier-submissions) | 构建并检查 Editorial Manager 投稿包。 |
