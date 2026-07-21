@@ -1,0 +1,386 @@
+% =================================================================================
+% Response-to-reviewers letter template (Elsevier journals).
+% Letter-style layout (article class), compiled with pdfLaTeX -- Editorial
+% Manager's default engine:
+%
+%     latexmk -pdf main.tex
+%
+% Placeholder convention: every value that belongs to one specific paper is
+% written as {{FIELD-NAME}} -- double curly braces, ALL-CAPS, hyphen-separated.
+% The braces are LaTeX grouping characters, so an unsubstituted template still
+% compiles and the placeholder shows up in the PDF where it will be replaced.
+% Find them all with:
+%
+%     grep -ron '{{[A-Z0-9-]\+}}' .
+%
+% See README.md for the full placeholder list.
+% =================================================================================
+
+\documentclass[a4paper,twoside,11pt]{article}
+
+% --- Encoding, Language and Fonts (pdfLaTeX-compatible) ------------------------
+% Editorial Manager defaults to pdfLaTeX.  We avoid fontspec / system fonts and
+% use the standard Helvetica-compatible sans-serif family, which preserves the
+% Arial/Helvetica visual style without requiring local Arial.
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[scaled=0.95]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% --- Page Geometry --------------------------------------------------------------
+\usepackage[
+    a4paper,
+    top=2.5cm,
+    bottom=2.5cm,
+    left=1.8cm,
+    right=1.8cm,
+    headheight=14pt
+]{geometry}
+
+% --- Typography -----------------------------------------------------------------
+\usepackage{setspace}
+\setstretch{1}
+\usepackage{calc}
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{csquotes}
+
+% --- Math -----------------------------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% --- Graphics & Colors ----------------------------------------------------------
+\usepackage[dvipsnames]{xcolor}
+
+% --- Lists ----------------------------------------------------------------------
+\usepackage{enumitem}
+
+% --- Header & Footer ------------------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LO]{\leftmark}
+\fancyhead[RE]{\myJournal{} -- \myShortTitle}
+\fancyhead[RO,LE]{\thepage}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% --- Hyperlinks (loaded before tcolorbox so the two cooperate) ------------------
+\usepackage[
+    bookmarks, bookmarksopen=true, bookmarksnumbered=true,
+    colorlinks=true, linkcolor=black,
+    citecolor=blue!50!black, urlcolor=blue!50!black,
+    linktoc=all
+]{hyperref}
+
+% --- Author Affiliations --------------------------------------------------------
+\usepackage{authblk}
+\renewcommand\Affilfont{\itshape\small}
+
+% --- Bibliography ---------------------------------------------------------------
+% No bibliography package is loaded on purpose: literature references inside a
+% response letter are given inline in author-year plain text (e.g.\ ``Guo
+% et~al., CVPR 2019, ...''), so the reader can cross-check them against the
+% manuscript's own bibliography without an extra bib pass.  If you do need a
+% real bibliography, add natbib/biblatex here -- nothing else in the template
+% depends on its absence.
+
+% --- tcolorbox (visual engine) --------------------------------------------------
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% --- Pantone-inspired editorial palette -----------------------------------------
+% Coated (C) hex equivalents drawn from the Pantone Solid Coated guide; tuned
+% for legible PDF rendering.  Three families (gray / blue / green) replace the
+% default xcolor names {gray!60!black, cyan!70!black, green!45!black} so that
+% the letter reads as a single coherent palette.
+%
+% Pantone Cool Gray 10 C   -> reviewer / editor comment frame
+% Pantone Cool Gray 1 C    -> comment title fill
+\definecolor{pantonegray}{HTML}{4F5152}
+\definecolor{pantonegraytitle}{HTML}{ECEDED}
+% Pantone 295 C            -> our-response frame (deep editorial blue)
+% Pantone 657 C            -> our-response title fill
+\definecolor{pantoneblue}{HTML}{1F3A68}
+\definecolor{pantonebluetitle}{HTML}{D9E2F1}
+% Pantone 7484 C           -> revised-manuscript-text frame (forest green)
+% Pantone 558 C            -> revised-text title fill
+% Pantone 559 C 5\% tint   -> revised-text body wash
+\definecolor{pantonegreen}{HTML}{2D6A4F}
+\definecolor{pantonegreentitle}{HTML}{D8E8DC}
+\definecolor{pantonegreenbody}{HTML}{F5F9F6}
+
+% TOC entries use ``linktoc=all'' from the hyperref load, so re-pointing
+% linkcolor at Pantone blue paints the entire table of contents (entry
+% text + page numbers + dot leaders' clickable region) in the same blue
+% used for citations and URLs.  This is what gives the letter its
+% editorial-blue TOC without pulling in the elsarticle layout.
+\hypersetup{
+    linkcolor=pantoneblue,
+    citecolor=pantoneblue,
+    urlcolor=pantoneblue
+}
+
+% --- Shared base style: title bar INSIDE the box -------------------------------
+% An earlier revision of this template used ``attach boxed title to top
+% left=...'', which let each box's title float above the frame; that worked
+% aesthetically but the floating title was not reserved in the surrounding
+% paragraph flow, so on dense pages the next box's title clipped into the
+% previous box's bottom frame.  We now place the title bar INSIDE the frame.
+% Because the title is part of the box's vertical extent, it cannot collide
+% with the previous box no matter how a page break or paragraph descender
+% shifts the layout.
+\tcbset{
+    letterboxbase/.style={
+        enhanced, breakable,
+        boxrule=0.5pt,
+        arc=2pt,
+        left=10pt, right=10pt, top=4pt, bottom=8pt,
+        boxsep=2pt,
+        before skip=12pt, after skip=8pt,
+        fonttitle=\sffamily\bfseries\small,
+        coltitle=black,
+        toptitle=3pt, bottomtitle=3pt,
+        titlerule=0pt
+    }
+}
+
+% Loosen line-breaking for dense bullet items with inline math/code.
+\setlength{\emergencystretch}{2em}
+\tolerance=2500
+
+
+% =================================================================================
+% Metadata -- the six per-paper commands.  Substitute the {{...}} placeholders
+% and nothing else in this block needs to change.
+% =================================================================================
+\newcommand{\myShortTitle}{Response to reviewers}
+\newcommand{\myJournal}{{{JOURNAL-NAME}}}
+\newcommand{\myManuscriptID}{{{MANUSCRIPT-ID}}}
+\newcommand{\myManuscriptTitle}{{{MANUSCRIPT-TITLE}}}
+\newcommand{\myEditorName}{{{EDITOR-NAME}}}
+\newcommand{\myRevisionRound}{{{REVISION-ROUND}}}
+
+\newcommand{\horizontalline}{\noindent\rule{\textwidth}{0.6pt}}
+
+
+% =================================================================================
+% Counters and environments for editor / reviewer / revised-text boxes.
+%
+% NUMBERING IS BY ORDER OF APPEARANCE.  Both comment environments call
+% \stepcounter, so ``Comment 3'' is simply the third reviewercomment in the
+% file -- there is no explicit number to pass.  Reordering the environments
+% renumbers the letter.  \startReviewerSection resets the reviewer counter,
+% so every reviewer starts again at 1.
+% =================================================================================
+
+% --- Editor counters / names ----------------------------------------------------
+\newcounter{editorcomment}
+\newcommand{\currenteditorcommentfulltitle}{}
+\newcommand{\currenteditorcommentshorttitle}{}
+
+% --- Reviewer counters / names --------------------------------------------------
+\newcounter{reviewercomment}
+\newcommand{\currentreviewername}{}
+\newcommand{\currentreviewercommentfulltitle}{}
+\newcommand{\currentreviewercommentshorttitle}{}
+
+\newcommand{\startReviewerSection}[1]{%
+    \clearpage
+    \section{Response to #1}%
+    \par\nobreak\vspace{1.0\baselineskip}%
+    \setcounter{reviewercomment}{0}%
+    \gdef\currentreviewername{#1}%
+}
+
+% --- Editor comment (Pantone Cool Gray 10) -------------------------------------
+\newenvironment{editorcomment}{%
+    \stepcounter{editorcomment}%
+    \xdef\currenteditorcommentfulltitle{Editor Comment \theeditorcomment}%
+    \xdef\currenteditorcommentshorttitle{Comment \theeditorcomment}%
+    \addcontentsline{toc}{subsection}{\currenteditorcommentfulltitle}%
+    \begin{tcolorbox}[
+        letterboxbase,
+        colback=white, colframe=pantonegray,
+        colbacktitle=pantonegraytitle,
+        title=\currenteditorcommentfulltitle
+    ]%
+    \itshape
+}{%
+    \end{tcolorbox}%
+}
+
+% --- Editor response (Pantone 295 C) -------------------------------------------
+\newenvironment{editorresponse}{%
+    \addcontentsline{toc}{subsubsection}{Response to \currenteditorcommentshorttitle}%
+    \begin{tcolorbox}[
+        letterboxbase,
+        colback=white, colframe=pantoneblue,
+        colbacktitle=pantonebluetitle,
+        title=Response to \currenteditorcommentshorttitle
+    ]%
+}{%
+    \end{tcolorbox}%
+}
+
+% --- Reviewer comment (Pantone Cool Gray 10) -----------------------------------
+\newenvironment{reviewercomment}{%
+    \stepcounter{reviewercomment}%
+    \xdef\currentreviewercommentfulltitle{\currentreviewername\ Comment \thereviewercomment}%
+    \xdef\currentreviewercommentshorttitle{Comment \thereviewercomment}%
+    \addcontentsline{toc}{subsection}{\currentreviewercommentfulltitle}%
+    \begin{tcolorbox}[
+        letterboxbase,
+        colback=white, colframe=pantonegray,
+        colbacktitle=pantonegraytitle,
+        title=\currentreviewercommentfulltitle
+    ]%
+    \itshape
+}{%
+    \end{tcolorbox}%
+}
+
+% --- Reviewer response (Pantone 295 C) -----------------------------------------
+\newenvironment{reviewerresponse}{%
+    \addcontentsline{toc}{subsubsection}{Response to \currentreviewercommentshorttitle}%
+    \begin{tcolorbox}[
+        letterboxbase,
+        colback=white, colframe=pantoneblue,
+        colbacktitle=pantonebluetitle,
+        title=Response to \currentreviewercommentshorttitle
+    ]%
+}{%
+    \end{tcolorbox}%
+}
+
+% --- Revised manuscript text (Pantone 7484 C) ----------------------------------
+% Used inside a \begin{reviewerresponse} to display the exact wording that
+% has been added to the manuscript.
+\newenvironment{changes}{%
+    \begin{tcolorbox}[
+        letterboxbase,
+        colback=pantonegreenbody, colframe=pantonegreen,
+        colbacktitle=pantonegreentitle,
+        title=Revised manuscript text
+    ]%
+}{%
+    \end{tcolorbox}%
+}
+
+
+% =================================================================================
+% Author block
+% =================================================================================
+% authblk: repeat \author/\affil pairs for co-authors.  The ``*'' marks the
+% corresponding author; the matching \affil is the corresponding-author note.
+\author[a,*]{{{AUTHOR-NAME}}}
+\affil[a]{{{AUTHOR-AFFILIATION}}}
+\date{}
+
+
+\begin{document}
+
+\thispagestyle{plain}
+\title{\textbf{Response Letter to the Editor and Reviewers} \\
+       \large{\myJournal} \\[0.2em]
+       \normalsize Manuscript \myManuscriptID\ --- \myRevisionRound}
+\maketitle
+
+\vspace{-2em}
+
+% --- Manuscript Information panel ---------------------------------------------
+\begin{tcolorbox}[
+    enhanced, breakable,
+    colback=pantonegraytitle!40,
+    colframe=pantonegray,
+    boxrule=0.5pt, arc=2pt,
+    left=10pt, right=10pt, top=4pt, bottom=8pt,
+    boxsep=2pt,
+    fonttitle=\sffamily\bfseries\small,
+    coltitle=black,
+    colbacktitle=pantonegraytitle,
+    toptitle=3pt, bottomtitle=3pt,
+    titlerule=0pt,
+    title=Manuscript Information
+]
+    \begin{tabular}{@{} p{0.22\linewidth} p{0.74\linewidth} @{}}
+        \textbf{Manuscript ID:}   & \myManuscriptID \\
+        \textbf{Title:}           & \myManuscriptTitle \\
+        \textbf{Submitted to:}    & \myJournal{} (Elsevier) \\
+        \textbf{Handling Editor:} & \myEditorName \\
+        \textbf{Revision round:}  & \myRevisionRound
+    \end{tabular}
+\end{tcolorbox}
+
+\vspace{1em}
+
+% --- Opening Letter -----------------------------------------------------------
+% Keep this short and factual: thank, name the manuscript, say the revision is
+% enclosed.  No promises, no summary of results -- the summary section below is
+% where the substance goes.
+\noindent Dear \myEditorName{} and the Reviewers,
+
+\vspace{0.4em}
+
+We thank you for handling our submission and for the constructive feedback from the review panel. Please find enclosed the revised version of our manuscript entitled \enquote{\myManuscriptTitle} (\myManuscriptID), originally submitted to \myJournal. Your comments have helped us improve the clarity, completeness, and experimental rigor of the paper.
+
+\section*{Summary of Revisions Made}
+\addcontentsline{toc}{section}{Summary of Revisions Made}
+
+In this revision, we have addressed all points raised by {{REVIEWER-LIST}}. The main high-level changes are:
+
+% Every item follows the same shape:
+%   \textbf{<what changed>} (<where it landed in the manuscript>).
+%   <one or two sentences of substance, with the concrete numbers>.
+%   \emph{Addresses <comment ids>.}
+%
+% The trailing \emph{Addresses ...} sentence is not decoration: an item that
+% cannot name the comment ids it serves is work nobody asked for, and it does
+% not belong in this list.  Use \emph{Supports ...} for a change that helps a
+% comment without being the direct answer to it, and \emph{Voluntary cleanup}
+% for the small consistency fixes -- but keep those to a minimum.
+% Delete the example below and write one item per substantive change.
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=2pt]
+    \item \textbf{{{CHANGE-HEADLINE}}} (Sec.~{{SECTION}}, Table~{{TABLE}}). {{CHANGE-DESCRIPTION-WITH-CONCRETE-NUMBERS}} \emph{Addresses {{COMMENT-IDS}}.}
+\end{itemize}
+
+\section*{Point-by-Point Reply to the Reports}
+\addcontentsline{toc}{section}{Point-by-Point Reply to the Reports}
+
+Revised passages are quoted in change boxes below so that the corresponding manuscript updates are easy to locate. In this letter:
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=1pt]
+    \item The comments from the Editor and the Reviewers are typeset in \textit{italic} and enclosed in {\color{pantonegray}gray boxes}.
+    \item Our corresponding responses are presented in {\color{pantoneblue}blue boxes}.
+    \item The exact textual additions that now appear in the manuscript are showcased in {\color{pantonegreen}green boxes}.
+\end{itemize}
+
+\vspace{1em}
+\noindent With kind regards,
+
+\vspace{0.5em}
+\noindent {{AUTHOR-NAME}} (on behalf of all authors)
+
+\clearpage
+\tableofcontents
+\clearpage
+
+% =================================================================================
+% Point-by-point responses -- one file per audience, under Reviewers/.
+% Add one \input line per reviewer, in the order the decision letter uses.
+% The order of these \input lines is the order of the sections in the PDF.
+% =================================================================================
+
+% Editor / meta review
+\input{Reviewers/Editor.tex}
+
+% Reviewer 1
+\input{Reviewers/R1.tex}
+
+% Add further reviewers here, e.g.:
+% \input{Reviewers/R2.tex}
+% \input{Reviewers/R3.tex}
+
+\end{document}

@@ -1,0 +1,48 @@
+% =================================================================================
+% Reviewer 1 -- one file per reviewer, \input from main.tex.
+%
+% NUMBERING IS BY ORDER OF APPEARANCE: each \begin{reviewercomment} calls
+% \stepcounter, so the Nth reviewercomment in this file becomes ``Reviewer \#1
+% Comment N''.  There is no number to pass and no number to keep in sync --
+% but reordering the environments renumbers the letter, and the ids you cite
+% elsewhere (R1-Q3, the Summary of Revisions, the HTML board) will no longer
+% match.  Keep the environments in the order the decision letter uses.
+%
+% \startReviewerSection resets the counter, so the next reviewer file starts
+% again at Comment 1.
+%
+% Every numbered comment gets its own reviewercomment/reviewerresponse pair,
+% including the trivial ones (a typo, a missing citation).  A comment with no
+% entry reads as a comment that was ignored.
+% =================================================================================
+\startReviewerSection{Reviewer \#1}
+
+% --- R1-Q1: <one-line summary of the ask, for navigation> ----------------------
+% Paste the reviewer's words verbatim -- do not paraphrase, do not fix their
+% typos, do not merge two of their points into one box.  The environment sets
+% the text in italic already.
+\begin{reviewercomment}
+{{REVIEWER-COMMENT-VERBATIM}}
+\end{reviewercomment}
+
+% Response order: state the action taken -> show the evidence -> point to the
+% location in the revised manuscript.  Report only work that exists.
+\begin{reviewerresponse}
+We thank the reviewer for this observation. {{ACTION-TAKEN}} The revised text now appears in Sec.~{{SECTION}} of the manuscript, and {{EVIDENCE-OR-NUMBERS}}.
+\end{reviewerresponse}
+
+% --- R1-Q2: <one-line summary of the ask> --------------------------------------
+\begin{reviewercomment}
+{{REVIEWER-COMMENT-VERBATIM}}
+\end{reviewercomment}
+
+\begin{reviewerresponse}
+We agree that the original description was too compact. {{ACTION-TAKEN}} The new text reads:
+% The changes box quotes the exact wording that is now in the manuscript --
+% copy it from the revised source, do not re-write it here.  Anything inside
+% this box must be findable verbatim in the attached manuscript.
+\begin{changes}
+{{VERBATIM-REVISED-MANUSCRIPT-TEXT}}
+\end{changes}
+{{POINTER-TO-WHERE-IT-LANDED-AND-WHAT-IT-SETTLES}}
+\end{reviewerresponse}

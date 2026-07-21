@@ -1,6 +1,6 @@
 ---
 name: answering-reviewers
-description: Answers reviewer comments on a major/minor revision — treats each comment as a spec to implement, not a claim to debate, and holds the work to that spec's scope. Use when the user has a revision decision, reviewer comments, an editor's summary, a point-by-point response to reviewers, 修回, 返稿, 逐条回应, 审稿意见, or asks how to handle a specific reviewer point. Also use when the user is deciding which requested experiments to run, is about to argue that a reviewer is wrong, is considering extra experiments nobody asked for, or asks where the revision stands (进展, 现在怎么说, what now). Not for drafting or polishing the manuscript itself (that's writing-papers), nor for assembling the EM packet (that's elsevier-submissions).
+description: Answers reviewer comments on a major/minor revision — treats each comment as a spec to implement, not a claim to debate, and holds the work to that spec's scope. Use when the user has a revision decision, reviewer comments, an editor's summary, a point-by-point response to reviewers, 修回, 返稿, 逐条回应, 审稿意见, or asks how to handle a specific reviewer point. Also use when the user is deciding which requested experiments to run, is about to argue that a reviewer is wrong, is considering extra experiments nobody asked for, or asks where the revision stands (进展, 现在怎么说, what now). Does not draft or polish the manuscript prose itself, and does not assemble the Editorial Manager upload packet.
 ---
 
 # Answering Reviewers
@@ -85,12 +85,35 @@ Verify → run → write. Land the numbers first; the letter is what you write o
 
 When the schedule is tight, cut scope within each comment (fewer seeds, shorter schedule, fewer datasets) rather than dropping comments. An addressed comment at reduced scope scores; an unaddressed comment does not.
 
-## Showing the state
+## The page
 
-Status belongs in a document, not in chat. A revision carries ten to twenty comments, each with a verbatim quote, a translation, a status, and its evidence — a board the author re-reads over weeks. Chat scrollback loses it; the same summary gets retyped every few days and drifts from the truth each time.
+The revision lives on one page, not in chat. Build it the moment the decision letter arrives, in
+whatever form it came — a PDF, a `.docx`, screenshots of the submission system, or text pasted
+into the conversation. It starts as a translation of the reviewers' words and grows, comment by
+comment, into the draft of the response letter.
 
-Render the state as a self-contained HTML dashboard: whenever the user asks how things stand, whenever a batch of results lands and changes a status, and before any scope decision — they need the whole board, not the slice you happen to be holding.
+Re-render it whenever the user asks where things stand, whenever results land and change a
+status, and before any scope decision. They need the whole board, not the slice you happen to be
+holding.
 
-Two properties do the work. **Bilingual cards** put the verbatim original beside the translation, so the reviewer's exact words stay in front of you (paraphrase is how scope quietly drifts). **An evidence slot per comment** stays visibly empty until a real number fills it — intentions do not count, which is the same rule the response letter runs on.
+Three properties carry the work. **Verbatim originals beside the translation**, because
+paraphrase is how scope quietly drifts. **An evidence slot that stays visibly empty** until a real
+number fills it — intentions do not count, which is the rule the letter runs on too. And **the
+force of the reviewer's wording marked in the English**, because translation flattens it: "provide
+**concrete** evidence" is a reviewer who has already judged your evidence thin, and the Chinese
+for it reads like a neutral request.
 
-See [HTML-REPORT.md](HTML-REPORT.md) for the format.
+Offer two or three routes per open comment rather than one instruction, and let the page record
+which one the author picks. They know which GPU is free and how much of the deadline is real.
+
+See [references/html-report.md](references/html-report.md) for the format.
+
+## The response letter
+
+The page feeds a LaTeX letter; [`assets/response-letter/`](assets/response-letter/) holds the
+template. Generate the skeleton once the ids and the verbatim text are settled — those blocks are
+quotations, so they carry no risk — then fill each response in as it becomes true.
+
+Emit the comment blocks in the letter's own order. The template numbers them by counter, so the
+sequence in the file becomes the numbering the reviewer reads, and a list sorted by status
+renumbers the response.
