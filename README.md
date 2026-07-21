@@ -34,7 +34,7 @@ npx skills add ImWenyaoT/skills --all
 
 ```bash
 npx skills add . --list
-npx skills add . --skill paper-workflow
+npx skills add . --skill answering-reviewers
 ```
 
 ## Skills
@@ -55,7 +55,6 @@ npx skills add . --skill paper-workflow
 
 | Skill | 用途 |
 |---|---|
-| [`paper-workflow`](skills/paper-workflow) | 用户调用的论文流程编排入口。 |
 | [`writing-papers`](skills/writing-papers) | 起草、审阅和润色技术论文。 |
 | [`answering-reviewers`](skills/answering-reviewers) | 把审稿意见当 spec 逐条实现,并渲染修回看板。 |
 | [`drawing-figures`](skills/drawing-figures) | 规划并制作出版级论文图表。 |

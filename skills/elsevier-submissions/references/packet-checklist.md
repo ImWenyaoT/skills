@@ -30,16 +30,24 @@ generic instructions about which files are requested now.
   "source_required": true,
   "source_zip": "source.zip",
   "source_entrypoint": "main.tex",
-  "side_materials": ["highlights.docx", "cover-letter.docx"]
+  "side_materials": ["highlights.docx", "cover-letter.docx"],
+  "submission_stage": "revision",
+  "response_to_reviewers": "response.docx",
+  "marked_manuscript": "marked.pdf"
 }
 ```
 
+`submission_stage` is required and must be `initial` or `revision`. A revision must declare
+`response_to_reviewers`; `marked_manuscript` is optional but, when declared, must exist and
+differ from the clean manuscript. Unknown keys are rejected — a misspelled field would
+otherwise silently disable the check it was meant to enable.
+
 Run `python scripts/check_packet.py packet.json`. It checks freshness of the EM-step and
 live-guide evidence, enforces the recorded abstract/highlights limits, verifies structural
-statement order and real DOCX parts, checks flat ASCII source-zip names, and performs a
-standalone `latexmk` build when source is required. A missing LaTeX runtime blocks completion
-instead of becoming a false pass. If the EM step contains `source`, the manifest cannot set
-`source_required` to false.
+statement order and real DOCX parts, confirms revision files exist, checks flat ASCII
+source-zip names, and performs a standalone `latexmk` build when source is required. A missing
+LaTeX runtime blocks completion instead of becoming a false pass. If the EM step contains
+`source`, the manifest cannot set `source_required` to false.
 
 ## Required manuscript backmatter order
 

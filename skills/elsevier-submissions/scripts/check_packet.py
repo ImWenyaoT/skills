@@ -53,6 +53,9 @@ class PacketManifest:
     source_zip: Path | None
     source_entrypoint: str
     side_materials: tuple[Path, ...]
+    submission_stage: str
+    response_to_reviewers: Path | None
+    marked_manuscript: Path | None
 
 
 def resolve(base: Path, value: str) -> Path:
@@ -106,11 +109,37 @@ def parse_positive_int(raw: object, key: str, errors: list[str]) -> int | None:
     return raw
 
 
+KNOWN_MANIFEST_KEYS = frozenset(
+    {
+        "em_step",
+        "em_step_checked_on",
+        "journal_guide_url",
+        "journal_limits_checked_on",
+        "journal_limits",
+        "manuscript",
+        "source_required",
+        "source_zip",
+        "source_entrypoint",
+        "side_materials",
+        "submission_stage",
+        "response_to_reviewers",
+        "marked_manuscript",
+    }
+)
+
+SUBMISSION_STAGES = ("initial", "revision")
+
+
 def parse_manifest(raw: object, base: Path) -> tuple[PacketManifest | None, list[str]]:
     """Validate the JSON schema once before packet checks consume it."""
     if not isinstance(raw, dict):
         return None, ["manifest must be a JSON object"]
     errors: list[str] = []
+    unknown = sorted(set(raw) - KNOWN_MANIFEST_KEYS)
+    if unknown:
+        # A silently ignored key is how a misspelled revision field turns into a
+        # green packet that is missing the file it claimed to declare.
+        errors.append(f"unknown manifest key(s): {', '.join(unknown)}")
 
     def required_string(key: str) -> str:
         value = raw.get(key)
@@ -145,6 +174,21 @@ def parse_manifest(raw: object, base: Path) -> tuple[PacketManifest | None, list
     if not isinstance(source_entrypoint, str) or not source_entrypoint.strip():
         errors.append("source_entrypoint must be a non-empty path")
         source_entrypoint = "main.tex"
+
+    submission_stage = raw.get("submission_stage")
+    if submission_stage not in SUBMISSION_STAGES:
+        errors.append(f"submission_stage must be one of {' or '.join(SUBMISSION_STAGES)}")
+        submission_stage = ""
+    response_value = raw.get("response_to_reviewers")
+    if submission_stage == "revision" and (
+        not isinstance(response_value, str) or not response_value.strip()
+    ):
+        errors.append("response_to_reviewers must be a non-empty path for a revision packet")
+        response_value = None
+    marked_value = raw.get("marked_manuscript")
+    if marked_value is not None and (not isinstance(marked_value, str) or not marked_value.strip()):
+        errors.append("marked_manuscript must be a non-empty path when present")
+        marked_value = None
 
     raw_limits = raw.get("journal_limits")
     if not isinstance(raw_limits, dict):
@@ -189,7 +233,34 @@ def parse_manifest(raw: object, base: Path) -> tuple[PacketManifest | None, list
         source_zip=resolve(base, source_zip_value) if isinstance(source_zip_value, str) else None,
         source_entrypoint=source_entrypoint,
         side_materials=tuple(resolve(base, item) for item in side_values),
+        submission_stage=submission_stage,
+        response_to_reviewers=(
+            resolve(base, response_value) if isinstance(response_value, str) else None
+        ),
+        marked_manuscript=resolve(base, marked_value) if isinstance(marked_value, str) else None,
     ), []
+
+
+def check_revision(manifest: PacketManifest) -> list[str]:
+    """Require a revision packet to ship the files that answer the reviewers.
+
+    The skill's completion criteria demand a point-by-point response and a
+    clean/marked distinction. Both are declared as manifest paths, so both are
+    checkable here — declaring a path that does not exist must not pass.
+    """
+    if manifest.submission_stage != "revision":
+        return []
+    errors: list[str] = []
+    response = manifest.response_to_reviewers
+    if response is None or not response.is_file():
+        errors.append(f"response_to_reviewers is missing: {response}")
+    marked = manifest.marked_manuscript
+    if marked is not None:
+        if not marked.is_file():
+            errors.append(f"marked_manuscript is missing: {marked}")
+        elif marked.resolve() == manifest.manuscript.resolve():
+            errors.append("marked_manuscript must differ from the clean manuscript")
+    return errors
 
 
 def check_recent_date(label: str, raw_date: str, max_age_days: int) -> list[str]:
@@ -362,6 +433,7 @@ def main() -> int:
             print(f"FAIL: {error}")
         return 1
     errors.extend(check_guide(manifest, args.max_evidence_age_days))
+    errors.extend(check_revision(manifest))
     text, manuscript_errors = manuscript_text(manifest.manuscript)
     errors.extend(manuscript_errors)
     if text is not None:
