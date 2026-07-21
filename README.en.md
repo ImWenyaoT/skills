@@ -35,7 +35,7 @@ Validate or install from a local checkout:
 
 ```bash
 npx skills add . --list
-npx skills add . --skill paper-workflow
+npx skills add . --skill answering-reviewers
 ```
 
 ## Skills
@@ -56,7 +56,6 @@ npx skills add . --skill paper-workflow
 
 | Skill | Purpose |
 |---|---|
-| [`paper-workflow`](skills/paper-workflow) | User-invoked orchestration for an end-to-end paper workflow. |
 | [`writing-papers`](skills/writing-papers) | Draft, review, and polish technical papers. |
 | [`answering-reviewers`](skills/answering-reviewers) | Implement reviewer comments as a spec and render the revision board. |
 | [`drawing-figures`](skills/drawing-figures) | Plan and produce publication-ready figures. |

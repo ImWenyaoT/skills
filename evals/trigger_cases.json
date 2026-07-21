@@ -3,34 +3,6 @@
   "purpose": "Golden prompts for checking whether this repository's skill descriptions have clear trigger boundaries. These cases are not a full model trace; they define the expected trigger contract for classifier, sub-agent, or platform-trace evals.",
   "cases": [
     {
-      "id": "paper-workflow-positive-end-to-end",
-      "prompt": "Run paper-workflow to take this draft through figures, Elsevier source, and a checked submission packet.",
-      "expected_skills": ["paper-workflow"],
-      "forbidden_skills": [],
-      "notes": "Explicit end-to-end paper orchestration."
-    },
-    {
-      "id": "paper-workflow-positive-zh",
-      "prompt": "用 paper workflow 帮我从论文写作、绘图一路做到 Elsevier 投稿包。",
-      "expected_skills": ["paper-workflow"],
-      "forbidden_skills": [],
-      "notes": "Explicit Chinese invocation of the orchestrator."
-    },
-    {
-      "id": "paper-workflow-negative-prose",
-      "prompt": "Polish only this academic paragraph and preserve every technical claim.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["paper-workflow"],
-      "notes": "One discipline does not need orchestration."
-    },
-    {
-      "id": "paper-workflow-negative-figure",
-      "prompt": "Draw this already specified architecture figure as a publication-ready PDF.",
-      "expected_skills": ["drawing-figures"],
-      "forbidden_skills": ["paper-workflow"],
-      "notes": "Standalone figure work does not need orchestration."
-    },
-    {
       "id": "importing-skills-positive-import",
       "prompt": "I found an open-source agent skill on GitHub. Help me decide whether to import it as-is, adapt it, or clean-room rewrite it with attribution.",
       "expected_skills": ["importing-skills"],
