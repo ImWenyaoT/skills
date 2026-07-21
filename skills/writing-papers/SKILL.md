@@ -1,6 +1,6 @@
 ---
 name: writing-papers
-description: Academic-paper drafting, review, polishing, and rebuttal work. Use when experiment results or an algorithm need a paper structure; to draft an introduction, abstract, related work, or contribution bullets; to polish manuscript LaTeX or a NeurIPS paragraph while preserving technical claims; to review logical self-consistency, experiment narrative, captions, figure-text linkage, and evidence-bound conclusions; to remove AI tone; or to answer reviewers. Chinese triggers include 从零开始写论文, 写摘要, 写引言, 相关工作, 起草论文, 贡献列表, 润色论文 LaTeX, 去掉 AI 味, 不改变技术主张, 首句点题, 图表 caption, 证据自洽, 审稿, and 回复审稿意见. Do not use for generic editing, standalone figure production, or submission packaging.
+description: Academic-paper drafting, review, and polishing. Use when experiment results or an algorithm need a paper structure; to draft an introduction, abstract, related work, or contribution bullets; to polish manuscript LaTeX or a NeurIPS paragraph while preserving technical claims; to review logical self-consistency, experiment narrative, captions, figure-text linkage, and evidence-bound conclusions; or to remove AI tone. Chinese triggers include 从零开始写论文, 写摘要, 写引言, 相关工作, 起草论文, 贡献列表, 润色论文 LaTeX, 去掉 AI 味, 不改变技术主张, 首句点题, 图表 caption, 证据自洽, and 终稿红线. Do not use for answering reviewer comments on a revision, generic editing, standalone figure production, or submission packaging.
 ---
 
 # Writing Academic Papers
@@ -14,7 +14,6 @@ facts, experiments, citations, and method details. Mark missing inputs as `[AUTH
 |---|---|
 | Ideas, results, or outline without prose | Draft the missing structure and sections. |
 | Existing manuscript, LaTeX, data, or figures | Review and compress the existing material. |
-| Reviewer comments | Draft a point-by-point response grounded in existing evidence. |
 | Mixed material | Draft missing structure first, then review existing prose. |
 
 All branches preserve equations, citations, labels, numbers, terminology, and uncertainty.
@@ -49,14 +48,13 @@ Classify findings as P0 blocker, P1 important, or P2 local polish. Every P0/P1 m
 risk, and a concrete repair. A final redline with no substantive issue returns
 `[PASS — no substantive issues]`.
 
-## Rebuttal
-
-Split reviewer feedback into atomic concerns. For each, give acknowledgement, answer, supplied
-evidence, and the exact manuscript change. Never promise an experiment that has not been completed.
-
 ## Completion
 
 The requested branch is complete only when claims stay inside the evidence, LaTeX and technical
 meaning are preserved, figure/text relationships have been checked where applicable, and every
 unresolved author decision is explicit. Figure artifact production belongs to `drawing-figures`;
 submission packaging belongs to the relevant submission skill.
+
+Responding to a revision decision is a different discipline: reviewer comments are a spec to
+implement, not prose to polish. Draft manuscript text here only after that work has decided what
+the paper will say.

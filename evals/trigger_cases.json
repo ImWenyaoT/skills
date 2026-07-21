@@ -391,8 +391,8 @@
       "id": "writing-papers-positive-rebuttal",
       "prompt": "Polish this NeurIPS rebuttal paragraph and remove AI-sounding phrasing without changing the technical claims.",
       "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["writing-resumes"],
-      "notes": "Academic paper language polish."
+      "forbidden_skills": ["writing-resumes", "answering-reviewers"],
+      "notes": "Language polish of already-decided rebuttal prose — not deciding how to answer the reviewers."
     },
     {
       "id": "writing-papers-positive-figure-table",
@@ -652,6 +652,34 @@
       "expected_skills": [],
       "forbidden_skills": ["apple-hig"],
       "notes": "Android Material Design is a different platform/design system; should abstain, not fire HIG."
+    },
+    {
+      "id": "answering-reviewers-positive-major-revision",
+      "prompt": "We got a major revision. Reviewer 2 says our ablation does not isolate the two modules, and one of his premises about our baseline is simply wrong. How should I handle that comment?",
+      "expected_skills": ["answering-reviewers"],
+      "forbidden_skills": ["writing-papers"],
+      "notes": "Deciding how to answer a reviewer comment, including a wrong premise — the revision discipline, not prose work."
+    },
+    {
+      "id": "answering-reviewers-positive-zh-scope",
+      "prompt": "修回还剩两周,审稿人点名要的三个数据集只跑得完两个,另外我想顺手补一个他们没问的消融。现在这轮该怎么取舍?",
+      "expected_skills": ["answering-reviewers"],
+      "forbidden_skills": ["training-models"],
+      "notes": "Chinese revision scope decision: downgrade vs drop, and unasked experiments — not a training-debugging question."
+    },
+    {
+      "id": "answering-reviewers-negative-packet",
+      "prompt": "Assemble the revised Elsevier manuscript into the Editorial Manager upload set with the declarations, highlights DOCX, and a flat source zip.",
+      "expected_skills": ["elsevier-submissions"],
+      "forbidden_skills": ["answering-reviewers"],
+      "notes": "Packaging the revision upload is submission work, not deciding what to answer."
+    },
+    {
+      "id": "answering-reviewers-negative-draft-section",
+      "prompt": "Draft the related-work section and the contribution bullets for my paper from scratch.",
+      "expected_skills": ["writing-papers"],
+      "forbidden_skills": ["answering-reviewers"],
+      "notes": "No revision decision in play — ordinary drafting."
     }
   ]
 }
