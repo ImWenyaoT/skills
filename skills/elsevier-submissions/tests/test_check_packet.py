@@ -71,6 +71,7 @@ def base_manifest() -> dict[str, object]:
         "manuscript": "main.tex",
         "source_required": False,
         "side_materials": ["highlights.docx"],
+        "submission_stage": "initial",
     }
 
 
@@ -102,6 +103,71 @@ class PacketCheckTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("packet check passed", result.stdout.lower())
+
+    def test_revision_packet_rejects_missing_response_to_reviewers(self) -> None:
+        """A revision must not pass while the response it declares does not exist."""
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            self.prepare_packet(directory)
+            manifest = base_manifest()
+            manifest.update(
+                em_step="revision upload",
+                submission_stage="revision",
+                response_to_reviewers="response.docx",
+            )
+            result = self.run_check(directory, manifest)
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("response_to_reviewers is missing", result.stdout.lower())
+
+    def test_revision_packet_rejects_missing_marked_manuscript(self) -> None:
+        """A declared marked manuscript must exist and differ from the clean one."""
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            self.prepare_packet(directory)
+            write_minimal_docx(directory / "response.docx", ["Response to reviewers"])
+            manifest = base_manifest()
+            manifest.update(
+                em_step="revision upload",
+                submission_stage="revision",
+                response_to_reviewers="response.docx",
+                marked_manuscript="marked.pdf",
+            )
+            result = self.run_check(directory, manifest)
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("marked_manuscript is missing", result.stdout.lower())
+
+    def test_complete_revision_packet_passes(self) -> None:
+        """The same revision packet passes once both files are really present."""
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            self.prepare_packet(directory)
+            write_minimal_docx(directory / "response.docx", ["Response to reviewers"])
+            (directory / "marked.pdf").write_bytes(b"%PDF-1.4 marked")
+            manifest = base_manifest()
+            manifest.update(
+                em_step="revision upload",
+                submission_stage="revision",
+                response_to_reviewers="response.docx",
+                marked_manuscript="marked.pdf",
+            )
+            result = self.run_check(directory, manifest)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("packet check passed", result.stdout.lower())
+
+    def test_unknown_manifest_key_is_rejected(self) -> None:
+        """A misspelled key must fail loudly instead of silently disabling a check."""
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            self.prepare_packet(directory)
+            manifest = base_manifest()
+            manifest.update(submission_stage="revision", response_to_reviewer="response.docx")
+            result = self.run_check(directory, manifest)
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("unknown manifest key(s): response_to_reviewer", result.stdout.lower())
 
     def test_required_source_zip_cannot_be_omitted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
