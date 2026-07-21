@@ -7,9 +7,14 @@ python3 skills/offer-magic/scripts/validate-bundle.py
 python3 skills/offer-magic/grill-resume/scripts/test-prepare-review-packet.py
 python3 skills/offer-magic/grill-resume/scripts/test-validate-review-report.py
 python3 -W error::ResourceWarning -m unittest discover -s tests -v
-python3 -m unittest discover -s skills/drawing-figures/tests -p 'test_*.py' -v
-python3 -m unittest discover -s skills/elsevier-articles/tests -p 'test_*.py' -v
-python3 -m unittest discover -s skills/elsevier-submissions/tests -p 'test_*.py' -v
+
+# Every skill that ships tests gets them run. Listing the directories by hand
+# meant a new skill's tests stayed silently unexecuted until someone noticed.
+for suite in skills/*/tests; do
+  [ -d "$suite" ] || continue
+  echo "== $suite"
+  python3 -m unittest discover -s "$suite" -p 'test_*.py' -v
+done
 
 while IFS= read -r file; do
   python3 -m py_compile "$file"
