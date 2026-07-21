@@ -45,6 +45,21 @@
 - 可放心 bundle 大资源(API 文档、数据集、脚本)——**未被读取的文件零 token 开销**。
 - 脚本优先 **`uv run`**、尽量 stdlib;**函数级注释**;新增脚本前先看现有脚本能否复用。
 
+## 指令强度(degrees of freedom)
+
+**按每段内容的脆弱性选语气,不要全篇一个调门。** Anthropic 的比喻:窄桥 vs 开阔地。
+
+- **窄桥**——脆弱、易错、顺序不能变。给精确步骤和硬判据。例:必须按序执行的迁移命令、训练前的 sanity check。
+- **开阔地**——多条路都通、选哪条依上下文。给方向、给排序、**给每个选项的理由**,让模型自己判断。
+
+**压缩时最容易出事**:把一份带理由的阶梯压成裸序列,就把引导写成了命令。模型照做,但选不对——因为你把判断依据删了。要么保留理由,要么把这段指向 reference 并说明"那里有每个选项的理由"。
+
+**解释 why,而不是堆 MUST。** 全大写的 `ALWAYS`/`NEVER` 是黄信号:能改写成「目标行为 + 理由」就改写。今天的模型有 theory of mind,给了理由它能外推到你没写的情形;只给禁令它只会在你写到的那一条上听话。
+
+**ASD-STE100 的取舍**:它的**词汇纪律**(一词一义、不为文采换词、主动语态、不省略成分、名词串 ≤3 词)对 agent 完全适用,与 Anthropic 的 "consistent terminology" 同向,该守。它的**命令语气**只适用于窄桥段落——那套规范是给飞机维修手册写的,那里每一步都是窄桥。整篇套用会把开阔地也写成窄桥。
+
+参考:[Anthropic — Set appropriate degrees of freedom](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)、[OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills)。
+
 ## 触发测试(本库的验证闭环)
 
 把测试分两层(Anthropic Claude Code 指引):
