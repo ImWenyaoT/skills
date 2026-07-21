@@ -1,50 +1,74 @@
-# 6 条经典坑 · 逐条自检详解
+# Fourteen Silent Failure Modes
 
-每条遵循统一结构：**症状 → 为什么会错 → 怎么查 → 怎么改**。代码以 PyTorch 为例，思路通用。
+Each entry has the same four parts: **Symptom**, **Cause**, **Check**, **Repair**. The examples use
+PyTorch. The reasoning holds for any framework.
+
+Read [SKILL.md](../SKILL.md) first. Each entry names the Stage 2 gate that it sits behind. A gate
+that stays shut therefore points you at a short list of entries.
 
 ## Contents
 
-- 经典 6 条（Karpathy 原推文）
-  - [1. 不先 overfit 单个 batch](#1-不先-overfit-单个-batch)
-  - [2. 忘记切换 `model.train()` / `model.eval()`](#2-忘记切换-modeltrain--modeleval)
-  - [3. 忘记 `optimizer.zero_grad()`](#3-忘记-optimizerzero_grad)
-  - [4. logits 与 softmax / 概率搞混](#4-logits-与-softmax--概率搞混)
-  - [5. BatchNorm 前面的层带了 bias](#5-batchnorm-前面的层带了-bias)
-  - [6. 用 `view` 当 `permute`（或反之）](#6-用-view-当-permute或反之)
-  - [排查流程图（口诀）](#排查流程图口诀)
-- 扩展 8 条（推文未列但同样高频，第 7~14 条）
-  - [7. 训练 DataLoader 没 `shuffle=True`](#7-训练-dataloader-没-shuffletrue)
-  - [8. loss 没对 batch 取平均 / reduction 不一致](#8-loss-没对-batch-取平均--reduction-不一致)
-  - [9. 学习率没 warmup / 没 scheduler / 量级离谱](#9-学习率没-warmup--没-scheduler--量级离谱)
-  - [10. 归一化统计量泄漏 / 推理忘了同样的归一化](#10-归一化统计量泄漏--推理忘了同样的归一化)
-  - [11. 没固定随机种子 → 不可复现](#11-没固定随机种子--不可复现)
-  - [12. 在 GPU 上累加 loss 不 `.item()` / `.detach()` → 显存泄漏](#12-在-gpu-上累加-loss-不-item--detach--显存泄漏)
-  - [13. `CrossEntropyLoss` 的 target 类型/形状不对](#13-crossentropyloss-的-target-类型形状不对)
-  - [14. weight decay 误加到 bias / BatchNorm / LayerNorm 参数上](#14-weight-decay-误加到-bias--batchnorm--layernorm-参数上)
-  - [扩展坑排查口诀](#扩展坑排查口诀)
+Entries 1 to 6 come from the original Karpathy thread. They decide whether the pipeline is correct.
+
+- [1. No one-batch overfit check](#1-no-one-batch-overfit-check)
+- [2. Wrong train mode and eval mode](#2-wrong-train-mode-and-eval-mode)
+- [3. Missing zero_grad call](#3-missing-zero_grad-call)
+- [4. Confusion of logits and probabilities](#4-confusion-of-logits-and-probabilities)
+- [5. Bias in the layer before BatchNorm](#5-bias-in-the-layer-before-batchnorm)
+- [6. Use of view in place of permute](#6-use-of-view-in-place-of-permute)
+- [Diagnostic route for entries 1 to 6](#diagnostic-route-for-entries-1-to-6)
+
+[Entries 7 to 14](#entries-7-to-14-the-training-strategy) are not in that thread. They are as
+frequent, and most of them are as silent. They decide how well a run trains and whether it
+reproduces.
+
+- [7. No shuffle in the train DataLoader](#7-no-shuffle-in-the-train-dataloader)
+- [8. Wrong loss reduction](#8-wrong-loss-reduction)
+- [9. No warmup and no scheduler](#9-no-warmup-and-no-scheduler)
+- [10. Normalization statistics leak](#10-normalization-statistics-leak)
+- [11. No fixed random seed](#11-no-fixed-random-seed)
+- [12. Loss accumulation that holds the graph](#12-loss-accumulation-that-holds-the-graph)
+- [13. Wrong CrossEntropyLoss target](#13-wrong-crossentropyloss-target)
+- [14. Weight decay on bias and norm parameters](#14-weight-decay-on-bias-and-norm-parameters)
+- [Diagnostic route for entries 7 to 14](#diagnostic-route-for-entries-7-to-14)
 
 ---
 
-## 1. 不先 overfit 单个 batch
+## 1. No one-batch overfit check
 
-**症状**
-- loss 卡在某个值不动，但你分不清是"数据/标签坏了"、"模型容量不够"、"学习率不对"还是"代码有 bug"。
-- 调了半天超参毫无头绪。
+This entry sits behind Stage 2 gate 5: one batch of 2 to 8 examples overfits to near zero.
 
-**为什么会错**
-- 直接上全量数据 + 正则 + 增强训练，一旦不收敛，变量太多无法定位。失去了"链路是否正确"这个最基本的判据。
+**Symptom**
 
-**怎么查**
-- 取**一个固定的小 batch**（比如 2~8 个样本），关闭 dropout/数据增强/weight decay，反复在这同一个 batch 上训练几百步。
-- 观察 loss 是否能降到接近 0（分类任务可达到接近 0 的 train loss、100% train acc）。
+- The loss stops at a value and does not move. You cannot tell whether the data is wrong, the model
+  is too small, the learning rate is wrong, or the code holds a defect.
+- You tune hyperparameters for hours without a hypothesis.
 
-**怎么改**
-- **能 overfit** → 前向、反向、优化器、loss 链路是通的。问题在数据规模、正则、泛化或学习率调度，往后排查第 2~6 条之外的"训练策略层"。
-- **不能 overfit** → 链路本身有 bug。立刻去查第 2/3/4 条（没 `zero_grad`、没切 `train()`、loss 与输出契约不对、标签错位、梯度没回传到该更新的参数等）。
-- 顺手检查：loss 初始值是否合理（N 分类交叉熵初始 loss 应约为 `ln(N)`，不是这个数量级说明 logits 尺度/初始化/标签有问题）。
+**Cause**
+
+- You started on the full dataset with regularization and augmentation. Too many variables move at
+  once. You lost the most basic verdict of all: is the pipeline correct?
+
+**Check**
+
+- Take one fixed small batch of 2 to 8 examples. Turn off dropout, augmentation, and weight decay.
+- Train on that same batch for several hundred steps.
+- Watch whether the loss falls to near zero. A classifier must reach a near-zero train loss and
+  100 percent train accuracy.
+
+**Repair**
+
+- **The batch overfits.** The forward pass, the backward pass, the optimizer, and the loss are
+  correct. Look at the data scale, the regularization, the generalization, and the learning rate
+  schedule. Continue with entries 7 to 14.
+- **The batch does not overfit.** The pipeline holds a defect. Read entries 2, 3, and 4 next. Look
+  for a missing `zero_grad`, a wrong mode, a wrong loss contract, an offset label, or a parameter
+  that receives no gradient.
+- Also check the loss at init, which is Stage 2 gate 1. Uniform `n`-class cross entropy starts near
+  `log(n)`. Another magnitude points at the logit scale, the initialization, or the labels.
 
 ```python
-# 取一个 batch，反复喂，loss 必须能掉下去
+# Take one batch, feed it again and again. The loss must fall.
 xb, yb = next(iter(loader))
 model.train()
 for step in range(500):
@@ -53,319 +77,444 @@ for step in range(500):
     loss.backward()
     optimizer.step()
     if step % 50 == 0:
-        print(step, loss.item())   # 期望：稳步逼近 0
+        print(step, loss.item())   # expect a steady approach to zero
 ```
 
 ---
 
-## 2. 忘记切换 `model.train()` / `model.eval()`
+## 2. Wrong train mode and eval mode
 
-**症状**
-- 验证集指标比训练集差很多，或验证/推理结果**每次跑都不一样**（有随机性）。
-- BatchNorm 在小 batch 评估时统计量乱跳；模型在生产推理时表现和训练时对不上。
+This entry sits behind Stage 2 gate 5. A wrong mode also breaks the reproduction of any run.
 
-**为什么会错**
-- `Dropout`、`BatchNorm` 等层在训练和评估时**行为不同**：
-  - 训练模式：Dropout 随机置零；BN 用当前 batch 的均值/方差并更新 running stats。
-  - 评估模式：Dropout 关闭（全保留）；BN 用累积的 running mean/var。
-- 验证/推理时仍处于 `train()` 模式 → Dropout 仍在丢、BN 用 batch 统计 → 结果有随机性且不稳。
-- 反过来，训练时误处于 `eval()` → 正则失效、BN 不更新统计。
+**Symptom**
 
-**怎么查**
-- 检查训练循环：每个 epoch 训练段前是否 `model.train()`，验证/测试/推理段前是否 `model.eval()`。
-- 推理时是否同时用了 `with torch.no_grad():`（省显存、加速，且明确意图）。
+- The validation metric is much worse than the training metric.
+- The validation result or the inference result changes on every run.
+- The BatchNorm statistics jump on small evaluation batches. Production inference disagrees with
+  training.
 
-**怎么改**
+**Cause**
+
+- `Dropout` and `BatchNorm` behave differently in the two modes.
+  - Train mode: Dropout zeroes units at random. BatchNorm uses the statistics of the current batch
+    and updates the running statistics.
+  - Eval mode: Dropout passes every unit. BatchNorm uses the stored running mean and variance.
+- A model that stays in train mode during validation still drops units and still uses batch
+  statistics. The result is random and unstable.
+- A model that stays in eval mode during training loses its regularization. BatchNorm then never
+  updates its statistics.
+
+**Check**
+
+- Confirm that `model.train()` runs before the training section of each epoch.
+- Confirm that `model.eval()` runs before each validation, test, or inference section.
+- Confirm that inference also runs under `with torch.no_grad():`. It saves memory and states the
+  intent.
+
+**Repair**
+
 ```python
-# 训练阶段
+# Training section
 model.train()
 for xb, yb in train_loader:
     ...
 
-# 验证/推理阶段
+# Validation or inference section
 model.eval()
 with torch.no_grad():
     for xb, yb in val_loader:
         ...
 ```
-- 二者要**成对出现**。封装成 `train_one_epoch()` / `evaluate()` 函数，把模式切换写进函数开头，避免漏切。
+
+- The two calls must appear as a pair. Put each call at the top of `train_one_epoch()` and of
+  `evaluate()`. No section can then miss its mode.
 
 ---
 
-## 3. 忘记 `optimizer.zero_grad()`
+## 3. Missing zero_grad call
 
-**症状**
-- loss 不降、或出现诡异的震荡/发散。
-- 训练越跑越慢、显存随 step 缓慢上涨（梯度图/累积相关）。
+This entry sits behind Stage 2 gate 5: one batch of 2 to 8 examples overfits to near zero.
 
-**为什么会错**
-- PyTorch 的 `.backward()` 是**累加**梯度到 `.grad`，不是覆盖。若不在每个 step 前清零，本 step 的梯度会叠加上之前所有 step 的旧梯度 → `optimizer.step()` 用的是错误的累积梯度 → 更新方向错乱。
+**Symptom**
 
-**怎么查**
-- 确认训练循环里 `optimizer.zero_grad()` 出现在每个 step 的 `backward()` **之前**。
-- 注意顺序：`zero_grad()` → `forward` → `loss.backward()` → `optimizer.step()`。
+- The loss does not fall, or it oscillates and diverges.
+- The run gets slower, and memory grows slowly with each step.
 
-**怎么改**
+**Cause**
+
+- `.backward()` adds gradients into `.grad`. It does not overwrite them. Without a reset before
+  each step, the current gradient stacks on every earlier gradient. Then `optimizer.step()` uses a
+  wrong sum, and the update direction is wrong.
+
+**Check**
+
+- Confirm that `optimizer.zero_grad()` appears before `backward()` in every step.
+- Confirm the order: `zero_grad()`, forward, `loss.backward()`, `optimizer.step()`.
+
+**Repair**
+
 ```python
 for xb, yb in train_loader:
-    optimizer.zero_grad()          # 1. 清梯度（或 zero_grad(set_to_none=True)）
-    out = model(xb)                # 2. 前向
+    optimizer.zero_grad()          # 1. clear the gradients (or zero_grad(set_to_none=True))
+    out = model(xb)                # 2. forward
     loss = criterion(out, yb)
-    loss.backward()                # 3. 反向（累加到 .grad）
-    optimizer.step()               # 4. 更新
+    loss.backward()                # 3. backward, which adds into .grad
+    optimizer.step()               # 4. update
 ```
-- **例外（梯度累积）**：若刻意做 gradient accumulation，则每 N 个 micro-step 才 `step()` + `zero_grad()` 一次——这是有意的累加，不是 bug。区别在于"是否是你主动设计的"。
+
+- **Exception: gradient accumulation.** With deliberate accumulation, call `step()` and
+  `zero_grad()` once every N micro-steps. That sum is intended, so it is not a defect. The test is
+  whether you designed it.
 
 ---
 
-## 4. logits 与 softmax / 概率搞混
+## 4. Confusion of logits and probabilities
 
-**症状**
-- 分类 loss 偏高且降不动；或训练能动但数值不稳、容易 NaN。
-- 推理输出的"概率"加起来不为 1，或被 argmax 出奇怪结果。
+This entry sits behind Stage 2 gate 1: the loss at init matches the prior. A second softmax moves
+the loss at init away from `log(n)`.
 
-**为什么会错**
-- 不同 loss 对输入的约定不同，最常见的是**对模型输出做了多余的 softmax/sigmoid**：
-  - `nn.CrossEntropyLoss` = `LogSoftmax` + `NLLLoss`，**内部已含 softmax**，必须喂**原始 logits**。若你先 `softmax` 再传进去，等于做了两次 → loss 失真。
-  - `nn.BCEWithLogitsLoss` **内部含 sigmoid**，喂 logits；用了它就别再自己 sigmoid。
-  - `nn.NLLLoss` 吃的是 **log 概率**（前面要接 `log_softmax`）。
-  - `nn.BCELoss` 吃 **[0,1] 概率**（前面要 sigmoid）——数值稳定性不如 `BCEWithLogitsLoss`。
+**Symptom**
 
-**怎么查**
-- 看模型最后一层：有没有自己加 `Softmax`/`Sigmoid`？
-- 看 loss 类型：它期望 logits 还是概率？二者必须**正好对上一次**，不能零次也不能两次。
-- 推理时再单独决定是否需要 softmax（多数只需 `argmax(logits)` 即可，argmax 不受单调的 softmax 影响）。
+- The classification loss is high and does not fall. The run moves, but the numbers are unstable
+  and reach NaN.
+- The probabilities at inference do not sum to 1, or argmax returns a strange class.
 
-**怎么改**
+**Cause**
 
-| 任务 | 推荐 loss | 模型输出应是 | 不要做 |
-|------|-----------|-------------|--------|
-| 多分类 | `CrossEntropyLoss` | 原始 logits | 别在输出层加 softmax |
-| 二分类/多标签 | `BCEWithLogitsLoss` | 原始 logits | 别自己 sigmoid |
-| 已 log_softmax | `NLLLoss` | log 概率 | — |
+- Each loss states its own input contract. The most common defect is an extra softmax or sigmoid on
+  the model output.
+  - `nn.CrossEntropyLoss` is `LogSoftmax` plus `NLLLoss`. It already holds the softmax, so feed it
+    raw logits. A softmax before it applies the operation twice and distorts the loss.
+  - `nn.BCEWithLogitsLoss` already holds the sigmoid. Feed it logits and add no sigmoid of your own.
+  - `nn.NLLLoss` takes log probabilities, so put `log_softmax` in front of it.
+  - `nn.BCELoss` takes probabilities in `[0, 1]`, so put a sigmoid in front of it. It is less
+    stable than `nn.BCEWithLogitsLoss`.
+
+**Check**
+
+- Read the last layer of the model. Look for a `Softmax` or a `Sigmoid` that you added.
+- Read the loss class. Decide whether it expects logits or probabilities.
+- The operation must appear exactly once: never zero times and never twice.
+- Decide separately at inference whether you need a softmax. Most code needs only
+  `argmax(logits)`, because a monotonic softmax does not move the argmax.
+
+**Repair**
+
+| Task | Loss | Model output | Do not |
+|------|------|--------------|--------|
+| Multi-class | `CrossEntropyLoss` | raw logits | Do not add a softmax to the output layer. |
+| Binary or multi-label | `BCEWithLogitsLoss` | raw logits | Do not add a sigmoid of your own. |
+| Already `log_softmax` | `NLLLoss` | log probabilities | — |
 
 ```python
-# 正确：输出 logits，loss 内部处理 softmax
-logits = model(xb)                 # 不接 softmax
+# Correct: the model returns logits, and the loss applies the softmax.
+logits = model(xb)                 # no softmax here
 loss = nn.CrossEntropyLoss()(logits, yb)
 
-# 推理拿概率（需要时才做）
+# Probabilities at inference, only when you need them
 probs = logits.softmax(dim=-1)
-pred  = logits.argmax(dim=-1)      # 取类别可直接对 logits argmax
+pred  = logits.argmax(dim=-1)      # argmax works directly on the logits
 ```
 
 ---
 
-## 5. BatchNorm 前面的层带了 bias
+## 5. Bias in the layer before BatchNorm
 
-**症状**
-- 不致命：网络照常训练。但参数有冗余，且属于"对 BN 理解不到位"的信号。
+No Stage 2 gate covers this entry. The run still trains.
 
-**为什么会错**
-- BatchNorm 会对输入做 `(x - mean) / std`，其中的均值减法**会抵消掉前一层的 bias**——bias 是个常数偏移，被 BN 的去均值直接消掉，永远不起作用。
-- 所以 `Conv`/`Linear` 紧接 `BatchNorm` 时，前面那层的 `bias` 是**多余参数**（白占显存、白算梯度）。BN 自身的 `affine` 参数（γ、β）已经提供了可学习的缩放和偏移。
+**Symptom**
 
-**怎么查**
-- 找形如 `Conv2d(...) -> BatchNorm2d(...)` 或 `Linear(...) -> BatchNorm1d(...)` 的结构，看前一层是否设了 `bias=False`。
+- The defect is not fatal, and the network trains as usual. The parameters hold redundancy, and the
+  code shows an incomplete model of BatchNorm.
 
-**怎么改**
+**Cause**
+
+- BatchNorm computes `(x - mean) / std`. The subtraction of the mean removes the bias of the
+  previous layer, because a bias is a constant offset. That bias therefore never has an effect.
+- A `Conv` or `Linear` layer directly before a `BatchNorm` holds a redundant `bias`. It costs
+  memory and gradient computation. The affine parameters of BatchNorm, which are gamma and beta,
+  already give a learnable scale and offset.
+
+**Check**
+
+- Find each `Conv2d(...) -> BatchNorm2d(...)` or `Linear(...) -> BatchNorm1d(...)` pair. Confirm
+  that the first layer sets `bias=False`.
+
+**Repair**
+
 ```python
-# 推荐：BN 前的层关掉 bias
+# Turn the bias off in the layer before BatchNorm.
 nn.Sequential(
-    nn.Conv2d(3, 64, 3, padding=1, bias=False),   # ← bias=False
-    nn.BatchNorm2d(64),                            # β 充当偏移
+    nn.Conv2d(3, 64, 3, padding=1, bias=False),   # <- bias=False
+    nn.BatchNorm2d(64),                           # beta supplies the offset
     nn.ReLU(inplace=True),
 )
 ```
-- 反过来：如果某层后面**没有** BN，则正常保留 bias。
+
+- A layer with no BatchNorm after it keeps its bias.
 
 ---
 
-## 6. 用 `view` 当 `permute`（或反之）
+## 6. Use of view in place of permute
 
-**症状**
-- 张量"shape 看着对，但内容是乱的"，模型精度莫名其妙崩掉或远低于预期。
-- 报错 `view size is not compatible with input tensor's size and stride` / 提示需要 `.contiguous()`。
+This entry sits behind Stage 2 gate 6: the tensors are correct at the last seam.
 
-**为什么会错**
-- 两类操作语义完全不同：
-  - `permute` / `transpose`：**交换维度顺序**（换轴），数据在内存里**不搬动**，只改变 stride/视图。`(N, C, H, W) -> (N, H, W, C)` 用 `permute`。
-  - `view` / `reshape`：**重新解释内存布局**，按行优先（C-order）重新分块。它**不交换语义轴**，只是把同一段连续内存切成新形状。
-- 把"想换轴"的需求用 `view` 写 → 元素被按内存顺序硬塞进新形状，语义全乱（比如想把 `(N,C,H,W)` 变 `(N,H,W,C)` 却用 view，得到的根本不是转置）。
-- 把"想合并/拆分维度"的需求用 `permute` 写 → 维度数对不上或报错。
-- 额外坑：`permute`/`transpose` 后张量**非 contiguous**，直接 `view` 会报错，需先 `.contiguous()`（或改用 `reshape`，它会在必要时自动拷贝）。
+**Symptom**
 
-**怎么查**
-- 问自己一句话：**我是要"换轴顺序"还是"重排内存形状"？**
-  - 换轴顺序（转置类）→ `permute` / `transpose`。
-  - 合并/拆分维度、展平（如 `(N, C, H, W) -> (N, C*H*W)`）→ `view` / `reshape`。
-- 变换后抽样打印几个元素，确认内容符合预期，别只看 shape。
+- The tensor shape looks correct, but the contents are scrambled. The accuracy collapses, or it
+  stays far below the expected value.
+- PyTorch raises `view size is not compatible with input tensor's size and stride`, or it asks for
+  `.contiguous()`.
 
-**怎么改**
+**Cause**
+
+- The two operations have different meanings.
+  - `permute` and `transpose` exchange the order of the axes. The data stays in place, and only the
+    stride and the view change. Use `permute` for `(N, C, H, W) -> (N, H, W, C)`.
+  - `view` and `reshape` reinterpret the memory layout in row-major order. They do not exchange the
+    semantic axes. They cut the same contiguous memory into a new shape.
+- A `view` that stands for an axis exchange packs the elements into the new shape in memory order.
+  The result is not a transpose, and the meaning is lost.
+- A `permute` that stands for a merge or a split of dimensions gives a wrong rank or raises an
+  error.
+- After `permute` or `transpose` the tensor is not contiguous, so a direct `view` fails. Call
+  `.contiguous()` first, or use `reshape`, which copies when it must.
+
+**Check**
+
+- Ask one question: do I want a new axis order, or a new memory shape?
+  - New axis order, such as a transpose: use `permute` or `transpose`.
+  - A merge, a split, or a flatten such as `(N, C, H, W) -> (N, C*H*W)`: use `view` or `reshape`.
+- Print a few elements after the operation. Confirm the contents, not only the shape.
+
+**Repair**
+
 ```python
 x = torch.randn(2, 3, 4, 5)        # (N, C, H, W)
 
-# 换轴：NCHW -> NHWC，用 permute（内容语义正确）
+# Axis order: NCHW -> NHWC needs permute, which keeps the meaning.
 x_nhwc = x.permute(0, 2, 3, 1)     # shape (2, 4, 5, 3)
 
-# permute 后非 contiguous，要 view 须先 contiguous，或直接用 reshape
-flat = x_nhwc.contiguous().view(2, -1)   # 或 x_nhwc.reshape(2, -1)
+# The result is not contiguous. Call contiguous before view, or use reshape.
+flat = x_nhwc.contiguous().view(2, -1)   # or x_nhwc.reshape(2, -1)
 
-# 展平特征图：合并 C,H,W，用 view/reshape（不是 permute）
-feat = x.reshape(2, -1)            # (2, 60)，行优先展平
+# Flatten a feature map: merge C, H, and W with view or reshape, not with permute.
+feat = x.reshape(2, -1)            # (2, 60), row-major
 ```
 
-经验法则：
-- **要"转置/换轴" → `permute`/`transpose`**
-- **要"改形状/合并拆分/展平" → `reshape`（最省心）或 `view`（需保证 contiguous）**
+Rule of thumb:
+
+- For a transpose or an axis exchange, use `permute` or `transpose`.
+- For a new shape, a merge, a split, or a flatten, use `reshape`. Use `view` only when the tensor
+  is contiguous.
 
 ---
 
-## 排查流程图（口诀）
+## Diagnostic route for entries 1 to 6
 
 ```
-不收敛？
- └─ 先 overfit 一个 batch（第1条）
-     ├─ 能 overfit → 链路OK，查数据/正则/学习率/调度
-     └─ 不能 overfit → 查链路：
-         ├─ train()/eval() 切了吗？        (第2条)
-         ├─ 每步 zero_grad() 了吗？         (第3条)
-         └─ loss 吃 logits 还是概率？对上没？(第4条)
+The run does not converge.
+ └─ Overfit one batch first.                                   (entry 1)
+     ├─ It overfits         -> the pipeline is correct. Check the data, the
+     │                         regularization, the learning rate, the schedule.
+     └─ It does not overfit -> check the pipeline:
+         ├─ Do train() and eval() run in the right sections?    (entry 2)
+         ├─ Does zero_grad() run in every step?                 (entry 3)
+         └─ Does the loss take logits or probabilities?         (entry 4)
 
-结果错乱/精度怪、维度操作后变乱？
- └─ view vs permute 用对了吗？contiguous？ (第6条)
+The contents are scrambled after a shape operation.
+ └─ Is view correct here, or does it need permute? contiguous?  (entry 6)
 
-整洁性收尾：BN 前的层 bias=False 了吗？   (第5条)
+Cleanup:
+ └─ Does the layer before BatchNorm set bias=False?             (entry 5)
 ```
 
 ---
 
-# 扩展：Karpathy 推文未列但同样高频的坑（第 7~14 条）
+## Entries 7 to 14: the training strategy
 
-> 以下 8 条**不在原推文**中，但实战同样高频、且多数同样"静默"。它们多属"训练策略层"——不决定"链路对不对"，而决定"训得好不好、能不能复现"。建议在跑通前 6 条后照此复查。
+The next eight entries are not in the original thread. They are as frequent in practice, and most
+of them are as silent. They belong to the training strategy. They do not decide whether the
+pipeline is correct. They decide how well the run trains, and whether it reproduces. Walk them
+after entries 1 to 6 hold.
 
 ---
 
-## 7. 训练 DataLoader 没 `shuffle=True`
+## 7. No shuffle in the train DataLoader
 
-**症状**
-- 每个 epoch 内 loss 呈现固定的周期性抖动；收敛慢或卡住。
-- 数据若按类别/时间排序，训练直接崩坏（一个 batch 全是同一类）。
+No Stage 2 gate covers this entry. It belongs to Stage 3, where you overfit the full training set.
 
-**为什么会错**
-- SGD 假定每个 batch 是从分布里近似 i.i.d. 采样的。不 shuffle → batch 间高度相关、梯度有偏，且每个 epoch 看到的 batch 序列完全相同，引入伪周期。
-- 按 label 排序的数据不 shuffle 时，单个 batch 类别极不均衡，BN 统计与梯度方向都被带偏。
+**Symptom**
 
-**怎么查**
-- 训练 `DataLoader(..., shuffle=True)`（或用随机 `Sampler`）；验证/测试集 `shuffle=False`（评估不需要、且要可复现）。
-- 检查数据是否在落盘时就按 label/时间排好序了。
+- The loss shows a fixed periodic wobble inside each epoch. Convergence is slow, or it stops.
+- Data sorted by class or by time breaks the run at once, because one batch then holds one class.
 
-**怎么改**
+**Cause**
+
+- SGD assumes that each batch is an approximate i.i.d. sample of the distribution. Without shuffle
+  the batches correlate, the gradient is biased, and every epoch sees the same batch order. That
+  fixed order adds a false period.
+- With data sorted by label, one batch is extremely imbalanced. The BatchNorm statistics and the
+  gradient direction both move away from the truth.
+
+**Check**
+
+- Set `shuffle=True` on the train `DataLoader`, or pass a random `Sampler`.
+- Set `shuffle=False` on the validation loader and the test loader. Evaluation does not need
+  shuffle, and it must reproduce.
+- Check whether the data was already sorted by label or by time on disk.
+
+**Repair**
+
 ```python
 train_loader = DataLoader(train_ds, batch_size=64, shuffle=True)
 val_loader   = DataLoader(val_ds,   batch_size=64, shuffle=False)
 ```
-- 时序/分组数据要小心：不能跨时间泄漏，应在合法分组内 shuffle，而不是全局打乱。
+
+- Time series and grouped data need care. Shuffle inside a legal group. A global shuffle leaks
+  across time.
 
 ---
 
-## 8. loss 没对 batch 取平均 / reduction 不一致
+## 8. Wrong loss reduction
 
-**症状**
-- 换了 batch_size 后必须重调学习率；梯度量级随 batch 变化。
-- 多任务把几个 loss 相加时尺度失衡；手动累加 loss 忘了除以样本数。
+This entry sits behind Stage 2 gate 1: the loss at init matches the prior. A `sum` reduction
+multiplies the loss at init by the batch size.
 
-**为什么会错**
-- `reduction='sum'` 与 `'mean'` 差一个 batch_size 因子：**sum 的梯度量级恰好是 mean 的 batch_size 倍**（可手算验证：`L_sum = Σ Lᵢ`，`L_mean = L_sum / N`，故 `grad(sum) = N · grad(mean)`）。
-- 用 sum，等效学习率被 batch_size 放大，换 batch 就发散或学不动。多个 loss 相加时若各自 reduction 不一致，权重被隐式扭曲。
+**Symptom**
 
-**怎么查**
-- 确认 loss 的 `reduction`（默认 `'mean'`，一般保持默认）。
-- 手写 loss 时确认除以了 batch 大小。
-- 变长序列（NLP）：明确是按 token 数还是样本数平均，padding 的位置用 mask 排除、别算进分母。
+- A new batch size forces a new learning rate. The gradient magnitude follows the batch size.
+- Several task losses that you add together have unbalanced scales. A hand-written sum forgets the
+  division by the sample count.
 
-**怎么改**
+**Cause**
+
+- `reduction='sum'` and `reduction='mean'` differ by a factor of the batch size. The gradient of
+  the sum is exactly `batch_size` times the gradient of the mean. Verify it by hand: `L_sum = Σ Lᵢ`
+  and `L_mean = L_sum / N`, so `grad(sum) = N · grad(mean)`.
+- With `sum`, the batch size scales the effective learning rate. A new batch size then diverges or
+  stalls. Mixed reductions across several losses distort their weights silently.
+
+**Check**
+
+- Read the `reduction` of each loss. The default is `'mean'`. Keep the default.
+- With a hand-written loss, confirm the division by the batch size.
+- For variable-length sequences, state whether you average over tokens or over samples. Mask the
+  padding positions and keep them out of the denominator.
+
+**Repair**
+
 ```python
-criterion = nn.CrossEntropyLoss()          # 默认 reduction='mean'
+criterion = nn.CrossEntropyLoss()          # reduction='mean' by default
 
-# 变长序列：按有效 token 数平均（mask 掉 padding）
+# Variable-length sequences: average over the valid tokens and mask the padding.
 loss = (per_token_loss * mask).sum() / mask.sum()
 
-# 梯度累积：每个 micro-batch 的 loss 先除以累积步数，再 backward
+# Gradient accumulation: divide each micro-batch loss by the step count first.
 loss = criterion(out, yb) / accum_steps
 ```
 
 ---
 
-## 9. 学习率没 warmup / 没 scheduler / 量级离谱
+## 9. No warmup and no scheduler
 
-**症状**
-- 训练前几百步就发散或 loss 爆成 NaN（尤其 Adam + 大 batch + Transformer）。
-- 或 loss 降一点就进平台、后期榨不出精度。
+No Stage 2 gate covers this entry. It belongs to Stage 3, where the recipe starts at Adam `3e-4`
+with the decay off.
 
-**为什么会错**
-- 训练初期 Adam 的二阶矩估计还不稳，步长方差大；大 batch/大模型初期梯度噪声大，直接用目标 LR 容易冲飞。warmup 让 LR 从 0 线性升到目标值，稳住初期；后期 cosine/step decay 收尾才能逼近最优。
-- LR 是最重要的超参，量级错一个数量级基本等于白训。
+**Symptom**
 
-**怎么查**
-- Transformer/大 batch 训练是否有 warmup（几百~几千 step）。
-- 是否挂了 LR scheduler；有没有用 LR range test 粗扫过合理量级。
+- The run diverges, or the loss reaches NaN in the first few hundred steps. Adam with a large batch
+  and a Transformer shows this most often.
+- The loss falls a little and then reaches a plateau, and the late accuracy never arrives.
 
-**怎么改**
-```python
-from torch.optim.lr_scheduler import LambdaLR
+**Cause**
 
-def warmup_cosine(step, warmup, total):
-    """线性 warmup + 余弦衰减的 LR 系数。step<warmup 时线性升，之后余弦降。"""
-    import math
-    if step < warmup:
-        return step / max(1, warmup)
-    progress = (step - warmup) / max(1, total - warmup)
-    return 0.5 * (1.0 + math.cos(math.pi * progress))
+- Early in a run the second-moment estimate of Adam is still unstable, so the step size varies a
+  lot. A large batch or a large model also adds gradient noise early. The target learning rate then
+  throws the run off course. A warmup raises the rate linearly from 0 to the target and holds the
+  early steps steady. A cosine decay or a step decay at the end approaches the optimum.
+- The learning rate is the most important hyperparameter. An error of one order of magnitude wastes
+  the run.
 
-scheduler = LambdaLR(optimizer, lr_lambda=lambda s: warmup_cosine(s, 500, 10000))
-# 每个 optimizer.step() 后调用 scheduler.step()
-```
-- HuggingFace 可直接用 `get_linear_schedule_with_warmup` / `get_cosine_schedule_with_warmup`。
+**Check**
+
+- Confirm that a Transformer run or a large-batch run has a warmup. Several hundred to several
+  thousand steps is normal.
+- Confirm that a scheduler is attached. Confirm that a learning rate range test found the correct
+  magnitude.
+
+**Repair**
+
+- Use the `warmup_cosine` factor in
+  [`extra_pitfalls_before_after.py`](../sample_codes/common-patterns/extra_pitfalls_before_after.py)
+  as the `lr_lambda` of `torch.optim.lr_scheduler.LambdaLR`. It rises linearly to the target over
+  the warmup steps, and then follows a cosine down to zero.
+- Call `scheduler.step()` after each `optimizer.step()`.
+- HuggingFace offers `get_linear_schedule_with_warmup` and `get_cosine_schedule_with_warmup`
+  directly.
 
 ---
 
-## 10. 归一化统计量泄漏 / 推理忘了同样的归一化
+## 10. Normalization statistics leak
 
-**症状**
-- 验证/测试指标虚高（泄漏），或线上推理比线下评估差很多（推理没归一化或用错 stats）。
+This entry sits behind Stage 2 gate 6: the tensors are correct at the last seam. Print the batch in
+denormalized form to expose the defect. Gate 4 catches the related case, where a label leaks into
+the input.
 
-**为什么会错**
-- ① 用**整个数据集**（含 val/test）算 mean/std → 信息从测试集泄漏进训练，指标虚高。
-- ② 训练做了 normalize，推理却忘了用**同一套** train 统计量 → 输入分布错位。
-- ③ 对 val/test 各自重新算 stats 归一化，也是泄漏/不一致。
+**Symptom**
 
-**怎么查**
-- 归一化的 mean/std **只用训练集**拟合；val/test/线上推理一律复用这同一组。
-- `transforms.Normalize`（图像）或标准化器（表格）的参数，训练与推理必须一致。
+- The validation metric or the test metric is too good, because information leaked.
+- Production inference is much worse than offline evaluation, because inference skipped the
+  normalization or used the wrong statistics.
 
-**怎么改**
+**Cause**
+
+- The code computed the mean and the standard deviation over the whole dataset, including
+  validation and test. Information leaks from the test set into training, and the metric rises
+  falsely.
+- Training normalized the input, and inference forgot to reuse the same train statistics. The input
+  distribution then shifts.
+- The code recomputed the statistics separately on validation or on test. That is both a leak and
+  an inconsistency.
+
+**Check**
+
+- Fit the mean and the standard deviation on the training set alone. Reuse that one set everywhere:
+  validation, test, and production inference.
+- Confirm that the parameters of `transforms.Normalize` for images, or of a tabular scaler, are
+  identical in training and in inference.
+
+**Repair**
+
 ```python
-mu = train_x.mean(0, keepdim=True)      # 只在训练集上拟合
+mu = train_x.mean(0, keepdim=True)      # fit on the training set alone
 sd = train_x.std(0, keepdim=True) + 1e-8
-# 保存 mu, sd；train/val/test/线上推理全部复用：
+# Save mu and sd. Reuse them for train, validation, test, and production.
 norm = lambda x: (x - mu) / sd
 ```
 
 ---
 
-## 11. 没固定随机种子 → 不可复现
+## 11. No fixed random seed
 
-**症状**
-- 同样代码每次结果不同，无法判断"指标变化是改动有效还是随机波动"，实验无法对比。
+This entry sits behind the Stage 2 gate as a whole: all seven gates hold under one reproduction
+command. Stage 2 also asks you to fix the seed before you start.
 
-**为什么会错**
-- torch、numpy、python `random`、CUDA 各有独立 RNG；DataLoader worker、cudnn 的非确定算法都引入随机。
+**Symptom**
 
-**怎么改**
+- The same code gives a different result on every run. You cannot tell whether a metric moved
+  because of your change or because of noise. The runs do not compare.
+
+**Cause**
+
+- torch, numpy, python `random`, and CUDA each hold an independent RNG. The DataLoader workers and
+  the non-deterministic cudnn algorithms add more randomness.
+
+**Repair**
+
 ```python
 def seed_everything(seed=42):
-    """统一固定 torch/numpy/python/CUDA 的随机种子，保证实验可复现可对比。"""
+    """Fix the torch, numpy, python, and CUDA seeds so that a run reproduces."""
     import os, random
     import numpy as np
     import torch
@@ -374,99 +523,119 @@ def seed_everything(seed=42):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
-    # 需严格复现再开（会牺牲速度）：
+    # Turn these on for a strict reproduction. They cost speed.
     # torch.backends.cudnn.deterministic = True
     # torch.backends.cudnn.benchmark = False
 ```
-- DataLoader 多 worker 严格复现还需 `worker_init_fn` + 显式 `generator`。
-- 注意：固定种子是为了**可控对比**，不是为了挑一个"好看的种子"——那是自欺。
+
+- A strict reproduction with several DataLoader workers also needs `worker_init_fn` and an explicit
+  `generator`.
+- A fixed seed gives you a controlled comparison. Do not search for a seed that flatters the
+  result. That is self-deception.
 
 ---
 
-## 12. 在 GPU 上累加 loss 不 `.item()` / `.detach()` → 显存泄漏
+## 12. Loss accumulation that holds the graph
 
-**症状**
-- 显存随 step/epoch 持续上涨直到 OOM；训练越跑越慢。
+No Stage 2 gate covers this entry. It appears in the long runs of Stage 3 and Stage 4.
 
-**为什么会错**
-- `total_loss += loss`，其中 `loss` 是带计算图的 tensor。这样会把每个 batch 的计算图都挂住不释放，显存不断累积。
+**Symptom**
 
-**怎么查/改**
+- Memory grows with each step and each epoch until the run reaches OOM. The run also gets slower.
+
+**Cause**
+
+- `total_loss += loss` adds a tensor that still carries its graph. Every batch graph stays alive, so
+  memory accumulates.
+
+**Check and repair**
+
 ```python
 running_loss = 0.0
 for xb, yb in train_loader:
     ...
     loss = criterion(out, yb)
     loss.backward(); optimizer.step()
-    running_loss += loss.item() * xb.size(0)   # 取标量；并按样本数加权（呼应第 8 条）
+    running_loss += loss.item() * xb.size(0)   # a scalar, weighted by the sample count (entry 8)
 epoch_loss = running_loss / len(train_loader.dataset)
 ```
-- 统计任何指标（loss/acc）时都用 `.item()` 或 `.detach()`，别直接累加带图的 tensor。
+
+- Call `.item()` or `.detach()` for every metric that you record, such as the loss and the accuracy.
+- Never add a tensor that still carries a graph.
 
 ---
 
-## 13. `CrossEntropyLoss` 的 target 类型/形状不对
+## 13. Wrong CrossEntropyLoss target
 
-**症状**
-- 报 dtype/形状错（这条不算 silent）；或更隐蔽——把 one-hot/float 概率当 target、target 多一维，训练能跑但学错。
+This entry sits behind Stage 2 gate 1: the loss at init matches the prior. A wrong target contract
+moves the loss at init away from `log(n)`.
 
-**为什么会错**
-- `nn.CrossEntropyLoss` 的 target 默认期望 **`long` 类型的类别索引**，形状 `(N,)`（图像分割等是 `(N, H, W)`），**不是 one-hot**。
-- `nn.BCEWithLogitsLoss` 才吃 `float` 的 `(N, C)`。两者混用会语义错或维度错。
+**Symptom**
 
-**怎么查/改**
+- PyTorch raises a dtype error or a shape error. That case is not silent.
+- The silent case is a one-hot target, a float probability target, or a target with one extra
+  dimension. The run proceeds and learns the wrong thing.
+
+**Cause**
+
+- `nn.CrossEntropyLoss` expects class indices of dtype `long` with shape `(N,)`. Image segmentation
+  uses shape `(N, H, W)`. It does not expect a one-hot target.
+- `nn.BCEWithLogitsLoss` expects `float` values with shape `(N, C)`. A swap of the two losses gives
+  a wrong meaning or a wrong rank.
+
+**Check and repair**
+
 ```python
-# 多分类：target 是 (N,) 的 long 类别索引
-yb = yb.long()                       # 别做 one-hot
-loss = nn.CrossEntropyLoss()(logits, yb)     # logits 形状 (N, C)
+# Multi-class: the target is a long class index of shape (N,).
+yb = yb.long()                       # do not build a one-hot target
+loss = nn.CrossEntropyLoss()(logits, yb)     # the logits have shape (N, C)
 
-# 多标签/二分类：target 是 (N, C) 的 float（0/1）
+# Multi-label or binary: the target is a float 0 or 1 of shape (N, C).
 loss = nn.BCEWithLogitsLoss()(logits, yb.float())
 ```
 
 ---
 
-## 14. weight decay 误加到 bias / BatchNorm / LayerNorm 参数上
+## 14. Weight decay on bias and norm parameters
 
-**症状**
-- 不致命，但正则略偏；norm 层的 γ、β 和各层 bias 被错误衰减，轻微伤性能。与第 5 条同属"对组件理解不到位"的信号。
+No Stage 2 gate covers this entry. It belongs to Stage 4, where you regularize.
 
-**为什么会错**
-- weight decay 的本意是惩罚**权重矩阵**的幅度。对 1-D 的 bias / norm 仿射参数做衰减缺乏理论依据，多数 SOTA 配方都把这些参数单列为 `weight_decay=0`。
+**Symptom**
 
-**怎么改**
+- The defect is not fatal, but the regularization is slightly wrong. The gamma and beta of the norm
+  layers and the bias of each layer decay by mistake, and performance drops a little. Like entry 5,
+  it shows an incomplete model of the components.
+
+**Cause**
+
+- Weight decay exists to penalize the magnitude of the weight matrices. A decay on a 1-D bias or on
+  a norm affine parameter has no theoretical basis. Most state-of-the-art recipes put these
+  parameters in a separate group with `weight_decay=0`.
+
+**Repair**
+
+- Call `split_param_groups` from
+  [`extra_pitfalls_before_after.py`](../sample_codes/common-patterns/extra_pitfalls_before_after.py).
+  It returns two parameter groups. The weight matrices keep the decay. The bias and the 1-D norm
+  parameters get `weight_decay=0`.
+
 ```python
-def split_param_groups(model, weight_decay=1e-2):
-    """把参数分两组：weight 走 weight_decay，bias/norm 参数 weight_decay=0。"""
-    decay, no_decay = [], []
-    for name, p in model.named_parameters():
-        if not p.requires_grad:
-            continue
-        # bias 及 1-D 参数（BN/LayerNorm 的 weight 也是 1-D）不做 weight decay
-        if p.ndim <= 1 or name.endswith(".bias"):
-            no_decay.append(p)
-        else:
-            decay.append(p)
-    return [
-        {"params": decay, "weight_decay": weight_decay},
-        {"params": no_decay, "weight_decay": 0.0},
-    ]
-
 optimizer = torch.optim.AdamW(split_param_groups(model), lr=3e-4)
 ```
 
 ---
 
-## 扩展坑排查口诀
+## Diagnostic route for entries 7 to 14
 
 ```
-能 overfit 单 batch、链路也通，但训得不好 / 不可复现？查训练策略层：
- ├─ 训练数据 shuffle 了吗？            (第7条)
- ├─ loss 按样本数平均了吗？reduction 一致？(第8条)
- ├─ LR 有 warmup + scheduler 吗？量级合理？(第9条)
- ├─ 归一化 stats 只用训练集、各阶段复用？  (第10条)
- ├─ 随机种子固定了吗（能复现/可对比）？     (第11条)
- ├─ 统计 loss 用 .item() 防显存泄漏？      (第12条)
- ├─ CrossEntropy 的 target 是 long 索引？  (第13条)
- └─ weight decay 排除了 bias/norm？        (第14条)
+One batch overfits and the pipeline is correct, but the run trains poorly
+or does not reproduce. Check the training strategy:
+ ├─ Does the train loader shuffle?                        (entry 7)
+ ├─ Does the loss average over the samples?               (entry 8)
+ ├─ Does the learning rate have a warmup and a scheduler? (entry 9)
+ ├─ Do all stages reuse the train statistics?             (entry 10)
+ ├─ Is the random seed fixed?                             (entry 11)
+ ├─ Does each metric use .item() to free the graph?       (entry 12)
+ ├─ Is the CrossEntropy target a long index?              (entry 13)
+ └─ Does weight decay skip the bias and norm parameters?  (entry 14)
 ```

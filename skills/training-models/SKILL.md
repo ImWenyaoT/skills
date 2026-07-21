@@ -1,48 +1,119 @@
 ---
 name: training-models
-description: Neural-network training discipline and silent-failure debugging. Use when loss stalls, accuracy is stuck, gradients explode or vanish, train/eval results disagree, inference is wrong, a one-batch overfit check fails, an existing loop needs review, or a new training pipeline needs staged setup. Chinese triggers include loss 不下降, acc 卡住, 梯度异常, 训练验证不一致, 推理错误, 检查训练循环, and 从零搭训练流程.
+description: Staged setup and silent-failure diagnosis for neural network training. Use when you start a new training pipeline, when you review a training loop, or when a run goes wrong — the loss does not decrease, accuracy stalls, gradients explode or vanish, train and eval disagree, inference is wrong, or a one-batch overfit fails. Chinese triggers include 从零搭训练流程, 检查训练循环, loss 不下降, acc 卡住, 梯度异常, 训练验证不一致, and 推理错误. Do not use for experiment orchestration, ablation matrices, or result tables.
 ---
 
-# Training Neural Networks Reliably
+# Training Neural Networks
 
-Silent failures are normal in neural-network training. Establish a minimal reproducible feedback loop,
-then add data complexity, regularization, and model capacity one change at a time.
+A misconfigured network trains. The loss decreases, the run completes, and the model is quietly
+wrong. The error surface here is logical, not syntactic, so the usual defences do not fire: no
+exception, no stack trace, no unit test. A fast approach does not work here.
+
+The defence is a **gate**. A gate is the evidence that permits entry to the next stage. Collect
+that evidence before you continue. A stage that you enter through a shut gate hides a defect,
+and you must then find it with more code in the way.
+
+Two habits open gates faster than all others: **visualize** the tensors at each seam, and change
+**one thing at a time**.
 
 ## Route
 
-- **Existing failure**: freeze one symptom and reproduction command, then run the diagnostic loop.
-- **Loop review**: audit modes, gradient lifecycle, output/loss contracts, and the smallest sanity check.
-- **New pipeline**: follow the [six-stage recipe](references/karpathy-recipe.md), proving each stage
-  before adding the next.
+- **New pipeline** — walk the six stages in order. Open each gate before you continue.
+- **Broken run** — the gates are also the diagnosis. Run the Stage 2 gates in order. The first
+  gate that stays shut localizes the defect.
+- **Loop review** — audit the run against the Stage 2 gates. Report each gate as open or shut.
 
-## Diagnostic loop
+Read [karpathy-recipe.md](references/karpathy-recipe.md) for the full tips of each stage. Read
+[checklist.md](references/checklist.md) when a gate stays shut and you need the failure modes
+behind it.
 
-1. Fix the random seed; disable augmentation, dropout, and weight decay; record initial loss,
-   training loss, and the primary metric under one command.
-2. Check expected initial loss. Uniform `n`-class cross entropy should be near `log(n)`; otherwise
-   inspect labels, initialization, final bias, logit scale, and the loss input contract.
-3. Overfit 2–8 fixed examples until loss approaches zero, then compare predictions with labels.
-4. Retrain with zeroed inputs. Similar performance points to leakage, index misalignment, or a model
-   that ignores its inputs.
-5. Localize the first failed contract using the [failure checklist](references/checklist.md), apply
-   the smallest repair, and rerun the identical reproduction.
+## Stage 1 — Become one with the data
 
-When small-batch overfit fails, check `train()`/`eval()`, `zero_grad()` → forward → `backward()` →
-`step()`, logits-versus-probability loss contracts, tensor axis transforms, and label alignment first.
+Scan thousands of examples. Sort and filter by label, size, and length. Look at the outliers on
+every axis, because an outlier almost always exposes a defect in the data or the preprocessing.
+
+**Gate:** you can state the label noise, the duplicates, the corrupt samples, and the class
+imbalance of this dataset. You can also say which architecture the data asks for, and why.
+
+## Stage 2 — Skeleton and dumb baselines
+
+Connect training to evaluation with a model that you cannot get wrong, such as a linear
+classifier or a tiny ConvNet. Fix the seed. Turn off augmentation, dropout, and weight decay.
+Evaluate on the whole test set.
+
+These seven gates are also the diagnostic order. Open them one by one.
+
+1. **Loss at init matches the prior.** Uniform `n`-class cross entropy starts near `log(n)`. L2
+   regression starts near the label variance. A mismatch points at the labels, the final layer,
+   the logit scale, or the loss input contract.
+2. **The final-layer bias holds the prior.** Set it to the target mean for regression, and to
+   `log(pos/neg)` for imbalanced classification. Otherwise the first hundreds of steps only
+   unlearn a wrong bias.
+3. **A human-checkable metric exists.** Track accuracy or a similar metric next to the loss.
+   Record your own human accuracy as the reference ceiling.
+4. **The input-independent baseline is clearly worse.** Train once on zeroed inputs. A similar
+   result means that the model ignores its input, or that a label leaks in.
+5. **One batch of 2 to 8 examples overfits to near zero.** Plot the labels and the predictions
+   together and confirm that they align point by point. This gate separates a broken pipeline
+   from a generalization problem.
+6. **The tensors are correct at the last seam.** Print `x` and `y` in denormalized form on the
+   line directly above `y_hat = model(x)`. A dataset can be correct while collate, transform, or
+   the device copy corrupts the batch.
+7. **Gradients respect the sample boundary.** Build a scalar from the loss of sample `i` alone,
+   call backward, and confirm that only the input of sample `i` carries gradient. The same probe
+   proves causality in an autoregressive model.
+
+**Gate:** all seven gates hold under one reproduction command.
+
+## Stage 3 — Overfit
+
+Copy the simplest architecture that a related paper reports. Use Adam at `3e-4`. Turn learning
+rate decay off. Add one signal, module, or data source at a time, and verify each one.
+
+**Gate:** the model reaches a very low training loss on the full training set. A model that
+cannot reach it gives you a defect report, not a capacity report.
+
+## Stage 4 — Regularize
+
+Trade training fit for validation performance, in this order of value: more real data, stronger
+augmentation, a pretrained backbone, fewer input dimensions, a smaller model, a smaller batch,
+dropout, more weight decay, early stopping. Try a larger model last, and only together with
+early stopping.
+
+**Gate:** validation loss improves, the first-layer weights show clean edges, and the internal
+activations show no odd artifact.
+
+## Stage 5 — Tune
+
+Search hyperparameters at random rather than on a grid. A grid resamples the axes that do not
+matter.
+
+**Gate:** the search covers the sensitive hyperparameters, and the best configuration repeats.
+
+## Stage 6 — Squeeze
+
+Ensemble the models. Distill the ensemble back into one model when compute is short. Train for
+longer than feels necessary, because networks improve for an unintuitive length of time.
+
+**Gate:** you report the final number against the Stage 3 and Stage 4 results.
 
 ## Runnable checks
 
-- [`sanity_check.py`](sample_codes/getting-started/sanity_check.py): initial loss and
-  input-independent baselines.
-- [`correct_training_loop.py`](sample_codes/getting-started/correct_training_loop.py): training and
-  validation loop template.
+- [`sanity_check.py`](sample_codes/getting-started/sanity_check.py) — Stage 2 gates 1, 4, and 5,
+  plus the mode, `zero_grad`, and logits contracts. A check that cannot decide reports
+  `not_applicable` rather than a pass.
+- [`correct_training_loop.py`](sample_codes/getting-started/correct_training_loop.py) — a train
+  and validation loop to copy.
 - [`six_pitfalls_before_after.py`](sample_codes/common-patterns/six_pitfalls_before_after.py) and
-  [`extra_pitfalls_before_after.py`](sample_codes/common-patterns/extra_pitfalls_before_after.py):
-  broken/fixed examples.
+  [`extra_pitfalls_before_after.py`](sample_codes/common-patterns/extra_pitfalls_before_after.py)
+  — broken and repaired pairs for the failure modes in the checklist.
 
 ## Completion
 
-Report the reproduction command, applicable sanity-check results, defect evidence, repair, and
-before/after comparison. Existing failures are complete only when the original reproduction passes
-without weakened validation. New pipelines must also name the current recipe stage and the evidence
-that permits entering the next one.
+Report the reproduction command, the state of each gate that you touched, the evidence behind
+the defect, the repair, and the before-and-after comparison.
+
+A broken run is complete when the original reproduction passes and no validation step is weaker
+than before. A new pipeline is complete when you name the current stage and the evidence that
+opens its gate. A loop review is complete when every Stage 2 gate carries an open or shut
+verdict.
