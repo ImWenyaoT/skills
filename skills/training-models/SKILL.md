@@ -16,6 +16,11 @@ and you must then find it with more code in the way.
 Two habits open gates faster than all others: **visualize** the tensors at each seam, and change
 **one thing at a time**.
 
+The stages differ in how much room they leave you. Stages 1 to 3 are a narrow bridge: the order
+matters, and a skipped check costs you hours later. Stages 4 to 6 are an open field: many routes
+reach a good model, so the gates there describe what you should be able to show, not what you
+must do. The reference gives the reason behind each option, which is what lets you choose.
+
 ## Route
 
 - **New pipeline** — walk the six stages in order. Open each gate before you continue.
@@ -75,25 +80,30 @@ cannot reach it gives you a defect report, not a capacity report.
 
 ## Stage 4 — Regularize
 
-Trade training fit for validation performance, in this order of value: more real data, stronger
-augmentation, a pretrained backbone, fewer input dimensions, a smaller model, a smaller batch,
-dropout, more weight decay, early stopping. Try a larger model last, and only together with
-early stopping.
+Now trade a little training fit for validation performance. More real data is the one option that
+improves the model without a limit, so reach for it before the others. After that the choice
+depends on your data and your compute, and the reference ranks the twelve usual options with the
+reason behind each one. Two of them carry a condition worth knowing before you pick: dropout
+combines poorly with BatchNorm, and a larger model only helps together with early stopping.
 
-**Gate:** validation loss improves, the first-layer weights show clean edges, and the internal
-activations show no odd artifact.
+**Gate:** validation loss improves. The first-layer weights show reasonable edges, and the
+internal activations show no odd artifact. A filter that looks like noise means a defect, so
+treat that as a reason to return to Stage 2 rather than to add more regularization.
 
 ## Stage 5 — Tune
 
-Search hyperparameters at random rather than on a grid. A grid resamples the axes that do not
-matter.
+Random search suits this better than a grid, because a grid resamples the axes that do not matter.
+Bayesian tools exist and some people report success with them; manual exploration of a wide space
+still competes well.
 
-**Gate:** the search covers the sensitive hyperparameters, and the best configuration repeats.
+**Gate:** you can say which hyperparameters the model is sensitive to, and the best configuration
+repeats.
 
 ## Stage 6 — Squeeze
 
-Ensemble the models. Distill the ensemble back into one model when compute is short. Train for
-longer than feels necessary, because networks improve for an unintuitive length of time.
+Two low-risk gains remain. An ensemble gives roughly 2% almost every time, and distillation folds
+it back into one model when compute is short. Networks also improve for an unintuitive length of
+time, so a run that still descends slowly is usually a run to leave alone.
 
 **Gate:** you report the final number against the Stage 3 and Stage 4 results.
 
