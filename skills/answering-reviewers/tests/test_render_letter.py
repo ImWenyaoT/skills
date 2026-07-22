@@ -161,3 +161,30 @@ class CliTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class VoidElementTests(unittest.TestCase):
+    def test_card_with_form_controls_still_closes(self) -> None:
+        """A card that holds <input>/<br> (void elements, no end tag) must close.
+
+        The real revision page carries radio options inside every open card.
+        Void elements emit no end tag, so counting them in the depth tracker
+        left the first such card open forever and silently swallowed every
+        card after it — a 12-card page parsed as 1 card.
+        """
+        page = (
+            '<article class="comment-card" data-comment-id="R1-1">'
+            '<div class="verbatim">First ask.</div>'
+            '<label><input type="radio" name="o" value="A">Option A</label>'
+            '<br><img src="x.png">'
+            "</article>"
+            '<article class="comment-card" data-comment-id="R1-2">'
+            '<div class="verbatim">Second ask.</div>'
+            "</article>"
+        )
+        from render_letter import RevisionPageParser
+
+        parser = RevisionPageParser()
+        parser.feed(page)
+        self.assertEqual([c.comment_id for c in parser.cards], ["R1-1", "R1-2"])
+        self.assertEqual(parser.cards[0].field("verbatim"), "First ask.")

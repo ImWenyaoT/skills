@@ -58,6 +58,14 @@ FIELD_CLASSES = frozenset(
     }
 )
 
+# Void elements never emit an end tag, so they must not touch the depth
+# counters. A card that holds one <input> would otherwise never close, and
+# every later card would be swallowed into it silently.
+VOID_ELEMENTS = frozenset(
+    {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+     "meta", "param", "source", "track", "wbr"}
+)
+
 
 def escape_latex(text: str) -> str:
     """Escape the ten LaTeX special characters in one run of plain text.
@@ -112,6 +120,8 @@ class RevisionPageParser(HTMLParser):
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         """Open a card or a field when the matching class attribute appears."""
+        if tag in VOID_ELEMENTS:
+            return
         attributes = {key: (value or "") for key, value in attrs}
         classes = set(attributes.get("class", "").split())
 
@@ -139,7 +149,7 @@ class RevisionPageParser(HTMLParser):
 
     def handle_endtag(self, tag: str) -> None:
         """Close the open field or card as their depth counters unwind."""
-        if self._card is None:
+        if tag in VOID_ELEMENTS or self._card is None:
             return
         if self._field is not None:
             self._field_depth -= 1
