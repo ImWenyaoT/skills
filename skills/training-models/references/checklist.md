@@ -1,4 +1,4 @@
-# Fourteen Silent Failure Modes
+# Fifteen Silent Failure Modes
 
 Each entry has the same four parts: **Symptom**, **Cause**, **Check**, **Repair**. The examples use
 PyTorch. The reasoning holds for any framework.
@@ -20,7 +20,8 @@ Entries 1 to 6 come from the original Karpathy thread. They decide whether the p
 
 [Entries 7 to 14](#entries-7-to-14-the-training-strategy) are not in that thread. They are as
 frequent, and most of them are as silent. They decide how well a run trains and whether it
-reproduces.
+reproduces. Entry 15 sits one level above them: it decides whether two correct runs mean anything
+when you put their numbers side by side.
 
 - [7. No shuffle in the train DataLoader](#7-no-shuffle-in-the-train-dataloader)
 - [8. Wrong loss reduction](#8-wrong-loss-reduction)
@@ -30,6 +31,7 @@ reproduces.
 - [12. Loss accumulation that holds the graph](#12-loss-accumulation-that-holds-the-graph)
 - [13. Wrong CrossEntropyLoss target](#13-wrong-crossentropyloss-target)
 - [14. Weight decay on bias and norm parameters](#14-weight-decay-on-bias-and-norm-parameters)
+- [15. Ablation arms that are not comparable](#15-ablation-arms-that-are-not-comparable)
 - [Diagnostic route for entries 7 to 14](#diagnostic-route-for-entries-7-to-14)
 
 ---
@@ -622,6 +624,60 @@ No Stage 2 gate covers this entry. It belongs to Stage 4, where you regularize.
 ```python
 optimizer = torch.optim.AdamW(split_param_groups(model), lr=3e-4)
 ```
+
+---
+
+## 15. Ablation arms that are not comparable
+
+No Stage 2 gate covers this entry. It belongs to the experiment design around the run, and it is
+the most expensive defect in this file: every arm trains correctly, every number looks reasonable,
+and the comparison between them means nothing.
+
+**Symptom**
+
+- Each arm converges, each metric is plausible, and the ablation table is ready to publish. The
+  numbers still cannot be compared, because the arms differ in something other than the one
+  variable you meant to isolate.
+
+**Cause**
+
+- The evaluation protocol reads a training parameter. A validation transform that resizes only
+  when `batch_size > 1` ties the metric domain to a throughput knob, so raising the batch size
+  silently changes what the number means.
+- The metric domain includes padding. Aligning both the input and the target to a multiple of the
+  network stride, then never cropping back, scores the reflected border as if it were content.
+- Early stopping watches a different metric than the checkpoint selector. The run then stops while
+  the reported metric is still improving, and each arm stops at a different point in its own
+  trajectory.
+- Stopping rules differ across arms. One arm runs the full schedule while another exits on
+  patience, so the table compares a converged model with a stopped one.
+- A swapped component changes the input scale. A representation whose channels span `[-100, 100]`
+  fed to a network tuned for `[-1, 1]` makes the experiment "swap the component and destroy the
+  initialization", not "swap the component".
+- The arms hold different numbers of trainable parameters. Whichever way the result falls, the
+  cause is ambiguous.
+
+**Check**
+
+- Diff the resolved config of every arm, not the config files. The file may have changed after the
+  run. Each run should archive the config it actually used; compare those archives and confirm the
+  only difference is the variable under study.
+- Assert that the evaluation protocol is independent of every training parameter.
+- Confirm the metric is computed on the original resolution, in the original domain, against an
+  untouched target.
+- Confirm the stopping rule, the schedule length, and the seed are identical across arms.
+- Normalize a swapped representation to the range the network already expects, and record the
+  constant used for each one.
+
+**Repair**
+
+- Give the evaluation its own protocol, fixed and separate from the training configuration.
+- Pad the input inside the forward pass and crop the output back before the metric sees it.
+- Point early stopping at the same metric the checkpoint selector uses.
+- Report the stopping epoch of each arm in the table. A footnote costs one line, and a reviewer who
+  finds the difference without it audits everything else.
+- When an arm carries an advantage that the others lack, such as an extra trainable parameter, say
+  so. If that arm still loses, the handicap becomes evidence that the comparison was fair.
 
 ---
 

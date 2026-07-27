@@ -647,6 +647,13 @@
       "notes": "Packaging the revision upload is submission work, not deciding what to answer."
     },
     {
+      "id": "answering-reviewers-positive-experiment-backfires",
+      "prompt": "受控对照跑完了,结果审稿人是对的 —— 我们的色彩空间确实不如他点名的那个,差 1.5 dB。可整篇论文都建在这个空间上,不可能换。这条意见现在怎么答?",
+      "expected_skills": ["answering-reviewers"],
+      "forbidden_skills": ["training-models"],
+      "notes": "The demanded comparison confirmed the reviewer's doubt; the question is how to answer, not how to debug the run."
+    },
+    {
       "id": "answering-reviewers-negative-draft-section",
       "prompt": "Draft the related-work section and the contribution bullets for my paper from scratch.",
       "expected_skills": ["writing-papers"],

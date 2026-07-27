@@ -65,6 +65,37 @@ Reviewers make factual errors. Handle it in this order — the order is the whol
 
 A correction without an experiment reads as a dodge, no matter how right it is.
 
+## When the experiment proves the reviewer right
+
+The comparison they demanded sometimes returns the answer they predicted and you feared. Your
+method is not the best choice; the component they doubted contributes nothing measurable. This is
+the moment the revision is won or lost, and the instinct that loses it is to go looking for the
+cut of the data where you still win.
+
+Report the result. A number you suppress is a number the next reviewer finds, and by then it costs
+the paper rather than one comment.
+
+Then separate two questions that the reviewer's phrasing fused into one. *"Prove that X is the
+best choice"* presumes X is your contribution. Frequently it is not — it is the substrate your
+contribution runs on, and the comparison you just ran across substrates is evidence that your real
+contribution holds across all of them. Name what you actually claim, show the comparison supports
+that claim, and state plainly why the paper keeps the substrate it uses: comparability with the
+prior work under review, cost, or scope. Volunteering the better alternative as a direction
+strengthens the paper, because a limitation you name yourself is one the reviewer no longer has to.
+
+Two details make the concession land instead of read as defeat:
+
+- **Say that their judgement was confirmed.** They wrote the comment because they suspected
+  something; the experiment agreeing with them is the strongest evidence you took it seriously.
+- **Point out any handicap the losing arm carried in its favour.** If your method had a trainable
+  parameter the baselines lacked and still lost, say so — it forecloses "you did not tune the
+  comparison properly," which is otherwise the next round's comment.
+
+The boundary: hunting for a favourable framing is legitimate, and hunting for a favourable number
+is not. Reframing chooses which honest claim to foreground. Rerunning until the result flatters
+you, or reporting the one split where you win, is the fabrication that ends careers. If a new
+angle needs a new experiment, commit to reporting whatever it returns before you launch it.
+
 ## The response letter
 
 Per comment, in this order: quote the comment verbatim → state the action taken → show the evidence → point to the location in the revised manuscript ("Sec. 4.3, Table 5, p. 8").
