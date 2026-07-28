@@ -15,6 +15,12 @@ Read each comment as a work item, not as a proposition to evaluate. A spec you d
 
 This holds even when the reviewer is factually wrong (they often are — see [Wrong premises](#wrong-premises)). Being right about the science and wrong about the politics still ends in rejection.
 
+**Read the ask's grammar before scoping it.** The connectives in a reviewer's list are part of
+the spec. *"Such as A, B, or C"* offers examples and a choice — any sufficient subset answers it;
+*"A, B, and C"* conjoins. A revision plan that treats every listed item as mandatory buys
+experiments nobody required with days the required ones needed. Scope to what the sentence
+actually demands, and let the letter show the demanded thing done well.
+
 **Completion criterion:** every numbered comment from every reviewer, plus every point in the editor's summary, has its own entry in the response. The editor's summary is a separate spec — it is what the person who decides your fate chose to emphasize. Comments that seem trivial (font sizes, a missing citation) get entries too; they are the cheapest points you will ever score.
 
 ## Doing beats arguing
@@ -101,6 +107,16 @@ angle needs a new experiment, commit to reporting whatever it returns before you
 Per comment, in this order: quote the comment verbatim → state the action taken → show the evidence → point to the location in the revised manuscript ("Sec. 4.3, Table 5, p. 8").
 
 **Only report work that exists.** Every claim in the letter must be checkable in the attached manuscript. Promising a future experiment invites the reviewer to hold you to it on the next round, and there may not be one — if it isn't done by the deadline, it doesn't go in the letter.
+
+**The letter describes the paper, not the process.** Reviewers see the manuscript and the letter;
+they never see your repository, and nothing obliges you to narrate it. Defects you found and fixed
+in your own tooling, protocols you corrected mid-revision, runs that diverged and were redone —
+none of it belongs in the letter. State the protocol the revised paper uses, as the paper's
+protocol. When corrected numbers differ from the previous submission, the letter explains the
+protocol difference — "all reported metrics now use full-resolution evaluation (Sec. 4.1)" — not
+the engineering history behind it. The boundary is the same one the evidence rule draws: what the
+reviewer can check in the manuscript is reportable; your internals are not checkable and read as
+noise at best, as unforced confession at worst.
 
 Tone is a solved problem: plain, factual, no hedging, no gratitude inflation, no defensive framing. The letter's job is to be verifiable, not to be liked.
 
