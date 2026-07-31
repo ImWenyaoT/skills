@@ -16,24 +16,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from render_letter import escape_latex, main  # noqa: E402
 
 
-PAGE = """<!doctype html>
-<html lang="zh"><body>
-<article class="comment-card" data-comment-id="E-1" data-status="doing">
-  <div class="verbatim">Please distinguish the method from prior work &amp; resolve the gap.</div>
-  <div class="translation">请把方法与既有工作区分开。</div>
-  <div class="response-draft">We have clarified the distinction in Sec. 1.</div>
-</article>
-<article class="comment-card" data-comment-id="R1-1" data-status="done" data-choice="B">
-  <div class="verbatim">The reported PSNR is 23.5 while the original paper reports 28.2.</div>
-  <div class="response-draft">We reproduced the baseline with official weights.</div>
-  <div class="manuscript-change">Table 2 now reports 28.1 dB under the corrected protocol.</div>
-  <div class="location">Sec. 4.2, Table 2</div>
-</article>
-<article class="comment-card" data-comment-id="R1-2" data-status="todo">
-  <div class="verbatim">Only <strong>concrete</strong> evidence at 95% coverage will convince.</div>
-</article>
-</body></html>
-"""
+# The shipped example page is the fixture, so the two cannot drift: a change
+# that breaks the documented sample breaks the suite.
+EXAMPLE_PAGE = ROOT / "assets" / "revision-page-example.html"
+PAGE = EXAMPLE_PAGE.read_text(encoding="utf-8")
 
 
 class EscapeLatexTests(unittest.TestCase):

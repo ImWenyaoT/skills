@@ -44,12 +44,7 @@ npx skills add . --skill answering-reviewers
 
 | Skill | Purpose |
 |---|---|
-| [`agent-loops`](skills/agent-loops) | Build bounded agent loops, terminality, handoffs, and provider seams. |
-| [`agent-evals`](skills/agent-evals) | Score turns asynchronously and manage failure-case and golden regression loops. |
-| [`tool-policies`](skills/tool-policies) | Design uniform tool interfaces, risk tiers, and approval gates. |
-| [`persisting-traces`](skills/persisting-traces) | Persist session state, memory snapshots, and traces. |
-| [`bridging-legacy`](skills/bridging-legacy) | Place compatibility adapters around legacy services during migrations. |
-| [`spec-first`](skills/spec-first) | Update governing specifications before changing documented behavior. |
+| [`agent-runtime`](skills/agent-runtime) | Bounded agent loops, tool policy and approval gates, async scoring, session/trace persistence, and legacy-lane deletion gates. |
 | [`adversarial-review`](skills/adversarial-review) | Dispatch an independent read-only subagent for final verification. |
 
 ### Academic papers
@@ -59,25 +54,21 @@ npx skills add . --skill answering-reviewers
 | [`writing-papers`](skills/writing-papers) | Draft, review, and polish technical papers. |
 | [`answering-reviewers`](skills/answering-reviewers) | Implement reviewer comments as a spec and render the revision board. |
 | [`drawing-figures`](skills/drawing-figures) | Plan and produce publication-ready figures. |
-| [`elsevier-articles`](skills/elsevier-articles) | Maintain a reproducibly compiled `elsarticle` manuscript. |
-| [`elsevier-submissions`](skills/elsevier-submissions) | Build and verify an Editorial Manager submission packet. |
+| [`journal-articles`](skills/journal-articles) | Maintain a reproducibly compiled `elsarticle` or `IEEEtran` manuscript. |
+| [`journal-submissions`](skills/journal-submissions) | Build and verify an Elsevier or IEEE submission packet. |
 
-### Machine learning and writing
+### Machine learning and documents
 
 | Skill | Purpose |
 |---|---|
 | [`training-models`](skills/training-models) | Build, review, and debug neural-network training workflows. |
-| [`offer-magic`](skills/offer-magic) | Orchestrate a job application from role decision and resume delivery through interview preparation. |
-| [`writing-resumes`](skills/writing-resumes) | Write results-oriented technical and product resumes. |
 | [`markdown-pdf`](skills/markdown-pdf) | Convert Markdown into a polished printable PDF. |
-| [`apple-hig`](skills/apple-hig) | Review and implement interactions against Apple HIG. |
 
 ### Skill maintenance
 
 | Skill | Purpose |
 |---|---|
-| [`mining-sessions`](skills/mining-sessions) | Mine session history for recurring skill friction. |
-| [`importing-skills`](skills/importing-skills) | Review provenance, licensing, and adoption strategy for external skills. |
+| [`curating-skills`](skills/curating-skills) | Decide whether a candidate capability enters the library, whether it was mined from sessions or written by someone else. |
 
 ## Design principles
 

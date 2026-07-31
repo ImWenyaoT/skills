@@ -19,7 +19,15 @@ This holds even when the reviewer is factually wrong (they often are — see [Wr
 the spec. *"Such as A, B, or C"* offers examples and a choice — any sufficient subset answers it;
 *"A, B, and C"* conjoins. A revision plan that treats every listed item as mandatory buys
 experiments nobody required with days the required ones needed. Scope to what the sentence
-actually demands, and let the letter show the demanded thing done well.
+actually demands, and let the letter show the demanded thing done well. The exception is
+conditioned rather than default: when the editor's summary narrows the ask onto both named
+routes, or when both routes are cheap and jointly serve a goal the reviewer stated ("newer *and
+more diverse* datasets"), doing both is cheaper than defending the subset.
+
+**The verb sets the completion test.** *Discuss*, *explain*, *justify*, *compare*, and *conduct
+experiments* each finish differently, and answering one with another leaves the comment open into
+the next round. Preserve the operative words: "summarize the contributions **in a better way**"
+asks for a clearer and more defensible contribution structure, not for different contributions.
 
 **Completion criterion:** every numbered comment from every reviewer, plus every point in the editor's summary, has its own entry in the response. The editor's summary is a separate spec — it is what the person who decides your fate chose to emphasize. Comments that seem trivial (font sizes, a missing citation) get entries too; they are the cheapest points you will ever score.
 
@@ -52,13 +60,17 @@ So when an analysis surfaces a weakness the reviewers missed, that finding is in
 
 The exception is narrow: an unasked experiment earns its place only when it is the *cheapest* way to answer something they **did** ask. Test it by naming the comment number it serves. No number, no run.
 
+The same bound applies when the reviewer named a concern but prescribed no remedy: the editor's wording is the ceiling, not the floor. If the editor says the issue "must be discussed honestly," a candid quantitative discussion and a limitation may already satisfy the spec — do not invent an expensive experiment unless evidence is what makes that discussion credible. Where the reviewer *did* prescribe concrete actions (a citation, a named ablation, a dependency disclosure), implement them directly.
+
 ## Concede early and openly
 
 Name the components you adopted, cite them, and state plainly what is yours: *"Built on the adopted X [cite]; unlike prior work, we …"*
 
-This is counterintuitive and it works. Conceding an adopted component is what moved HGD-Net from major to minor revision. The reviewer is already suspicious; a concession you volunteer costs one sentence, while the same fact discovered by the reviewer costs your credibility on everything else.
+This is counterintuitive and it works. Volunteering an adopted component is what moved one submission from major to minor revision. The reviewer is already suspicious; a concession you volunteer costs one sentence, while the same fact discovered by the reviewer costs your credibility on everything else.
 
 The corollary: **keep adopted components out of the contribution list.** A contribution that leads with someone else's idea invites exactly the "these two works look similar" comment.
+
+When that comment does arrive, answer it by differentiating **claim sets**, not architectures. Rewrite the contribution list until every claimed contribution is distinct from both the nearest cited method and your own prior work. The objection is usually one of three shapes — *collision* (two works claim the same thing), *hierarchy* (a minor claim is billed as a major one), or *emphasis* (the adopted part leads) — and none of the three is a demand to abandon the adopted component. State the adopted parts as foundations, then locate the novelty where it actually lives: in the mechanism, the allocation, the interaction, the objective, or the evidence. If a separate comment challenges a foundation itself, answer it there rather than letting it bend the novelty response.
 
 ## Wrong premises
 
@@ -70,6 +82,22 @@ Reviewers make factual errors. Handle it in this order — the order is the whol
 4. **Then do what they asked anyway.** The correction earns nothing on its own; the experiment does. Running the comparison they wanted is what converts "the author argued with me" into "the author addressed it."
 
 A correction without an experiment reads as a dodge, no matter how right it is.
+
+## Verify provenance before constructing a defense
+
+A number matching a published one is not evidence that it was copied from the paper. Before you
+explain a suspicious baseline, go looking: run directories, archived machines, logs, checkpoints,
+scripts, old drafts, a co-author's records. Keep three states apart — reproduced locally with
+artifacts, reported from an external source, and provenance not yet recovered. "Not yet
+recovered" is an evidence slot to work on, not a licence to write a tidy origin story.
+
+When someone remembers a real run on another machine, hold that as a hypothesis and leave the
+response unwritten until the artifact or the protocol turns up. A letter can explain an
+unfavourable real result; it cannot recast it as a citation or a protocol mix-up that never
+happened.
+
+This governs your *investigation*, not your prose. What you may say is a separate rule — see
+[The response letter](#the-response-letter) — and neither one licenses guessing.
 
 ## When the experiment proves the reviewer right
 
@@ -101,6 +129,16 @@ The boundary: hunting for a favourable framing is legitimate, and hunting for a 
 is not. Reframing chooses which honest claim to foreground. Rerunning until the result flatters
 you, or reporting the one split where you win, is the fabrication that ends careers. If a new
 angle needs a new experiment, commit to reporting whatever it returns before you launch it.
+
+## Land each change in every manuscript location it governs
+
+One comment usually governs more than one place in the paper, and a change that lands in only one
+of them reads as half-addressed. Map the remedy onto the manuscript's structure before you write
+the letter entry. A motivation-and-ablation comment normally needs both a conceptual subsection
+and the controlled experiment. A failure-case comment normally needs an explicit limitations
+subsection near the end of Experiments plus a short echo in the Conclusion. A formatting comment
+triggers a template-level audit of table layout, font family, and size across the whole
+paper — follow the journal template rather than shrinking the one table they pointed at.
 
 ## The response letter
 
@@ -153,13 +191,22 @@ for it reads like a neutral request.
 Offer two or three routes per open comment rather than one instruction, and let the page record
 which one the author picks. They know which GPU is free and how much of the deadline is real.
 
-See [references/html-report.md](references/html-report.md) for the format.
+See [references/html-report.md](references/html-report.md) for the format, and
+[`assets/revision-page-example.html`](assets/revision-page-example.html) for the smallest page the
+generator accepts — it carries only the anchors, so it is the fastest way to check that a real
+page still parses.
 
-## The response letter
+## Rendering the letter
 
 The page feeds a LaTeX letter; [`assets/response-letter/`](assets/response-letter/) holds the
-template. Generate the skeleton once the ids and the verbatim text are settled — those blocks are
+template and [`scripts/render_letter.py`](scripts/render_letter.py) reads the page into it.
+Generate the skeleton once the ids and the verbatim text are settled — those blocks are
 quotations, so they carry no risk — then fill each response in as it becomes true.
+
+**Prerequisites.** The template needs a full TeX Live: `tcolorbox` with the `[most]` option and
+its `breakable` library, which the small distributions omit. Check the runtime before the
+deadline, not on it — [`scripts/smoke_letter.py`](scripts/smoke_letter.py) compiles the
+unsubstituted template and exits `2` naming the missing package rather than passing quietly.
 
 Emit the comment blocks in the letter's own order. The template numbers them by counter, so the
 sequence in the file becomes the numbering the reviewer reads, and a list sorted by status

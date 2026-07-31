@@ -1,13 +1,13 @@
 """diagram_primitives.py —— 架构图绘制公共原语。
 
-将 hgd_net 与 pace_net 两份 draw_cpm_branch.py 的公共核心抽取为可复用模块:
-  - SEMANTIC:  语义颜色字典(填充/描边各 10 个条目,源自 hgd_net/palette.py)
+架构图脚本的公共核心:
+  - SEMANTIC:  语义颜色字典(填充/描边各 10 个条目)
   - draw_box:  带标签的圆角矩形(FancyBboxPatch)
   - connect:   语义箭头(fwd/cond/nograd/grad)
   - save_diagram: 同时落盘 PDF+PNG(600 DPI,复用 figkit.plot_helpers.save_fig)
 
-各论文薄壳调用方只需导入本模块,不再重复实现上述原语;
-坐标、标签、连线拓扑等布局细节保留在各论文自己的脚本里。
+每篇论文写一个薄壳脚本导入本模块即可,不必重复实现上述原语;
+坐标、标签、连线拓扑等布局细节留在各自的脚本里。
 """
 
 from __future__ import annotations
@@ -20,40 +20,40 @@ from figkit.plot_helpers import save_fig
 
 
 # ── 语义颜色字典 ─────────────────────────────────────────────────────────────
-# 颜色值直接从 hgd_net/paper/figures/scripts/palette.py 逐字提取,
+# 语义色板：填充色浅、描边色深，同色相配对，
 # 每个键名语义化以覆盖架构图最常见的模块类型。
 SEMANTIC: dict[str, str] = {
     # 主干/骨干块 (GCM, DSR, PatchEmbed, Unpatchify …)
-    "TEAL_FILL":    "#D4E8EB",   # hgd_net palette.py TEAL_FILL
-    "TEAL_STROKE":  "#2A6478",   # hgd_net palette.py TEAL_STROKE
+    "TEAL_FILL":    "#D4E8EB",
+    "TEAL_STROKE":  "#2A6478",
 
     # 条件/软权重块 (AdaLN, CondEmbed, Proj …)
-    "AMBER":        "#E8D5B0",   # hgd_net palette.py AMBER_FILL
-    "AMBER_STROKE": "#C49A3C",   # hgd_net palette.py AMBER_STROKE
+    "AMBER":        "#E8D5B0",
+    "AMBER_STROKE": "#C49A3C",
 
     # 非可微/离散操作 (argmax, sort/unsort, routing …)
-    "GRAY":         "#DADADA",   # hgd_net palette.py GRAY_FILL
-    "GRAY_STROKE":  "#777777",   # hgd_net palette.py GRAY_STROKE
+    "GRAY":         "#DADADA",
+    "GRAY_STROKE":  "#777777",
 
     # 精化/后处理头 (BAR head, fusion, output smoothing …)
-    "GREEN":        "#CBE0C8",   # hgd_net palette.py GREEN_FILL
-    "GREEN_STROKE": "#4F7A4C",   # hgd_net palette.py GREEN_STROKE
+    "GREEN":        "#CBE0C8",
+    "GREEN_STROKE": "#4F7A4C",
 
     # 展开块内部 (MSA, MLP inside G-Block …)
-    "SLATE":        "#8DAFC0",   # hgd_net palette.py SLATE_FILL
-    "SLATE_STROKE": "#486878",   # hgd_net palette.py SLATE_STROKE
+    "SLATE":        "#8DAFC0",
+    "SLATE_STROKE": "#486878",
 
     # 冻结/外部模块 (DA-CLIP encoder, guidance provider …)
-    "FROZEN":        "#E0D8CE",  # hgd_net palette.py FROZEN_FILL
-    "FROZEN_STROKE": "#A09080",  # hgd_net palette.py FROZEN_STROKE
+    "FROZEN":        "#E0D8CE",
+    "FROZEN_STROKE": "#A09080",
 
     # 桥接/结构胶水 (linear 768→144, upsample, skip …)
-    "BRIDGE":        "#E8E4D8",  # hgd_net palette.py BRIDGE_FILL
-    "BRIDGE_STROKE": "#8A7A5C",  # hgd_net palette.py BRIDGE_STROKE
+    "BRIDGE":        "#E8E4D8",
+    "BRIDGE_STROKE": "#8A7A5C",
 
     # 输入/输出张量框
-    "IO_FILL":   "#FFFFFF",      # hgd_net palette.py IO_FILL
-    "IO_STROKE": "#333333",      # hgd_net palette.py IO_STROKE
+    "IO_FILL":   "#FFFFFF",
+    "IO_STROKE": "#333333",
 }
 
 # 箭头类型 → (颜色, 是否虚线) 映射表

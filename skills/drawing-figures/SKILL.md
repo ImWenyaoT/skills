@@ -27,18 +27,25 @@ the output; do not transplant one venue's requirements into another.
 
 ## Figure design system
 
-- White background (`#FFFFFF`); no dark theme, grey panel, gradient, 3D bar, or chartjunk.
-- Use distinct, saturated colours from `scripts/figkit/palette_base.py`, never matplotlib's
-  default cycle. For the CARE-Track look, use `CARETRACK_COLORPICK` from
-  `scripts/figkit/caretrack_palette.py`.
+- White background (`#FFFFFF`); no dark theme, grey panel, gradient, 3D bar, or chartjunk. One
+  figure carries one message.
+- Use distinct, saturated, colour-blind-safe colours from `scripts/figkit/palette_base.py`, never
+  matplotlib's default cycle.
 - Use Arial or Helvetica for sans-serif elements and Times New Roman for serif annotations.
   Final figures must not depend on DejaVu or Computer Modern.
 - Prefer PDF/EPS/SVG for vector-native plots and diagrams. For raster work, the target venue's
   artwork class controls DPI; 600 dpi is only the fallback when no stronger rule is known.
 - Design at final column size. Keep text at least 8 pt and strokes/symbols legible; use a compact
   canvas instead of shrinking text on an oversized canvas.
-- Encode meaning with colour plus marker shape, line style, label, or another redundant cue.
-- Use honest axes and a chart type appropriate to the data shape.
+- Encode meaning with colour plus marker shape, line style, label, or another redundant cue, so the
+  figure still reads in greyscale print.
+- Use honest axes and a chart type appropriate to the data shape. Do not truncate an axis to
+  exaggerate a gap; label a non-zero origin explicitly, and share one scale across subplots that
+  plot the same quantity.
+- Name every axis, legend entry, and annotation after the real method or metric. Ship no
+  `Module A` / `X` / `Y` placeholders.
+- Open each caption with the finding rather than "Fig. X shows …", so the figure is understandable
+  away from the body text.
 - Preserve the data and caller script behind analytical figures. Never synthesize missing
   experimental or observed-image evidence.
 
@@ -49,10 +56,6 @@ the output; do not transplant one venue's requirements into another.
 - [Figure script reference](references/figure-script-reference.md): diagram, plot, stitch,
   measurement, and annotation APIs with runnable examples.
 - [Publication artwork](references/publication-artwork.md): artwork classification and export QA.
-- [RGB-T common patterns](references/rgbt_journal_common_fig_table_patterns.md): distilled figure
-  set and visual conventions from journal papers.
-- [RGB-T caption audit](references/rgbt_journal_fig_table_captions.md): auto-extracted caption
-  evidence; verify against the source PDF before citing.
 
 ## Completion criteria
 

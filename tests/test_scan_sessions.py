@@ -8,7 +8,7 @@ from pathlib import Path
 MODULE_PATH = (
     Path(__file__).resolve().parents[1]
     / "skills"
-    / "mining-sessions"
+    / "curating-skills"
     / "scripts"
     / "scan_sessions.py"
 )

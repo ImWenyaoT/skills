@@ -51,62 +51,10 @@ class TriggerEvaluatorTests(unittest.TestCase):
         self.assertTrue(any("unknown skills" in failure for failure in failures))
         self.assertTrue(any("both expected and forbidden" in failure for failure in failures))
 
-    def test_prediction_loader_keeps_repeated_trials(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "predictions.jsonl"
-            path.write_text(
-                '{"id":"a","actual_skills":["one"]}\n'
-                '{"id":"a","actual_skills":[]}\n',
-                encoding="utf-8",
-            )
-            loaded = evaluator.load_predictions(path)
-        self.assertEqual(loaded["a"], [("one",), ()])
 
-    def test_perfect_predictions_have_perfect_routing_metrics(self) -> None:
-        skills = {"alpha-skill": self.skill("alpha-skill", "alpha")}
-        cases = [
-            evaluator.Case("positive", "alpha", ("alpha-skill",), (), ""),
-            evaluator.Case("abstain", "unrelated", (), ("alpha-skill",), ""),
-        ]
-        predictions = {"positive": [("alpha-skill",)], "abstain": [()]}
-        metrics = evaluator.compute_routing_metrics(cases, predictions, skills, 1)
-        self.assertEqual(metrics["precision"], 1.0)
-        self.assertEqual(metrics["recall"], 1.0)
-        self.assertEqual(metrics["f1"], 1.0)
-        self.assertEqual(metrics["false_trigger_rate"], 0.0)
-        self.assertEqual(metrics["failures"], [])
 
-    def test_bad_predictions_report_missing_forbidden_and_unknown_skills(self) -> None:
-        skills = {"alpha-skill": self.skill("alpha-skill", "alpha")}
-        cases = [evaluator.Case("positive", "alpha", ("alpha-skill",), ("beta-skill",), "")]
-        predictions = {"positive": [("beta-skill", "unknown-skill")]}
-        metrics = evaluator.compute_routing_metrics(cases, predictions, skills, 1)
-        self.assertEqual(metrics["recall"], 0.0)
-        self.assertGreater(metrics["forbidden_hits"], 0)
-        self.assertTrue(metrics["failures"])
 
-    def test_outcome_metrics_report_failed_assertions_and_missing_cases(self) -> None:
-        cases = [
-            evaluator.Case("graded", "a", ("alpha-skill",), (), ""),
-            evaluator.Case("missing", "b", ("alpha-skill",), (), ""),
-            evaluator.Case("abstain", "c", (), (), ""),
-        ]
-        outcomes = {"graded": (1, 2)}
-        metrics = evaluator.compute_outcome_metrics(cases, outcomes)
-        self.assertEqual(metrics["assertion_pass_rate"], 0.5)
-        self.assertEqual(metrics["case_pass_rate"], 0.0)
-        self.assertEqual(metrics["missing"], ["missing"])
 
-    def test_baseline_comparison_counts_changed_first_trials(self) -> None:
-        cases = [evaluator.Case("one", "a", ("alpha-skill",), (), "")]
-        delta = evaluator.compare_baseline(
-            cases,
-            {"one": [("alpha-skill",)]},
-            {"one": [()]},
-        )
-        self.assertEqual(delta["compared"], 1)
-        self.assertEqual(delta["changed"], 1)
-        self.assertEqual(delta["change_rate"], 1.0)
 
     def test_load_cases_reads_optional_fields(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

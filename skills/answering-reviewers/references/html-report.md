@@ -51,7 +51,7 @@ becomes the numbering in the compiled letter. A reordered card list silently ren
 response.
 
 **The original text is copied, never paraphrased.** Paraphrase is how scope quietly drifts —
-"evaluate on newer datasets" and "evaluate on LLIV-Phone or NTIRE 2024" are different specs, and
+"evaluate on newer datasets" and "evaluate on DATASET-A or DATASET-B" are different specs, and
 the second one is what you have to answer. Use `…` only where you genuinely omit a span.
 
 When one numbered comment contains two separable asks, split it into `R1-4a` and `R1-4b` and say
@@ -124,9 +124,9 @@ author under pressure forgets exists.
 
 ```
 下一步 · 三选一
-  A 全量   Lab + Luv + CIECAM02 三组受控对照   ~6 GPU天   最稳
-  B 降级   只做 Lab + Luv(审稿人点名的前两个)  ~3 GPU天   推荐 · CIECAM02 在信里说明缺席理由
-  C 只写   引文献论证 HVI 合理性               0 GPU      风险高 · R1 明确要了 ablation
+  A 全量   审稿人点名的三个变体全做受控对照   ~2N GPU天   最稳
+  B 降级   只做点名的前两个变体               ~N GPU天    推荐 · 第三个在信里说明缺席理由
+  C 只写   引文献论证现有设计合理              0 GPU       风险高 · R1 明确要了 ablation
 ```
 
 Mark one option as recommended and say why in one clause. A page that recommends nothing pushes
@@ -140,8 +140,8 @@ and picking it is a legitimate outcome rather than a failure to decide. When it 
 next move is a conversation, and the page records what came out of that conversation.
 
 Write the options as a recommendation with its reasoning attached, never as a verdict. The
-difference shows in one word: *"B is recommended — the two colour spaces R1 named cost 3 GPU days
-and CIECAM02 can be addressed in prose"* invites disagreement on the reasoning; *"Choose B"*
+difference shows in one word: *"B is recommended — the two variants R1 named cost half the budget,
+and the third can be addressed in prose"* invites disagreement on the reasoning; *"Choose B"*
 does not.
 
 An option that answers no comment id does not belong here at all. Unasked work is a new attack
@@ -159,11 +159,11 @@ A fixed bar at the bottom shows how many comments have a decision, and holds one
 copies a compact digest to the clipboard:
 
 ```
-KNOSYS-D-26-06552 · 2026-07-21 · 决策 7/11
+JOURNAL-D-YY-NNNNN · YYYY-MM-DD · 决策 7/11
 R1-1 done
 R1-2 doing
-R1-3 todo  → B  Lab+Luv only, CIECAM02 explained in letter
-R1-4 todo  → 另议  先问问同组有没有 LLIV-Phone 的镜像
+R1-3 todo  → B  first two variants only, third explained in letter
+R1-4 todo  → 另议  先找一下这个数据集还有没有可用镜像
 ```
 
 Plain text and nothing else. It has to survive a paste into any agent, and some never render a

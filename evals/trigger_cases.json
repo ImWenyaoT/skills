@@ -3,662 +3,899 @@
   "purpose": "Golden prompts for checking whether this repository's skill descriptions have clear trigger boundaries. These cases are not a full model trace; they define the expected trigger contract for classifier, sub-agent, or platform-trace evals.",
   "cases": [
     {
-      "id": "importing-skills-positive-import",
+      "id": "curating-skills-positive-import",
       "prompt": "I found an open-source agent skill on GitHub. Help me decide whether to import it as-is, adapt it, or clean-room rewrite it with attribution.",
-      "expected_skills": ["importing-skills"],
-      "forbidden_skills": ["mining-sessions"],
+      "expected_skills": [
+        "curating-skills"
+      ],
+      "forbidden_skills": [],
       "notes": "External skill adoption with provenance and license decisions."
     },
     {
-      "id": "importing-skills-positive-fork",
+      "id": "curating-skills-positive-fork",
       "prompt": "Audit this community skill before I fork it into my personal skills library. I need license, provenance, and attribution guidance.",
-      "expected_skills": ["importing-skills"],
-      "forbidden_skills": ["mining-sessions"],
+      "expected_skills": [
+        "curating-skills"
+      ],
+      "forbidden_skills": [],
       "notes": "Fork/import workflow should trigger adoption discipline."
     },
     {
-      "id": "importing-skills-negative-write-new",
+      "id": "curating-skills-positive-new-from-notes",
       "prompt": "Create a brand new skill from my own workflow notes and add it to this repo.",
-      "expected_skills": [],
-      "forbidden_skills": ["importing-skills"],
-      "notes": "Internal creation from notes is not external adoption and is not session mining."
+      "expected_skills": [
+        "curating-skills"
+      ],
+      "forbidden_skills": [],
+      "notes": "合并后改判：SKILL.md 第 4 步「Merge before creating」正是「该新建还是打补丁」的决策，「加进这个库」必须先过这一关。合并前 importing-skills 只管外部引入，这条才是负例。"
     },
     {
-      "id": "bridging-legacy-positive-adapter",
+      "id": "agent-runtime-positive-adapter",
       "prompt": "During this migration, wrap the old sanitizer service behind a compatibility adapter and keep the fallback path alive.",
-      "expected_skills": ["bridging-legacy"],
-      "forbidden_skills": ["spec-first"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Legacy service adapter and fallback lane."
     },
     {
-      "id": "bridging-legacy-positive-build-before-import",
+      "id": "agent-runtime-positive-build-before-import",
       "prompt": "The new code imports the legacy templates before they are built. Design a build-before-import bridge without rewriting the old module.",
-      "expected_skills": ["bridging-legacy"],
-      "forbidden_skills": ["agent-loops"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Legacy integration, not SDK abstraction."
     },
     {
-      "id": "bridging-legacy-positive-delete-proven-fallback",
+      "id": "agent-runtime-positive-delete-proven-fallback",
       "prompt": "The replacement lane now owns production and passes deterministic plus integration baselines. Migrate still-valid behavior contracts, then remove the unused legacy fallback, parser, switches, and legacy-only tests without widening scope.",
-      "expected_skills": ["bridging-legacy"],
-      "forbidden_skills": ["agent-loops"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "A compatibility migration includes a deletion gate, not permanent fallback retention."
     },
     {
-      "id": "bridging-legacy-negative-greenfield",
+      "id": "agent-runtime-negative-greenfield",
       "prompt": "Build a new stateless agent loop from scratch with terminal states and bounded turns.",
-      "expected_skills": ["agent-loops"],
-      "forbidden_skills": ["bridging-legacy"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "No legacy compatibility path."
     },
     {
-      "id": "agent-loops-positive-stateless",
+      "id": "agent-runtime-positive-stateless",
       "prompt": "Implement an agent loop inside a stateless request handler so each HTTP request advances one bounded step.",
-      "expected_skills": ["agent-loops"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "One-step-per-request loop contract."
     },
     {
-      "id": "agent-loops-positive-terminality",
+      "id": "agent-runtime-positive-terminality",
       "prompt": "Fix this agent route so terminality, handoff states, and post-tool continuation are explicit instead of an unbounded while loop.",
-      "expected_skills": ["agent-loops"],
-      "forbidden_skills": ["tool-policies"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Loop control, not tool policy."
     },
     {
-      "id": "agent-loops-negative-tool-policy",
+      "id": "agent-runtime-negative-tool-policy",
       "prompt": "Add approval gates and deterministic stubs to the agent tool registry.",
-      "expected_skills": ["tool-policies"],
-      "forbidden_skills": ["agent-loops"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Tool runtime policy only."
     },
     {
       "id": "markdown-pdf-positive-printable",
       "prompt": "Convert this Markdown report into a polished printable PDF with a cover page, table of contents, code highlighting, and page numbers.",
-      "expected_skills": ["markdown-pdf"],
-      "forbidden_skills": ["writing-resumes"],
+      "expected_skills": [
+        "markdown-pdf"
+      ],
+      "forbidden_skills": [],
       "notes": "Markdown to PDF output."
     },
     {
       "id": "markdown-pdf-positive-presentable",
       "prompt": "I have a .md file and need a presentable PDF version for sharing.",
-      "expected_skills": ["markdown-pdf"],
-      "forbidden_skills": ["elsevier-submissions"],
+      "expected_skills": [
+        "markdown-pdf"
+      ],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
       "notes": "Generic Markdown PDF conversion."
     },
     {
       "id": "markdown-pdf-positive-zh-export",
       "prompt": "把这个 Markdown 报告导出成适合打印和分享的 PDF，需要目录、代码高亮和页码。",
-      "expected_skills": ["markdown-pdf"],
-      "forbidden_skills": ["writing-resumes"],
+      "expected_skills": [
+        "markdown-pdf"
+      ],
+      "forbidden_skills": [],
       "notes": "Chinese Markdown-to-PDF conversion prompt."
     },
     {
       "id": "markdown-pdf-negative-doc-edit",
       "prompt": "Rewrite this Markdown section to make the argument clearer, but do not export anything.",
       "expected_skills": [],
-      "forbidden_skills": ["markdown-pdf", "writing-papers"],
+      "forbidden_skills": [
+        "markdown-pdf",
+        "writing-papers"
+      ],
       "notes": "Generic Markdown prose editing — not PDF conversion, and not academic-paper writing/review."
     },
     {
-      "id": "mining-sessions-positive-mine",
+      "id": "curating-skills-positive-mine",
       "prompt": "Scan my past Codex sessions and turn recurring workflow friction into new or improved skills.",
-      "expected_skills": ["mining-sessions"],
-      "forbidden_skills": ["importing-skills"],
+      "expected_skills": [
+        "curating-skills"
+      ],
+      "forbidden_skills": [],
       "notes": "Mine local sessions for skill opportunities."
     },
     {
-      "id": "mining-sessions-positive-transcripts",
+      "id": "curating-skills-positive-transcripts",
       "prompt": "Use the transcript history to decide what belongs in memory versus a reusable skill.",
-      "expected_skills": ["mining-sessions"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "curating-skills"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "Skill-vs-memory triage from transcripts."
     },
     {
-      "id": "mining-sessions-negative-external",
+      "id": "curating-skills-negative-external",
       "prompt": "Import this public skill repository and preserve license attribution.",
-      "expected_skills": ["importing-skills"],
-      "forbidden_skills": ["mining-sessions"],
+      "expected_skills": [
+        "curating-skills"
+      ],
+      "forbidden_skills": [],
       "notes": "External adoption, not mining own sessions."
     },
     {
       "id": "training-models-positive-loss",
       "prompt": "My PyTorch model's loss is not decreasing and accuracy is stuck. Check the training loop for train/eval mode, zero_grad, logits, and shape bugs.",
-      "expected_skills": ["training-models"],
-      "forbidden_skills": ["writing-papers"],
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Neural network training failure."
     },
     {
       "id": "training-models-positive-overfit",
       "prompt": "Help me sanity-check this deep learning training code by overfitting one batch and checking gradients.",
-      "expected_skills": ["training-models"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "Training sanity checks."
     },
     {
       "id": "training-models-positive-zh-loss",
       "prompt": "我的 PyTorch 训练 loss 不下降，acc 卡住了，帮我检查 train/eval、zero_grad、梯度和 logits 这些训练循环问题。",
-      "expected_skills": ["training-models"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "Chinese neural network training failure prompt."
     },
     {
       "id": "training-models-negative-agent-eval",
       "prompt": "Set up an evaluator for agent turns and export golden failure cases.",
-      "expected_skills": ["agent-evals"],
-      "forbidden_skills": ["training-models"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [
+        "training-models"
+      ],
       "notes": "Agent eval, not neural training."
     },
     {
       "id": "training-models-positive-recipe-setup",
       "prompt": "I'm setting up a new image-classification training run from scratch — what disciplined order should I follow (verify loss at init, overfit one batch, input-independent baseline) so bugs are easy to catch?",
-      "expected_skills": ["training-models"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "Karpathy recipe / from-scratch training setup methodology."
     },
     {
       "id": "training-models-positive-recipe-zh",
       "prompt": "从零搭一个神经网络训练 pipeline,按什么顺序做 sanity check(固定随机种子、验证 init loss、overfit 单 batch)才不容易踩坑?",
-      "expected_skills": ["training-models"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "Chinese: from-scratch NN training recipe / sanity-check order."
     },
     {
       "id": "training-models-negative-data-pipeline",
       "prompt": "Set up a data ingestion pipeline that loads CSV files into a feature store on a daily schedule.",
       "expected_skills": [],
-      "forbidden_skills": ["training-models"],
+      "forbidden_skills": [
+        "training-models"
+      ],
       "notes": "Generic data/ETL pipeline setup, not neural-network training correctness."
     },
     {
-      "id": "tool-policies-positive-approval",
+      "id": "agent-runtime-positive-approval",
       "prompt": "Design the agent tool registry with risk-tiered approval gates and POJO-validated playbooks.",
-      "expected_skills": ["tool-policies"],
-      "forbidden_skills": ["agent-loops"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Runtime tool policy vocabulary."
     },
     {
-      "id": "tool-policies-positive-stubs",
+      "id": "agent-runtime-positive-stubs",
       "prompt": "Add deterministic stubs for dangerous tools and define which actions require user approval.",
-      "expected_skills": ["tool-policies"],
-      "forbidden_skills": ["persisting-traces"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Policy gate, not persistence."
     },
     {
-      "id": "tool-policies-negative-sdk",
+      "id": "agent-runtime-negative-sdk",
       "prompt": "Hide the OpenAI Agents SDK behind one import site and map runner output onto our step contract.",
-      "expected_skills": ["agent-loops"],
-      "forbidden_skills": ["tool-policies"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "SDK runner boundary, not tool registry policy."
     },
     {
       "id": "drawing-figures-positive-figkit",
       "prompt": "For this Elsevier journal paper, derive a figure-count and palette budget from references, then draw architecture and Ours-vs-baseline plots.",
-      "expected_skills": ["drawing-figures"],
-      "forbidden_skills": ["writing-papers"],
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Figure production workflow."
     },
     {
       "id": "drawing-figures-positive-600dpi",
       "prompt": "Generate the 600 dpi result stitch and efficiency plot for our manuscript using the shared matplotlib figure kit.",
-      "expected_skills": ["drawing-figures"],
-      "forbidden_skills": ["elsevier-submissions"],
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
       "notes": "Drawing paper figures, not submission packaging."
     },
     {
       "id": "drawing-figures-positive-zh-architecture",
       "prompt": "帮我给这篇 CVPR 论文画方法架构图和 Ours-vs-baseline 散点图，要求 600 dpi、配色统一、可直接放进 LaTeX。",
-      "expected_skills": ["drawing-figures"],
-      "forbidden_skills": ["writing-papers"],
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Chinese publication figure production prompt."
     },
     {
       "id": "drawing-figures-negative-caption",
       "prompt": "Rewrite this Figure 3 caption and verify the text-table linkage.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["drawing-figures"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
       "notes": "Paper review/editing, not drawing a new figure."
     },
     {
       "id": "drawing-figures-negative-zh-caption-only",
       "prompt": "只帮我重写 Figure 2 的 caption，并检查正文里对这张图的引用是否逻辑自洽，不要画新图。",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["drawing-figures"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
       "notes": "Chinese caption-only hard negative for figure drawing."
     },
     {
-      "id": "spec-first-positive-architecture",
-      "prompt": "Before changing this docs-backed codebase's package boundaries and runtime lanes, update the governing design spec.",
-      "expected_skills": ["spec-first"],
-      "forbidden_skills": ["bridging-legacy"],
-      "notes": "Spec-first product decision."
-    },
-    {
-      "id": "spec-first-positive-vocabulary",
-      "prompt": "We are changing agent-loop vocabulary and memory semantics. Make the docs change first, then code.",
-      "expected_skills": ["spec-first"],
-      "forbidden_skills": ["persisting-traces"],
-      "notes": "Spec discipline around vocabulary change."
-    },
-    {
-      "id": "spec-first-negative-small-fix",
-      "prompt": "Fix this typo in a README and run the existing validation script.",
-      "expected_skills": [],
-      "forbidden_skills": ["spec-first"],
-      "notes": "Small doc typo is not a governing spec decision."
-    },
-    {
-      "id": "elsevier-submissions-positive-editorial",
+      "id": "journal-submissions-positive-editorial",
       "prompt": "Package this finished LaTeX manuscript for Elsevier Editorial Manager with CRediT, declarations, cover letter, and flat source zip.",
-      "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["drawing-figures", "elsevier-articles"],
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [
+        "drawing-figures",
+        "journal-articles"
+      ],
       "notes": "Submission packet assembly."
     },
     {
-      "id": "elsevier-submissions-positive-revision",
+      "id": "journal-submissions-positive-revision",
       "prompt": "Prepare the revised Elsevier submission packet and check abstract, highlights, graphical abstract, and data availability limits.",
-      "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["writing-papers"],
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Journal submission packaging."
     },
     {
-      "id": "elsevier-submissions-positive-zh-revision",
+      "id": "journal-submissions-positive-zh-revision",
       "prompt": "帮我把这篇 Elsevier 论文修回稿打包成 Editorial Manager 可提交的材料，包括声明、cover letter 和源码 zip。",
-      "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["writing-papers"],
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Chinese Elsevier revision packaging prompt."
     },
     {
-      "id": "elsevier-articles-positive-scaffold",
+      "id": "journal-articles-positive-scaffold",
       "prompt": "Scaffold a local Elsevier elsarticle manuscript and explain whether I should use preprint, review, 1p, 3p, or 5p with single-column or twocolumn output.",
-      "expected_skills": ["elsevier-articles"],
-      "forbidden_skills": ["elsevier-submissions", "writing-papers"],
+      "expected_skills": [
+        "journal-articles"
+      ],
+      "forbidden_skills": [
+        "journal-submissions",
+        "writing-papers"
+      ],
       "notes": "Elsevier article template and class-option setup, not prose authoring or EM packaging."
     },
     {
-      "id": "elsevier-articles-positive-compile",
+      "id": "journal-articles-positive-compile",
       "prompt": "My elsarticle paper fails under latexmk -pdf after adding natbib and a BibTeX bibliography; diagnose the local pdflatex build.",
-      "expected_skills": ["elsevier-articles"],
-      "forbidden_skills": ["elsevier-submissions"],
+      "expected_skills": [
+        "journal-articles"
+      ],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
       "notes": "Local elsarticle runtime and bibliography failure."
     },
     {
-      "id": "elsevier-articles-positive-zh-layout",
+      "id": "journal-articles-positive-zh-layout",
       "prompt": "帮我用 elsarticle 搭一个 Elsevier 论文模板，本地要能编译，并说明单栏 preprint 和 3p,twocolumn 双栏怎么选。",
-      "expected_skills": ["elsevier-articles"],
-      "forbidden_skills": ["elsevier-submissions", "writing-papers"],
+      "expected_skills": [
+        "journal-articles"
+      ],
+      "forbidden_skills": [
+        "journal-submissions",
+        "writing-papers"
+      ],
       "notes": "Chinese Elsevier template and local compile setup."
     },
     {
-      "id": "elsevier-articles-negative-finished-packet",
+      "id": "journal-articles-negative-finished-packet",
       "prompt": "The manuscript is finished. Build the Elsevier Editorial Manager revision packet with statements, highlights DOCX, cover letter, and the requested source zip.",
-      "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["elsevier-articles"],
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [
+        "journal-articles"
+      ],
       "notes": "Mature-manuscript submission packaging, not article setup."
     },
     {
-      "id": "elsevier-articles-negative-paper-prose",
+      "id": "journal-articles-negative-paper-prose",
       "prompt": "Draft and rewrite the introduction, contribution paragraphs, and evidence-backed experiment narrative of my technical paper.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["elsevier-articles", "elsevier-submissions"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "journal-articles",
+        "journal-submissions"
+      ],
       "notes": "Academic prose work without Elsevier template or runtime changes."
     },
     {
-      "id": "elsevier-articles-negative-generic-latex",
+      "id": "journal-articles-negative-generic-latex",
       "prompt": "Fix the margins, totals, company logo, and page numbers in this generic LaTeX invoice.",
       "expected_skills": [],
-      "forbidden_skills": ["elsevier-articles", "writing-papers"],
+      "forbidden_skills": [
+        "journal-articles",
+        "writing-papers"
+      ],
       "notes": "Generic non-paper LaTeX formatting must abstain."
     },
     {
-      "id": "elsevier-submissions-negative-review",
+      "id": "journal-submissions-negative-review",
       "prompt": "Review the LaTeX introduction for AI-tone and logical self-consistency.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["elsevier-submissions"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
       "notes": "Paper review, not finished packet."
     },
     {
-      "id": "elsevier-submissions-negative-generic-cover-letter",
+      "id": "journal-submissions-negative-generic-cover-letter",
       "prompt": "Write a cover letter for this software engineering job application.",
       "expected_skills": [],
-      "forbidden_skills": ["elsevier-submissions"],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
       "notes": "Generic cover letter, not Elsevier Editorial Manager packaging."
     },
     {
-      "id": "elsevier-submissions-negative-author-guidelines",
+      "id": "journal-submissions-negative-author-guidelines",
       "prompt": "Compare these two academic venue websites and summarize their scope, deadlines, and formatting links so I can decide where to submit later.",
       "expected_skills": [],
-      "forbidden_skills": ["elsevier-submissions"],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
       "notes": "Academic-adjacent venue research without a finished Elsevier submission packet."
     },
     {
-      "id": "persisting-traces-positive-sqlite",
+      "id": "agent-runtime-positive-sqlite",
       "prompt": "Migrate agent session state, memory snapshots, and trace rows from JSON files into SQLite with a fallback path.",
-      "expected_skills": ["persisting-traces"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Agent persistence migration."
     },
     {
-      "id": "persisting-traces-positive-traces",
+      "id": "agent-runtime-positive-traces",
       "prompt": "Add structured trace persistence for eval and debug fields without putting evidence into long-term memory.",
-      "expected_skills": ["persisting-traces"],
-      "forbidden_skills": ["tool-policies"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Trace/memory storage boundary."
     },
     {
-      "id": "persisting-traces-positive-ui-hydration",
+      "id": "agent-runtime-positive-ui-hydration",
       "prompt": "The agent messages are present in SQLite, but they disappear when I switch conversations or restart the Next.js dev server. Close the UI-to-API-to-database hydration loop and keep tests isolated.",
-      "expected_skills": ["persisting-traces"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Stored rows are incomplete until the product can read and hydrate them."
     },
     {
-      "id": "persisting-traces-negative-golden",
+      "id": "agent-runtime-negative-golden",
       "prompt": "Export golden cases from low-scoring agent turns and set score thresholds.",
-      "expected_skills": ["agent-evals"],
-      "forbidden_skills": ["persisting-traces"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Eval lifecycle, not persistence."
     },
     {
       "id": "writing-papers-positive-rebuttal",
       "prompt": "Polish this NeurIPS rebuttal paragraph and remove AI-sounding phrasing without changing the technical claims.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["writing-resumes", "answering-reviewers"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "answering-reviewers"
+      ],
       "notes": "Language polish of already-decided rebuttal prose — not deciding how to answer the reviewers."
     },
     {
       "id": "writing-papers-positive-figure-table",
       "prompt": "Check this paper's experiment narrative, Figure/Table captions, and evidence-bound conclusions for logical consistency.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["drawing-figures"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
       "notes": "Paper review and figure-text linkage."
     },
     {
       "id": "writing-papers-positive-zh-polish",
       "prompt": "帮我润色这段 NeurIPS 论文 LaTeX，去掉 AI 味，但不要改变技术主张。",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["writing-resumes"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [],
       "notes": "Chinese academic paper polishing prompt."
     },
     {
       "id": "writing-papers-positive-zh-figures",
       "prompt": "检查这篇论文的实验叙事、图表 caption 和结论是否证据自洽。",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["drawing-figures"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
       "notes": "Chinese paper narrative and caption review prompt."
     },
     {
       "id": "writing-papers-negative-general-english",
       "prompt": "Make this business email sound more natural in English.",
       "expected_skills": [],
-      "forbidden_skills": ["writing-papers"],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "General English editing is not academic paper writing or review."
     },
     {
       "id": "writing-papers-positive-draft-intro",
       "prompt": "I have experiment results for a new external-sort algorithm but haven't started writing. Help me draft the paper's introduction and structure the contributions.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["drawing-figures"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
       "notes": "From-scratch paper drafting / introduction structuring (Widom framework)."
     },
     {
       "id": "writing-papers-positive-draft-structure",
       "prompt": "I'm starting a technical paper from scratch — how should I organize the sections, what goes in the abstract vs the introduction, and should related work go before or after the body?",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["elsevier-submissions"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
       "notes": "Manuscript structuring decisions, not submission packaging."
     },
     {
       "id": "writing-papers-positive-zh-draft",
       "prompt": "我要从零开始写一篇 CVPR 论文，帮我搭引言的五段式结构、摘要该写什么、相关工作放前面还是后面。",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["drawing-figures"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
       "notes": "Chinese from-scratch paper drafting / structure decisions."
     },
     {
       "id": "writing-papers-positive-zh-outline",
       "prompt": "帮我起草这篇论文的 introduction 和 contributions bullet 列表。",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["writing-resumes"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [],
       "notes": "Chinese introduction + contributions drafting."
     },
     {
       "id": "writing-papers-negative-blog-draft",
       "prompt": "Help me draft a blog post and a project README from scratch.",
       "expected_skills": [],
-      "forbidden_skills": ["writing-papers"],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Generic prose/doc drafting is not academic technical-paper writing."
     },
     {
       "id": "writing-papers-negative-latex-invoice",
       "prompt": "Fix the LaTeX template for this invoice so the totals align and the company logo stays in the header.",
       "expected_skills": [],
-      "forbidden_skills": ["writing-papers"],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Non-paper LaTeX formatting should not trigger academic paper writing."
     },
     {
       "id": "writing-papers-negative-academic-admin",
       "prompt": "Summarize the department seminar schedule and turn it into an email announcement for grad students.",
       "expected_skills": [],
-      "forbidden_skills": ["writing-papers"],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Academic-adjacent admin writing is not manuscript drafting or review."
     },
     {
       "id": "writing-papers-positive-core-contribution",
       "prompt": "Help me pin down the single core contribution of my paper and restructure the intro around it, instead of a laundry list of everything I did.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["drawing-figures"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
       "notes": "Karpathy paper-writing taste: single core contribution + anti laundry-list structure."
     },
     {
       "id": "writing-papers-positive-zh-language",
       "prompt": "帮我把论文里 study/investigate/pipeline/combine 这些词换成更像顶会的写法，并检查每段是否首句点题。",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["writing-resumes"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [],
       "notes": "Chinese: good-vs-bad academic words + paragraph-first-sentence discipline."
     },
     {
       "id": "adversarial-review-positive-readiness",
       "prompt": "Before we call this implementation done, run an independent read-only adversarial review for blockers and weak evidence.",
-      "expected_skills": ["adversarial-review"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "adversarial-review"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "Explicit pre-completion adversarial review."
     },
     {
       "id": "adversarial-review-positive-is-done",
       "prompt": "Is this actually done? Have a separate reviewer attack the scope and correctness claims.",
-      "expected_skills": ["adversarial-review"],
-      "forbidden_skills": ["spec-first"],
+      "expected_skills": [
+        "adversarial-review"
+      ],
+      "forbidden_skills": [],
       "notes": "Readiness challenge."
     },
     {
       "id": "adversarial-review-positive-remote-delivery",
       "prompt": "Local tests are green and the branch was pushed. Before release, independently inspect the remote CI conclusion, failed-step logs, annotations, and ahead-behind state for blockers.",
-      "expected_skills": ["adversarial-review"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "adversarial-review"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "High-risk release readiness needs remote evidence, not local self-attestation."
     },
     {
       "id": "adversarial-review-negative-normal-work",
       "prompt": "Implement the requested feature and run the normal unit tests.",
       "expected_skills": [],
-      "forbidden_skills": ["adversarial-review"],
+      "forbidden_skills": [
+        "adversarial-review"
+      ],
       "notes": "Normal implementation should not automatically trigger adversarial review."
     },
     {
       "id": "adversarial-review-negative-summary",
       "prompt": "Summarize what changed and list the tests that passed.",
       "expected_skills": [],
-      "forbidden_skills": ["adversarial-review"],
+      "forbidden_skills": [
+        "adversarial-review"
+      ],
       "notes": "Routine completion summary should not trigger an adversarial sub-agent."
     },
     {
-      "id": "agent-evals-positive-fire-and-forget",
+      "id": "agent-runtime-positive-fire-and-forget",
       "prompt": "Build an async fire-and-forget evaluator that scores agent turns after the user-facing response and exports golden failures.",
-      "expected_skills": ["agent-evals"],
-      "forbidden_skills": ["persisting-traces"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Agent eval loop."
     },
     {
-      "id": "agent-evals-positive-thresholds",
+      "id": "agent-runtime-positive-thresholds",
       "prompt": "Add score thresholds, failure-case lifecycle, and regression harness reviews for agent responses.",
-      "expected_skills": ["agent-evals"],
-      "forbidden_skills": ["training-models"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [
+        "training-models"
+      ],
       "notes": "Agent regression evaluation."
     },
     {
-      "id": "agent-evals-positive-deterministic-before-judge",
+      "id": "agent-runtime-positive-deterministic-before-judge",
       "prompt": "Our golden suite fails whenever the LLM judge times out even though action and contains assertions pass. Separate deterministic product checks from judge-only score thresholds and report per-scenario timing.",
-      "expected_skills": ["agent-evals"],
-      "forbidden_skills": ["training-models"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [
+        "training-models"
+      ],
       "notes": "Judge availability must not erase deterministic regression evidence."
     },
     {
-      "id": "agent-evals-negative-model-training",
+      "id": "agent-runtime-negative-model-training",
       "prompt": "Debug why this neural network training run has exploding gradients.",
-      "expected_skills": ["training-models"],
-      "forbidden_skills": ["agent-evals"],
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "agent-runtime"
+      ],
       "notes": "ML training eval is not agent turn scoring."
     },
     {
-      "id": "agent-loops-positive-openai",
+      "id": "agent-runtime-positive-openai",
       "prompt": "Integrate the OpenAI Agents SDK behind a single import site with feature-flag opt-in and bounded runner turns.",
-      "expected_skills": ["agent-loops"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
       "forbidden_skills": [],
       "notes": "Vendor SDK runner abstraction."
     },
     {
-      "id": "agent-loops-positive-provider",
+      "id": "agent-runtime-positive-provider",
       "prompt": "Add multi-provider agent runner config and map the SDK output onto our loop step contract.",
-      "expected_skills": ["agent-loops"],
-      "forbidden_skills": ["tool-policies"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Provider SDK boundary."
     },
     {
-      "id": "agent-loops-negative-policy",
+      "id": "agent-runtime-negative-policy",
       "prompt": "Define which tool calls require approval and which are safe deterministic stubs.",
-      "expected_skills": ["tool-policies"],
-      "forbidden_skills": ["agent-loops"],
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [],
       "notes": "Tool policy, not vendor SDK wiring."
-    },
-    {
-      "id": "offer-magic-positive-end-to-end",
-      "prompt": "$offer-magic 帮我从岗位判断、简历改写一直准备到行为面试回答。",
-      "expected_skills": ["offer-magic"],
-      "forbidden_skills": ["writing-resumes"],
-      "notes": "Explicit end-to-end job application orchestration belongs to Offer Magic."
-    },
-    {
-      "id": "offer-magic-positive-english",
-      "prompt": "Use $offer-magic to evaluate this role, tailor my resume, and prepare defensible interview answers.",
-      "expected_skills": ["offer-magic"],
-      "forbidden_skills": ["writing-resumes"],
-      "notes": "English explicit invocation of the end-to-end application workflow."
-    },
-    {
-      "id": "writing-resumes-positive-bullet",
-      "prompt": "Rewrite this technical resume bullet into a quantified results-first statement with stronger action verbs.",
-      "expected_skills": ["writing-resumes"],
-      "forbidden_skills": ["writing-papers", "offer-magic"],
-      "notes": "Resume content editing."
-    },
-    {
-      "id": "writing-resumes-positive-tailor",
-      "prompt": "Tailor my engineering resume to this JD, cut it to one page, and improve the skills and self-evaluation sections.",
-      "expected_skills": ["writing-resumes"],
-      "forbidden_skills": ["markdown-pdf"],
-      "notes": "Role-tailored resume writing."
-    },
-    {
-      "id": "writing-resumes-positive-zh-bullet",
-      "prompt": "帮我把这条技术简历经历改成量化成果导向的 bullet，并按这个后端开发 JD 调整。",
-      "expected_skills": ["writing-resumes"],
-      "forbidden_skills": ["writing-papers", "offer-magic"],
-      "notes": "Chinese technical resume bullet prompt."
     },
     {
       "id": "writing-resumes-negative-cover-letter",
       "prompt": "Write an Elsevier cover letter for a manuscript submission.",
-      "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["writing-resumes"],
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [],
       "notes": "Academic submission cover letter, not resume."
     },
     {
       "id": "writing-resumes-negative-pdf-layout-only",
       "prompt": "My resume content is final in Markdown; just export it as a one-page PDF with better margins, fonts, and page breaks.",
-      "expected_skills": ["markdown-pdf"],
-      "forbidden_skills": ["writing-resumes"],
+      "expected_skills": [
+        "markdown-pdf"
+      ],
+      "forbidden_skills": [],
       "notes": "Resume PDF/layout-only work belongs to Markdown PDF conversion, not resume content editing."
-    },
-    {
-      "id": "apple-hig-positive-web-sheet-pattern",
-      "prompt": "I'm building a settings page and a modal sheet in my React web app. What is the Apple Human Interface Guidelines way to handle the navigation bar, sheet dismissal, and primary button placement so it feels like native iOS?",
-      "expected_skills": ["apple-hig"],
-      "forbidden_skills": ["drawing-figures"],
-      "notes": "HIG components and patterns applied to a web app (interaction/component/pattern focus)."
-    },
-    {
-      "id": "apple-hig-positive-interaction-audit",
-      "prompt": "Check my blog's buttons, lists, and tab bar against Apple's HIG — are the touch targets, focus states, and transition motion correct, and how do I map them to CSS and ARIA?",
-      "expected_skills": ["apple-hig"],
-      "forbidden_skills": ["adversarial-review"],
-      "notes": "Reviewing frontend interaction against HIG, not adversarial code review."
-    },
-    {
-      "id": "apple-hig-positive-zh-agent-ui",
-      "prompt": "我想让我的 agent 聊天界面真正符合 Apple HIG:确认危险操作的弹窗、加载和空状态、按钮的交互态,这些组件和模式该怎么做?",
-      "expected_skills": ["apple-hig"],
-      "forbidden_skills": ["agent-loops"],
-      "notes": "Chinese: HIG components/patterns for an agent chat UI (UI design, not agent control loop)."
     },
     {
       "id": "apple-hig-negative-paper-figure",
       "prompt": "Draw a publication-quality architecture diagram and a speed-accuracy scatter plot at 600 dpi for my CVPR paper.",
-      "expected_skills": ["drawing-figures"],
-      "forbidden_skills": ["apple-hig"],
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [],
       "notes": "Academic figure drawing, not UI design — must not fire the HIG skill."
-    },
-    {
-      "id": "apple-hig-negative-android-material",
-      "prompt": "Style my Android Jetpack Compose screen with Material Design 3 dynamic color, a bottom app bar, and ripple feedback.",
-      "expected_skills": [],
-      "forbidden_skills": ["apple-hig"],
-      "notes": "Android Material Design is a different platform/design system; should abstain, not fire HIG."
     },
     {
       "id": "answering-reviewers-positive-major-revision",
       "prompt": "We got a major revision. Reviewer 2 says our ablation does not isolate the two modules, and one of his premises about our baseline is simply wrong. How should I handle that comment?",
-      "expected_skills": ["answering-reviewers"],
-      "forbidden_skills": ["writing-papers"],
+      "expected_skills": [
+        "answering-reviewers"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
       "notes": "Deciding how to answer a reviewer comment, including a wrong premise — the revision discipline, not prose work."
     },
     {
       "id": "answering-reviewers-positive-zh-scope",
       "prompt": "修回还剩两周,审稿人点名要的三个数据集只跑得完两个,另外我想顺手补一个他们没问的消融。现在这轮该怎么取舍?",
-      "expected_skills": ["answering-reviewers"],
-      "forbidden_skills": ["training-models"],
+      "expected_skills": [
+        "answering-reviewers"
+      ],
+      "forbidden_skills": [
+        "training-models"
+      ],
       "notes": "Chinese revision scope decision: downgrade vs drop, and unasked experiments — not a training-debugging question."
     },
     {
       "id": "answering-reviewers-negative-packet",
       "prompt": "Assemble the revised Elsevier manuscript into the Editorial Manager upload set with the declarations, highlights DOCX, and a flat source zip.",
-      "expected_skills": ["elsevier-submissions"],
-      "forbidden_skills": ["answering-reviewers"],
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [
+        "answering-reviewers"
+      ],
       "notes": "Packaging the revision upload is submission work, not deciding what to answer."
     },
     {
       "id": "answering-reviewers-positive-experiment-backfires",
       "prompt": "受控对照跑完了,结果审稿人是对的 —— 我们的色彩空间确实不如他点名的那个,差 1.5 dB。可整篇论文都建在这个空间上,不可能换。这条意见现在怎么答?",
-      "expected_skills": ["answering-reviewers"],
-      "forbidden_skills": ["training-models"],
+      "expected_skills": [
+        "answering-reviewers"
+      ],
+      "forbidden_skills": [
+        "training-models"
+      ],
       "notes": "The demanded comparison confirmed the reviewer's doubt; the question is how to answer, not how to debug the run."
     },
     {
       "id": "answering-reviewers-negative-draft-section",
       "prompt": "Draft the related-work section and the contribution bullets for my paper from scratch.",
-      "expected_skills": ["writing-papers"],
-      "forbidden_skills": ["answering-reviewers"],
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "answering-reviewers"
+      ],
       "notes": "No revision decision in play — ordinary drafting."
+    },
+    {
+      "id": "curating-skills-negative-runtime-storage",
+      "prompt": "Where should my agent write its session transcripts so the UI can rehydrate them after a restart?",
+      "expected_skills": [
+        "agent-runtime"
+      ],
+      "forbidden_skills": [
+        "curating-skills"
+      ],
+      "notes": "扫会话找 skill 候选 vs 设计会话存储，是两件事。合并后仍需分得开。"
+    },
+    {
+      "id": "markdown-pdf-negative-text-only-edit",
+      "prompt": "帮我把这份 README 的措辞改顺一点，不用导出，也不用排版。",
+      "expected_skills": [],
+      "forbidden_skills": [
+        "markdown-pdf"
+      ],
+      "notes": "源是 Markdown 但没有 PDF 产出诉求，不该触发。"
+    },
+    {
+      "id": "journal-submissions-positive-ieee-portal",
+      "prompt": "Package this manuscript for the IEEE Author Portal: EDICS, the 13-page limit check on the two-column PDF, supplemental material, and the LaTeX source archive.",
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [
+        "journal-articles"
+      ],
+      "notes": "IEEE 投稿口径：EDICS、页数核验、归档。合并前的金标完全没有 IEEE 覆盖。"
+    },
+    {
+      "id": "journal-submissions-positive-zh-ieee-revision",
+      "prompt": "帮我把这篇 TMM 修回稿的投稿材料准备好，包括 response 和会议扩展的差异说明。",
+      "expected_skills": [
+        "journal-submissions"
+      ],
+      "forbidden_skills": [
+        "journal-articles"
+      ],
+      "notes": "中文触发 + IEEE 会议扩展 difference statement。"
+    },
+    {
+      "id": "journal-articles-positive-ieeetran-scaffold",
+      "prompt": "Scaffold an IEEEtran journal-mode paper: the \\thanks block for funding, \\markboth running heads, and IEEEtran.bst.",
+      "expected_skills": [
+        "journal-articles"
+      ],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
+      "notes": "IEEEtran 宏词汇与 elsarticle 不相交，必须能路由到模板侧而不是投稿侧。"
+    },
+    {
+      "id": "journal-articles-positive-zh-page-limit",
+      "prompt": "双栏排版下页数超限了，怎么在不动正文的情况下压回 13 页？",
+      "expected_skills": [
+        "journal-articles"
+      ],
+      "forbidden_skills": [
+        "journal-submissions"
+      ],
+      "notes": "页数超限的可执行工作在模板侧；投稿侧只做核验，不做压缩。"
+    },
+    {
+      "id": "curating-skills-negative-paper-figure",
+      "prompt": "Redraw this experiment comparison figure with a colour-blind-safe palette, vector output at 600 DPI, and axis labels naming the real metrics.",
+      "expected_skills": [],
+      "forbidden_skills": [
+        "curating-skills"
+      ],
+      "notes": "与库管理无关的日常请求，用来确认它不会因为出现「skill」相关词就泛触发。"
     }
   ]
 }

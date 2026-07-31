@@ -43,12 +43,7 @@ npx skills add . --skill answering-reviewers
 
 | Skill | 用途 |
 |---|---|
-| [`agent-loops`](skills/agent-loops) | 构建有界 agent loop、terminality、handoff 和 provider seam。 |
-| [`agent-evals`](skills/agent-evals) | 异步评分、failure-case 生命周期和 golden regression。 |
-| [`tool-policies`](skills/tool-policies) | 设计统一工具接口、风险分级和 approval gate。 |
-| [`persisting-traces`](skills/persisting-traces) | 持久化 session、memory 和 trace。 |
-| [`bridging-legacy`](skills/bridging-legacy) | 用兼容 adapter 包住迁移期遗留服务。 |
-| [`spec-first`](skills/spec-first) | 在 docs-backed codebase 中先更新规范再修改行为。 |
+| [`agent-runtime`](skills/agent-runtime) | 有界 agent loop、工具策略与审批、异步评分、会话/trace 持久化,以及遗留通道的退役闸门。 |
 | [`adversarial-review`](skills/adversarial-review) | 派独立只读 sub-agent 做对抗式终审。 |
 
 ### 学术论文
@@ -58,25 +53,21 @@ npx skills add . --skill answering-reviewers
 | [`writing-papers`](skills/writing-papers) | 起草、审阅和润色技术论文。 |
 | [`answering-reviewers`](skills/answering-reviewers) | 把审稿意见当 spec 逐条实现,并渲染修回看板。 |
 | [`drawing-figures`](skills/drawing-figures) | 规划并制作出版级论文图表。 |
-| [`elsevier-articles`](skills/elsevier-articles) | 维护可复现编译的 `elsarticle` 手稿。 |
-| [`elsevier-submissions`](skills/elsevier-submissions) | 构建并检查 Editorial Manager 投稿包。 |
+| [`journal-articles`](skills/journal-articles) | 维护可复现编译的 `elsarticle` / `IEEEtran` 手稿。 |
+| [`journal-submissions`](skills/journal-submissions) | 构建并检查 Elsevier / IEEE 投稿包。 |
 
-### 机器学习与写作
+### 机器学习与文档
 
 | Skill | 用途 |
 |---|---|
 | [`training-models`](skills/training-models) | 搭建、审查和诊断神经网络训练流程。 |
-| [`offer-magic`](skills/offer-magic) | 从岗位判断、简历交付一路编排到面试准备。 |
-| [`writing-resumes`](skills/writing-resumes) | 编写成果导向的技术或产品简历。 |
 | [`markdown-pdf`](skills/markdown-pdf) | 将 Markdown 转为适合打印的 PDF。 |
-| [`apple-hig`](skills/apple-hig) | 审查并实现符合 Apple HIG 的交互。 |
 
 ### Skill 维护
 
 | Skill | 用途 |
 |---|---|
-| [`mining-sessions`](skills/mining-sessions) | 从历史会话中发现反复出现的 skill 摩擦。 |
-| [`importing-skills`](skills/importing-skills) | 审核外部 skill 的来源、许可和引入方式。 |
+| [`curating-skills`](skills/curating-skills) | 判定一个候选能力该不该进库:从会话里挖,或审核别人写的 skill。 |
 
 ## 设计原则
 

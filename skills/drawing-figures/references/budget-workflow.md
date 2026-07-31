@@ -41,9 +41,9 @@ uv run scripts/extract_pdf_fig_tables.py \
   --pdf-dir <dir-of-pdfs> --out <captions.md>
 ```
 
-Compare the output with `rgbt_journal_fig_table_captions.md` and
-`rgbt_journal_common_fig_table_patterns.md`. Extraction is an audit aid, not a citable substitute
-for checking the source PDFs.
+Read the extracted captions for recurring figure/table types and caption phrasing, then record the
+patterns your own corpus shows. Extraction is an audit aid, not a citable substitute for checking
+the source PDFs.
 
 ## Budget evidence
 

@@ -28,7 +28,7 @@
 本库 house style:
 
 - **两段式 `x-y`(单连字符)**、简短可扫读;名字要**具体可发现**,避免 `helper`/`utils`/`data`/`tools` 这类泛名。
-- 例:`training-models`、`writing-papers`、`agent-loops`、`markdown-pdf`。
+- 例:`training-models`、`writing-papers`、`agent-runtime`、`markdown-pdf`。
 
 ## 描述 `description`(Anthropic SDO)
 
@@ -62,17 +62,19 @@
 
 ## 触发测试(本库的验证闭环)
 
-把测试分两层(Anthropic Claude Code 指引):
+本库只做**离线**的一层:**该触发的声明了吗、不该触发的划清了吗**。
 
-- **(A) 路由层**:该触发的触发了吗?不该的闭嘴了吗?→ 分类问题(precision / recall / F1 / 混淆矩阵 / abstain 假触发率 / pass^k)。
-- **(B) 结果层**:触发后照着做产出对吗?→ grader(代码判分优先,主观项用 LLM-judge)。
+不做模型在环的路由指标(precision / recall / F1 / 混淆矩阵 / pass^k),也不做结果层
+grader。这两层曾经实现过 375 行 + 一个 DeepSeek 路由器,在仓库全部历史里**一次都没跑过**
+(把仓库的 skill 描述发给外部端点这件事从未获批),已删除。真需要时那是一次性调研,
+不该常驻仓库。
 
 工具与契约:
 
-- `evals/trigger_cases.json`:每个 skill **≥2 条 positive + ≥2 条 forbidden** 用例;用**相邻 skill 做 hard negative**(如 writing-papers vs drawing-figures、agent-evals vs persisting-traces);路径专用 skill 的 positive 必须带路径/仓库/唯一站点信号、negative 覆盖泛化场景。
-- `scripts/evaluate_skill_triggers.py`:离线契约 + 元数据 smoke test;`--predictions <jsonl>` 进入真实指标模式(per-skill / macro / micro / weighted F1、abstain 假触发率、混淆矩阵、pass@k/pass^k、baseline 对比、selection-vs-outcome)。
-- `scripts/route_with_llm.py`:模型在环路由器(OpenAI 兼容,默认 DeepSeek,`DEEPSEEK_BASE_URL`/`DEEPSEEK_API_KEY`),把每条 prompt 的真实触发抓成 predictions JSONL 喂给上面打分。
-- **改了任何 `description` 后,重跑路由器确认不回退**(我们多次靠它发现/修复过度触发)。
+- `evals/trigger_cases.json`:每个 skill **≥2 条 positive + ≥2 条 forbidden** 用例;用**相邻 skill 做 hard negative**(如 writing-papers vs drawing-figures、journal-articles vs journal-submissions);路径专用 skill 的 positive 必须带路径/仓库/唯一站点信号、negative 覆盖泛化场景。
+- `scripts/evaluate_skill_triggers.py`:两件事——**契约**(标签指向真实 skill、每个 skill 两向覆盖齐)与 **smoke**(prompt 与「路由器在读 SKILL.md 之前能看到的元数据」做词面重叠)。
+- **smoke 的边界要知道**:它在描述的 `Do not` 处截断,所以 **anti-scope 文本不参与打分**——防误触发只能靠正面描述里放有区分度的词,不能靠写「Do not use for X」。它也不含词干还原,纯中文 prompt 可能对所有 skill 打 0 分。**smoke 过了不等于真实路由器会这么路由。**
+- **改了任何 `description` 后重跑它**,并且看的是「相邻 skill 有没有被挤下去」,不是绝对分值。
 
 ## 提交前(与 CI 同款)
 
@@ -90,7 +92,7 @@ diff AGENTS.md CLAUDE.md                    # CLAUDE.md 应是 AGENTS.md 的符�
 1. **先写评估**(Anthropic「start with evaluation」):在 `evals/trigger_cases.json` 加该 skill 的 positive/forbidden 用例(含相邻 hard negative)。
 2. 写 `SKILL.md`:两段式名字、「何时用」描述(不复述 workflow)、正文≤500 行、**自洽不引用别的 skill**。
 3. 重资料/脚本进 `references/`、`scripts/`;长引用文件加 `## Contents`。
-4. 跑提交前检查;需要时用 `route_with_llm.py` 实测路由,确认目标 skill 触发、相邻不串、域外 abstain。
+4. 跑提交前检查,确认目标 skill 触发、相邻不串、域外 abstain。
 5. **绝不"复活"被刻意删除/归档的 skill**——先与用户确认。
 
 ## 同步 / 双端

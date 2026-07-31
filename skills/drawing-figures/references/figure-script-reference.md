@@ -23,7 +23,9 @@ import sys
 
 import matplotlib.pyplot as plt
 
-sys.path.insert(0, "/path/to/drawing-figures/scripts")
+# Set SCRIPTS_DIR to this skill's own scripts/ directory, wherever the skill is installed,
+# so that `figkit` is importable from your paper's caller script.
+sys.path.insert(0, SCRIPTS_DIR)
 
 from figkit.plot_helpers import save_fig, scatter_ours_vs_base, style_axes
 
