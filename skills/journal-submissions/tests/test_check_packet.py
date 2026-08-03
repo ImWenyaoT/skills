@@ -238,6 +238,21 @@ class ElsevierPacketTests(PacketCheckTestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("unknown manifest key(s) for elsevier: response_to_reviewer", result.stdout)
 
+    def test_revision_rejects_pdf_in_the_editable_source_slot(self) -> None:
+        """A built PDF in the source slot must fail: production needs editable files."""
+        write_minimal_docx(self.base / "response.docx", ["Response to reviewers"])
+        (self.base / "manuscript.pdf").write_bytes(b"%PDF-1.4 built")
+        manifest = elsevier_manifest()
+        manifest.update(
+            submission_stage="revision",
+            response_to_reviewers="response.docx",
+            source_required=True,
+            source_zip="manuscript.pdf",
+        )
+        result = self.run_check(manifest)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("must be editable source, not a pdf", result.stdout.lower())
+
     def test_required_source_zip_cannot_be_omitted(self) -> None:
         manifest = elsevier_manifest()
         manifest.update(

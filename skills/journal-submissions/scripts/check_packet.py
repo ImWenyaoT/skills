@@ -364,6 +364,15 @@ def check_revision(manifest: PacketManifest) -> list[str]:
             errors.append(f"marked_manuscript is missing: {marked}")
         elif marked.resolve() == manifest.manuscript.resolve():
             errors.append("marked_manuscript must differ from the clean manuscript")
+
+    # The editable-source slot rejects PDF: production typesets from these files.
+    # A built PDF dropped into that slot stalls the revision before review, and the
+    # mistake is easy to make because the same PDF is correct for the marked slot.
+    if manifest.source_required and manifest.source_zip is not None:
+        if manifest.source_zip.suffix.lower() == ".pdf":
+            errors.append(
+                f"source archive must be editable source, not a PDF: {manifest.source_zip}"
+            )
     return errors
 
 
