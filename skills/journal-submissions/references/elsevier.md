@@ -85,6 +85,32 @@ the very files in the archive, in the same pass, so the two cannot drift.
 The clean version is what moves to production, so its source archive — figures, `.bib`, and
 class files included — is the copy that has to be complete and final.
 
+## What the EM LaTeX build accepts
+
+EM compiles the archive itself, and its build is stricter than a local `latexmk`. A tree
+that builds cleanly on your machine can still fail every one of these
+(support articles 37540 and "How to submit a LaTeX file in Editorial Manager"):
+
+- **No subfolders.** "LaTeX submissions containing subfolders cannot be processed by EM."
+  Everything sits at one level, and every `\input`, `\includegraphics`, and `\bibliography`
+  is written without a directory prefix. A maintainable nested tree (`tex/`, `tables/`,
+  `figs/`, `bib/`) therefore needs a flattening step at packaging time — keep it as a
+  script, not a manual copy, and have the script rewrite the path prefixes.
+- **Ship `.cls`, `.bst`, and `.bbl` in the archive**, even when they are standard TeX Live
+  files; editors ask for the class file by name at revision. The `.bbl` matching the main
+  file also rides along, since a missing bibliography surfaces as citations that silently
+  vanish from the built PDF.
+- **Filename rules**: one period per filename (`fig.1.eps` fails, `fig1.eps` works); no two
+  figure files sharing a basename across extensions; no special characters. Archive format
+  zip or tar.gz, never RAR.
+- **UTF characters in `.tex`/`.bib` break the build** at the offending line — keep source
+  ASCII with TeX escapes.
+
+The only proof that the archive is right is compiling it *as the archive*: extract to an
+empty directory (or build in the flattened staging dir) and require the same page count and
+zero undefined references as the working tree. A packaging script that flattens, verifies
+by compiling, and then zips makes the check unskippable.
+
 ## Mandatory checks that gate the editorial process
 
 Some journals list requirements whose failure stops the paper before review. They read as

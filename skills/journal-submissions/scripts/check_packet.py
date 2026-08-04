@@ -373,6 +373,39 @@ def check_revision(manifest: PacketManifest) -> list[str]:
             errors.append(
                 f"source archive must be editable source, not a PDF: {manifest.source_zip}"
             )
+        elif manifest.source_zip.suffix.lower() == ".zip" and manifest.source_zip.is_file():
+            errors.extend(check_em_archive(manifest.source_zip))
+    return errors
+
+
+def check_em_archive(archive: Path) -> list[str]:
+    """Enforce the constraints Editorial Manager's own LaTeX build imposes.
+
+    EM compiles the archive itself and fails on structures a local latexmk
+    accepts: subfolders are not processed at all, multi-period filenames are
+    excluded, and a LaTeX submission is expected to carry its .bib (with .bbl,
+    .cls, and .bst riding along so nothing resolves against the build host).
+    """
+    import zipfile
+
+    errors: list[str] = []
+    with zipfile.ZipFile(archive) as bundle:
+        names = [n for n in bundle.namelist() if not n.endswith("/")]
+    nested = sorted({n.split("/")[0] + "/" for n in names if "/" in n})
+    if nested:
+        errors.append(
+            f"EM cannot process subfolders in a LaTeX archive; found {', '.join(nested)} "
+            f"in {archive.name} — flatten to one level and strip path prefixes from "
+            "\\input/\\includegraphics/\\bibliography"
+        )
+    multi_period = [n for n in names if Path(n).name.count(".") != 1]
+    if multi_period:
+        errors.append(
+            f"EM excludes filenames with more than one period: {multi_period[:5]}"
+        )
+    flat = [Path(n).name for n in names]
+    if any(n.endswith(".tex") for n in flat) and not any(n.endswith(".bib") for n in flat):
+        errors.append(f"LaTeX archive {archive.name} carries no .bib file")
     return errors
 
 
