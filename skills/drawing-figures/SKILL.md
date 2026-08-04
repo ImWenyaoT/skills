@@ -65,6 +65,13 @@ palette, and caption patterns, or explicitly records which corpus artifact was u
 For **every final figure**, report this evidence contract:
 
 1. **Artifact path** — the canonical output and retained source/data/caller path.
+   For comparison figures, trace the "Ours" panel to the checkpoint or run that produced
+   its pixels — read the generator script's data paths, not the panel label. A label
+   is a claim, not evidence: panels inherited from a related project, an earlier model,
+   or an unversioned asset directory can carry your method's name over another model's
+   output, and the tables and figures then report different models without any visible
+   error. If a panel's pixels cannot be traced to your own run, regenerate it; if its
+   numbers must match a table, generate both from the same checkpoint.
 2. **Format evidence** — vector status for PDF/EPS/SVG, or raster format, physical dimensions,
    pixel dimensions, and effective DPI against the venue artwork class.
 3. **Design-system check** — font family/size and palette/contrast/dual-encoding result.
