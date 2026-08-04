@@ -1,5 +1,16 @@
 # Elsevier Packet Reference
 
+## Contents
+
+- Manifest keys
+- Editorial Manager step
+- Source archive in Editorial Manager
+- Screen fields pasted by hand
+- Required back-matter statements and their order
+- Highlights
+- Clean versus marked manuscript
+- Live limits worth rechecking
+
 ## Manifest keys
 
 Beyond the shared keys, an Elsevier manifest may declare `marked_manuscript`, and its
@@ -38,6 +49,40 @@ Elsevier journals submit through Editorial Manager. Record the current EM step i
 cannot set `source_required` to false. When the live EM screen disagrees with the Guide for
 Authors about what to upload, follow the screen and keep the discrepancy as evidence.
 
+## Source archive in Editorial Manager
+
+EM expands the uploaded archive into one submission item per file, each needing an item
+type chosen by hand. Three consequences shape the archive:
+
+- Ship exactly one `.tex`. EM's expanded list gives production no way to tell a root file
+  from a chapter include, so inline every `\input` (`latexpand --empty-comments main.tex`)
+  and strip the directory prefixes the flat layout invalidates, including `\graphicspath`.
+  Keep the split tree for authoring; the archive is a generated copy.
+- Figures ship as separate files inside the archive and are tagged `Figure`. EM states
+  this is mandatory for production, so never embed them in a container or a subfolder.
+- Subfolders make the archive unprocessable. Everything sits at one level.
+
+`Latest editable source file` and `Tables (Editable Version)` reject PDFs, because
+typesetting reads them; the `Figure` item type accepts PDF, so vector figures are safe.
+Tables written as LaTeX inside the source already satisfy the editable-tables requirement.
+
+## Screen fields pasted by hand
+
+The abstract and keywords are typed into the screen, not read from the source, so they need
+a plain-text copy generated from the manuscript and regenerated whenever it changes. A
+stale copy is how an old abstract reaches production.
+
+EM's abstract box is a CKEditor rich-text widget, which constrains the text:
+
+- One physical line per paragraph. A hard-wrapped file becomes several paragraphs.
+- No Markdown, no LaTeX macros, no math. They paste as literal characters; a formula has
+  to be re-entered through the widget's own math button, so keep the abstract free of it.
+- ASCII only. Curly quotes, en dashes, and non-breaking spaces arrive as mojibake.
+
+Keywords go in as a single semicolon-separated line. The screen states its own keyword
+count and per-keyword character limits; record them in the manifest and verify the live
+word count the widget displays against the abstract limit before moving on.
+
 ## Required back-matter statements and their order
 
 The checker verifies these headings exist in the manuscript and appear in this order:
@@ -55,103 +100,6 @@ authors. Do not invent funding, conflicts, data access, or author contributions.
 Elsevier's general guidance is three to five bullets, at most 85 characters including
 spaces, supplied as a Word document. A journal-specific guide can override when or how they
 are requested, so record the live numbers in the manifest rather than trusting the default.
-
-## The revision upload set
-
-A revision screen asks for a fixed set, and the item types are not interchangeable:
-
-| Item type | What it is |
-|---|---|
-| Cover letter | Restates the novel contribution; a revision also summarises what changed |
-| Response to reviewers | Point-by-point, every numbered comment answered |
-| Revised manuscript (with changes marked) | A **built PDF**, for review only |
-| Latest editable source file | The **source archive**, for typesetting |
-| Declaration of competing interest | Completed template |
-| CRediT author statement | DOCX, author name then roles |
-
-**PDF is rejected for "Latest editable source file" and for "Tables (editable version)".**
-Those two slots take Word or LaTeX, because production typesets from them. Uploading the
-built PDF into the source slot is the most common way a revision stalls before review.
-
-For a LaTeX submission, bundle every source file into one archive: `.tex`, `.bib`, tables,
-any `.cls` or `.sty` not in TeX Live, and anything else the manuscript needs to build.
-Figures go up as **separate files as well**, not only inside the archive — production
-requires them individually. Keep equations in editable form rather than as images; an
-equation shipped as a picture surfaces as a query at proof stage.
-
-The built PDF and the source archive must describe the same manuscript. Build the PDF from
-the very files in the archive, in the same pass, so the two cannot drift.
-
-The clean version is what moves to production, so its source archive — figures, `.bib`, and
-class files included — is the copy that has to be complete and final.
-
-## What the EM LaTeX build accepts
-
-EM compiles the archive itself, and its build is stricter than a local `latexmk`. A tree
-that builds cleanly on your machine can still fail every one of these
-(support articles 37540 and "How to submit a LaTeX file in Editorial Manager"):
-
-- **No subfolders.** "LaTeX submissions containing subfolders cannot be processed by EM."
-  Everything sits at one level, and every `\input`, `\includegraphics`, and `\bibliography`
-  is written without a directory prefix. A maintainable nested tree (`tex/`, `tables/`,
-  `figs/`, `bib/`) therefore needs a flattening step at packaging time — keep it as a
-  script, not a manual copy, and have the script rewrite the path prefixes.
-- **Ship `.cls`, `.bst`, and `.bbl` in the archive**, even when they are standard TeX Live
-  files; editors ask for the class file by name at revision. The `.bbl` matching the main
-  file also rides along, since a missing bibliography surfaces as citations that silently
-  vanish from the built PDF.
-- **Filename rules**: one period per filename (`fig.1.eps` fails, `fig1.eps` works); no two
-  figure files sharing a basename across extensions; no special characters. Archive format
-  zip or tar.gz, never RAR.
-- **UTF characters in `.tex`/`.bib` break the build** at the offending line — keep source
-  ASCII with TeX escapes.
-
-The only proof that the archive is right is compiling it *as the archive*: extract to an
-empty directory (or build in the flattened staging dir) and require the same page count and
-zero undefined references as the working tree. A packaging script that flattens, verifies
-by compiling, and then zips makes the check unskippable.
-
-## Editor-level reference discipline
-
-Elsevier editors-in-chief issue reference requirements as revision conditions, verbatim
-from one KBS-family decision letter:
-
-- **Total citations at most 50**; self-citations and citations to a single journal or
-  single author at most three each, "except in special cases".
-- **"Avoid citing references in large blocks and retain only the most relevant
-  references. For example, such kind of citations should be avoided, [1,2], [1-4],
-  [1,2,3]."** Any multi-key `\cite{a,b,c}` renders as exactly this and will be flagged.
-- References ordered by citation sequence, not alphabetically (`elsarticle-num`
-  satisfies this automatically — say so in the letter instead of changing anything).
-
-Defenses that have worked for the over-limit rules, argued in the response letter
-without touching the manuscript: a repeated surname belonging to *different authors*
-(name the institutions); a single journal exceeded because it published the
-*benchmark datasets and compared baselines themselves* — deleting those citations
-would break reproducibility, which is precisely the "special case" the editor's own
-wording reserves.
-
-## Mandatory checks that gate the editorial process
-
-Some journals list requirements whose failure stops the paper before review. They read as
-boilerplate and are enforced anyway:
-
-- **E-mail requirements vary by journal — read the live screen, not folklore.** Some
-  journals demand an institutional e-mail for every author; others (KBS among them) require
-  only the corresponding author's address on the title page. Adding all-author
-  institutional e-mails "to be safe" is itself a change to the title page that nobody
-  asked for — verify against the decision letter and the journal's guide before touching
-  the author block.
-- **Exactly one corresponding author**, in both the system and the manuscript. Neither the
-  corresponding author nor the author list can change after acceptance.
-- **Every author approves the submission** through a link they each receive. Tell the
-  co-authors before you submit; an unapproved paper simply waits.
-- A cover letter accompanies every manuscript, and for a research article it states the
-  novel contribution against the published literature.
-
-Check these against the live screen at revision time too. A requirement that went unremarked
-at first submission is still a requirement, and a desk rejection over an e-mail address costs
-the same as one over the science.
 
 ## Clean versus marked manuscript
 

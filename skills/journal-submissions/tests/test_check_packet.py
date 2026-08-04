@@ -238,21 +238,6 @@ class ElsevierPacketTests(PacketCheckTestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("unknown manifest key(s) for elsevier: response_to_reviewer", result.stdout)
 
-    def test_revision_rejects_pdf_in_the_editable_source_slot(self) -> None:
-        """A built PDF in the source slot must fail: production needs editable files."""
-        write_minimal_docx(self.base / "response.docx", ["Response to reviewers"])
-        (self.base / "manuscript.pdf").write_bytes(b"%PDF-1.4 built")
-        manifest = elsevier_manifest()
-        manifest.update(
-            submission_stage="revision",
-            response_to_reviewers="response.docx",
-            source_required=True,
-            source_zip="manuscript.pdf",
-        )
-        result = self.run_check(manifest)
-        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("must be editable source, not a pdf", result.stdout.lower())
-
     def test_required_source_zip_cannot_be_omitted(self) -> None:
         manifest = elsevier_manifest()
         manifest.update(
@@ -276,6 +261,22 @@ class ElsevierPacketTests(PacketCheckTestCase):
         result = self.run_check(manifest)
         self.assertEqual(result.returncode, 1)
         self.assertIn("source zip is not flat", result.stdout.lower())
+
+    def test_elsevier_source_zip_rejects_a_second_tex(self) -> None:
+        with zipfile.ZipFile(self.base / "source.zip", "w") as archive:
+            archive.writestr("main.tex", "\\documentclass{elsarticle}")
+            archive.writestr("chapter_01.tex", "\\section{Introduction}")
+        manifest = elsevier_manifest()
+        manifest.update(
+            submission_step="revision source upload",
+            source_required=True,
+            source_zip="source.zip",
+            source_entrypoint="main.tex",
+        )
+        result = self.run_check(manifest)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must ship one .tex", result.stdout)
+        self.assertIn("chapter_01.tex", result.stdout)
 
     def test_source_step_cannot_disable_source(self) -> None:
         manifest = elsevier_manifest()
@@ -416,6 +417,22 @@ class IeeePacketTests(PacketCheckTestCase):
         result = self.run_check(manifest)
         self.assertEqual(result.returncode, 1)
         self.assertIn("difference_statement is missing", result.stdout)
+
+    def test_source_zip_may_keep_several_tex(self) -> None:
+        with zipfile.ZipFile(self.base / "source.zip", "w") as archive:
+            archive.writestr("paper.tex", "\\documentclass{IEEEtran}")
+            archive.writestr("chapter_01.tex", "\\section{Introduction}")
+        manifest = ieee_manifest()
+        manifest.update(
+            submission_step="final files source upload",
+            source_required=True,
+            source_zip="source.zip",
+            source_entrypoint="absent.tex",
+        )
+        result = self.run_check(manifest)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("source entrypoint is missing", result.stdout)
+        self.assertNotIn("must ship one .tex", result.stdout)
 
     def test_final_step_cannot_disable_source(self) -> None:
         manifest = ieee_manifest()

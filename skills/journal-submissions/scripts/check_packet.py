@@ -364,48 +364,6 @@ def check_revision(manifest: PacketManifest) -> list[str]:
             errors.append(f"marked_manuscript is missing: {marked}")
         elif marked.resolve() == manifest.manuscript.resolve():
             errors.append("marked_manuscript must differ from the clean manuscript")
-
-    # The editable-source slot rejects PDF: production typesets from these files.
-    # A built PDF dropped into that slot stalls the revision before review, and the
-    # mistake is easy to make because the same PDF is correct for the marked slot.
-    if manifest.source_required and manifest.source_zip is not None:
-        if manifest.source_zip.suffix.lower() == ".pdf":
-            errors.append(
-                f"source archive must be editable source, not a PDF: {manifest.source_zip}"
-            )
-        elif manifest.source_zip.suffix.lower() == ".zip" and manifest.source_zip.is_file():
-            errors.extend(check_em_archive(manifest.source_zip))
-    return errors
-
-
-def check_em_archive(archive: Path) -> list[str]:
-    """Enforce the constraints Editorial Manager's own LaTeX build imposes.
-
-    EM compiles the archive itself and fails on structures a local latexmk
-    accepts: subfolders are not processed at all, multi-period filenames are
-    excluded, and a LaTeX submission is expected to carry its .bib (with .bbl,
-    .cls, and .bst riding along so nothing resolves against the build host).
-    """
-    import zipfile
-
-    errors: list[str] = []
-    with zipfile.ZipFile(archive) as bundle:
-        names = [n for n in bundle.namelist() if not n.endswith("/")]
-    nested = sorted({n.split("/")[0] + "/" for n in names if "/" in n})
-    if nested:
-        errors.append(
-            f"EM cannot process subfolders in a LaTeX archive; found {', '.join(nested)} "
-            f"in {archive.name} — flatten to one level and strip path prefixes from "
-            "\\input/\\includegraphics/\\bibliography"
-        )
-    multi_period = [n for n in names if Path(n).name.count(".") != 1]
-    if multi_period:
-        errors.append(
-            f"EM excludes filenames with more than one period: {multi_period[:5]}"
-        )
-    flat = [Path(n).name for n in names]
-    if any(n.endswith(".tex") for n in flat) and not any(n.endswith(".bib") for n in flat):
-        errors.append(f"LaTeX archive {archive.name} carries no .bib file")
     return errors
 
 
@@ -573,8 +531,12 @@ def check_difference_statement(manifest: PacketManifest) -> list[str]:
     return []
 
 
-def check_source_zip(path: Path, entrypoint: str) -> tuple[list[str], bool]:
-    """Inspect a required flat ASCII source archive and compile it when possible."""
+def check_source_zip(path: Path, entrypoint: str, single_tex: bool = False) -> tuple[list[str], bool]:
+    """Inspect a required flat ASCII source archive and compile it when possible.
+
+    `single_tex` enforces one `.tex` in the archive, which Editorial Manager needs because
+    it expands the upload into per-file items that carry no root-file marker.
+    """
     if not path.is_file():
         return [f"source zip does not exist: {path}"], False
     if not zipfile.is_zipfile(path):
@@ -591,6 +553,12 @@ def check_source_zip(path: Path, entrypoint: str) -> tuple[list[str], bool]:
                 errors.append(f"source zip filename is not ASCII: {name}")
         if entrypoint not in names:
             errors.append(f"source entrypoint is missing from zip: {entrypoint}")
+        extra_tex = sorted(n for n in names if n.endswith(".tex") and n != entrypoint)
+        if single_tex and extra_tex:
+            errors.append(
+                "source zip must ship one .tex for Editorial Manager; inline these into "
+                f"{entrypoint}: {', '.join(extra_tex)}"
+            )
         generated_pdf = str(Path(entrypoint).with_suffix(".pdf"))
         if generated_pdf in names:
             errors.append(f"source zip contains generated manuscript PDF: {generated_pdf}")
@@ -662,6 +630,7 @@ def main() -> int:
         source_errors, source_blocked = check_source_zip(
             manifest.source_zip or base,
             manifest.source_entrypoint,
+            single_tex=manifest.publisher == "elsevier",
         )
         errors.extend(source_errors)
         blocked = blocked or source_blocked
