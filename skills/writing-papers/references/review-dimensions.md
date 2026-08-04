@@ -15,6 +15,14 @@
 
 润色要求：标准学术书面语；避免口语缩写（用 it is 不用 it's）；拒绝华丽辞藻与生僻词；方法/模型/系统名避免所有格（优先 the performance of METHOD）；不要把段落改写成列表，除非原文就是列表或明确要求。
 
+Widom 的 General Writing 硬规则（逐条可 grep，违例常在修回新增段落里滋生）：
+
+- **裸指代**：句首的 This / That / It 必须带显式先行名词（This desaturation…，不是 This is…）。`grep -nE "^(This|It|That) "` 逐个判。
+- **斜体只用于定义与引文**，不用于强调。`\emph{without any fine-tuning}` 这种强调式斜体删掉；`\emph{Retinex-inspired decomposition}` 这种命名式定义合法。
+- **`etc.` 只在余项完全显然时允许**；"for various reasons" 一律禁止——写出真实理由。
+- **术语与记号只定义一次**（长间隔后的提醒除外），第二次带括号缩写的定义就是违例。
+- 贡献 bullet 的 Section 指针、结论不复读摘要（换定量表述）、引言第 ⑤ 点含 limitations——这三条在 drafting-framework 里，**review 时也要回查**：修回中新写的摘要/结论最容易重新趋同，新增贡献最容易漏指针。
+
 ## 2. 逻辑自洽审查
 
 检查：前后矛盾；核心概念换名；因果跳跃；结论超出证据；引言贡献是否在实验得到验证；方法描述能否解释实验表现；失败案例/限制/边界是否与主张冲突；"看似解释、实为补丁"的句子。
