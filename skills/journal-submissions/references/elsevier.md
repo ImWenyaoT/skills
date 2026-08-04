@@ -116,8 +116,12 @@ by compiling, and then zips makes the check unskippable.
 Some journals list requirements whose failure stops the paper before review. They read as
 boilerplate and are enforced anyway:
 
-- **An institutional e-mail for every author**, in the submission system *and* on the title
-  page. Where one genuinely does not exist, the cover letter states why.
+- **E-mail requirements vary by journal — read the live screen, not folklore.** Some
+  journals demand an institutional e-mail for every author; others (KBS among them) require
+  only the corresponding author's address on the title page. Adding all-author
+  institutional e-mails "to be safe" is itself a change to the title page that nobody
+  asked for — verify against the decision letter and the journal's guide before touching
+  the author block.
 - **Exactly one corresponding author**, in both the system and the manuscript. Neither the
   corresponding author nor the author list can change after acceptance.
 - **Every author approves the submission** through a link they each receive. Tell the
