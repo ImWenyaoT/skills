@@ -111,6 +111,26 @@ empty directory (or build in the flattened staging dir) and require the same pag
 zero undefined references as the working tree. A packaging script that flattens, verifies
 by compiling, and then zips makes the check unskippable.
 
+## Editor-level reference discipline
+
+Elsevier editors-in-chief issue reference requirements as revision conditions, verbatim
+from one KBS-family decision letter:
+
+- **Total citations at most 50**; self-citations and citations to a single journal or
+  single author at most three each, "except in special cases".
+- **"Avoid citing references in large blocks and retain only the most relevant
+  references. For example, such kind of citations should be avoided, [1,2], [1-4],
+  [1,2,3]."** Any multi-key `\cite{a,b,c}` renders as exactly this and will be flagged.
+- References ordered by citation sequence, not alphabetically (`elsarticle-num`
+  satisfies this automatically — say so in the letter instead of changing anything).
+
+Defenses that have worked for the over-limit rules, argued in the response letter
+without touching the manuscript: a repeated surname belonging to *different authors*
+(name the institutions); a single journal exceeded because it published the
+*benchmark datasets and compared baselines themselves* — deleting those citations
+would break reproducibility, which is precisely the "special case" the editor's own
+wording reserves.
+
 ## Mandatory checks that gate the editorial process
 
 Some journals list requirements whose failure stops the paper before review. They read as
