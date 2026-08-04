@@ -46,8 +46,8 @@ side material has `highlight` in its filename.
 
 Elsevier journals submit through Editorial Manager. Record the current EM step in
 `submission_step`; it decides which files are requested now, and a step containing `source`
-cannot set `source_required` to false. When the live EM screen disagrees with the Guide for
-Authors about what to upload, follow the screen and keep the discrepancy as evidence.
+cannot set `source_required` to false. The screen sits above the Guide for Authors and above
+everything on this page in the skill's precedence ladder, so record what it overrode.
 
 ## Source archive in Editorial Manager
 
@@ -71,8 +71,10 @@ So plan for expansion rather than against it:
   reaches production, and no FAQ asks for a single root file. Inlining every `\input` into
   one `.tex` (`latexpand --empty-comments main.tex`) is an option that shortens the list
   you classify by hand, not a requirement.
-- Where a journal's own screen names an item type for the bundle, that name wins over the
-  generic FAQ for that journal.
+- Item types come from the screen when the two sources disagree. The FAQ above tags
+  `.tex` and `.bib` as `Manuscript`, while a journal screen may name
+  `Latest editable source file` for the same files; the screen is narrower, so it wins.
+  `Figure` for images is common to both.
 
 An expanded archive is also why the built PDF ends with one "click here to access or
 download" page per uploaded file. That is EM assembling items, not a defect in the source.

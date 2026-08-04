@@ -30,14 +30,37 @@ facts, and any editor/reviewer instructions. Stop for missing facts; never infer
 declarations, contributions, funding, data availability, conflicts, EDICS categories, or
 conference-extension difference claims.
 
+## Precedence
+
+Instructions arrive from several places and they do conflict. The narrower the audience a
+source was written for, the more it outranks:
+
+1. The decision or invitation letter, written about this manuscript.
+2. The live submission screen for the current step: the item types it names, the limits it
+   displays, the formats it refuses.
+3. The journal's Guide for Authors.
+4. Publisher-wide policy and support articles, which describe every journal and therefore
+   none of them exactly.
+
+Record the conflict in the manifest instead of resolving it silently. A screen that
+contradicts the guide is a durable fact about this journal, and it will contradict it
+again next round.
+
+System behaviour is not a rung on this ladder. How the platform unpacks an archive, where
+it puts figures, what it does to a filename — that is mechanism. It holds whatever any
+instruction says, and no journal wording overrides it. The failure to avoid is inferring a
+requirement from a mechanism: that a platform expands an archive into per-file items tells
+you how to tag and order those items, and nothing at all about how many files the archive
+should have contained.
+
 ## Build the packet
 
 1. Establish the publisher, then read exactly one reference for the publisher-specific
    steps, statements, and screen fields:
    [references/elsevier.md](references/elsevier.md) or [references/ieee.md](references/ieee.md).
 2. Open the live author guide and the current submission screen, and record both in a local
-   `packet.json`. The current screen overrides generic instructions about which files are
-   requested now; the manifest is the evidence that you looked.
+   `packet.json`. The manifest is the evidence that you looked, and the place the
+   precedence conflicts above get written down.
 
 ```json
 {
