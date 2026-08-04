@@ -51,20 +51,31 @@ Authors about what to upload, follow the screen and keep the discrepancy as evid
 
 ## Source archive in Editorial Manager
 
-EM expands the uploaded archive into one submission item per file, each needing an item
-type and an order position chosen by hand. Expect this and plan the attach step for it:
+The archive is a transport container, not a preserved structure. EM unpacks it and lists
+every file as its own submission item needing an item type, and it puts them all in one
+build directory. Elsevier's LaTeX FAQ states the consequences directly:
 
-- Subfolders make the archive unprocessable. Everything sits at one level.
-- Figures ship as separate files inside the archive and are tagged `Figure`. EM states
-  this is mandatory for production, so never embed them in a container or a subfolder.
-- Per the EM/PM LaTeX Guide, order the expanded list as the root `.tex` first, then
-  `.bib`, `.bst`, `.cls` and the remaining source, then the figures. Source files take the
-  manuscript or editable-source item type; images take `Figure`.
-- A split chapter tree survives expansion — an archive of a dozen `.tex` files builds and
-  reaches production. Inlining every `\input` into one `.tex`
-  (`latexpand --empty-comments main.tex`, then strip the directory prefixes the flat
-  layout invalidates, including `\graphicspath`) is optional: it removes any question
-  about which file is the root and shortens the list you must classify by hand.
+> Select the Manuscript item type for .tex, .bbl, .bst, .sty, .bib, .nls, .ilg, and .nlo
+> files. Select the Figure item type for images and graphic files.
+
+> In Editorial Manager (EM), all figures are uploaded to the working directory so figure
+> file paths are not needed. [Remove the file path from \includegraphics command.]
+
+So plan for expansion rather than against it:
+
+- Flat archive, no subfolders, and no directory prefix in any `\input`,
+  `\includegraphics`, `\bibliography`, or `\graphicspath` — the build directory is flat
+  whatever the archive looked like.
+- Figure filenames and extensions in the source must match the uploaded files exactly.
+- A split chapter tree survives expansion; an archive of a dozen `.tex` files builds and
+  reaches production, and no FAQ asks for a single root file. Inlining every `\input` into
+  one `.tex` (`latexpand --empty-comments main.tex`) is an option that shortens the list
+  you classify by hand, not a requirement.
+- Where a journal's own screen names an item type for the bundle, that name wins over the
+  generic FAQ for that journal.
+
+An expanded archive is also why the built PDF ends with one "click here to access or
+download" page per uploaded file. That is EM assembling items, not a defect in the source.
 
 `Latest editable source file` and `Tables (Editable Version)` reject PDFs, because
 typesetting reads them; the `Figure` item type accepts PDF, so vector figures are safe.
@@ -121,5 +132,7 @@ not general Elsevier rules.
 Primary sources:
 
 - https://www.elsevier.com/researcher/author/policies-and-guidelines/latex-instructions
+- https://www.elsevier.support/publishing/answer/how-to-submit-a-latex-file-in-editorial-manager
+- https://www.elsevier.support/publishing/answer/how-to-identify-and-fix-errors-from-latex-error-codes-in-the-built-pdf
 - https://www.elsevier.com/researcher/author/tools-and-resources/highlights
 - https://www.elsevier.com/en-gb/researcher/author/policies-and-guidelines/credit-author-statement
