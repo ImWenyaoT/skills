@@ -46,6 +46,13 @@ Record the conflict in the manifest instead of resolving it silently. A screen t
 contradicts the guide is a durable fact about this journal, and it will contradict it
 again next round.
 
+Your notes about a source are not that source and hold no rank at all. A digest of the
+decision letter, a checklist someone typed up from the guide, a summary of last round —
+each is a claim to re-verify against the artifact it describes, and each drifts toward
+the generic list its author half-remembered. The specific failure to expect: a note that
+promotes a publisher's optional materials into "required", sending you off to build
+documents the screen never asked for. Read the letter and read the screen.
+
 System behaviour is not a rung on this ladder. How the platform unpacks an archive, where
 it puts figures, what it does to a filename — that is mechanism. It holds whatever any
 instruction says, and no journal wording overrides it. The failure to avoid is inferring a
