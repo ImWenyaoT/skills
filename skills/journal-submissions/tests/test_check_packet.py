@@ -262,22 +262,6 @@ class ElsevierPacketTests(PacketCheckTestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("source zip is not flat", result.stdout.lower())
 
-    def test_elsevier_source_zip_rejects_a_second_tex(self) -> None:
-        with zipfile.ZipFile(self.base / "source.zip", "w") as archive:
-            archive.writestr("main.tex", "\\documentclass{elsarticle}")
-            archive.writestr("chapter_01.tex", "\\section{Introduction}")
-        manifest = elsevier_manifest()
-        manifest.update(
-            submission_step="revision source upload",
-            source_required=True,
-            source_zip="source.zip",
-            source_entrypoint="main.tex",
-        )
-        result = self.run_check(manifest)
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("must ship one .tex", result.stdout)
-        self.assertIn("chapter_01.tex", result.stdout)
-
     def test_source_step_cannot_disable_source(self) -> None:
         manifest = elsevier_manifest()
         manifest["submission_step"] = "revision source upload"
@@ -417,22 +401,6 @@ class IeeePacketTests(PacketCheckTestCase):
         result = self.run_check(manifest)
         self.assertEqual(result.returncode, 1)
         self.assertIn("difference_statement is missing", result.stdout)
-
-    def test_source_zip_may_keep_several_tex(self) -> None:
-        with zipfile.ZipFile(self.base / "source.zip", "w") as archive:
-            archive.writestr("paper.tex", "\\documentclass{IEEEtran}")
-            archive.writestr("chapter_01.tex", "\\section{Introduction}")
-        manifest = ieee_manifest()
-        manifest.update(
-            submission_step="final files source upload",
-            source_required=True,
-            source_zip="source.zip",
-            source_entrypoint="absent.tex",
-        )
-        result = self.run_check(manifest)
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("source entrypoint is missing", result.stdout)
-        self.assertNotIn("must ship one .tex", result.stdout)
 
     def test_final_step_cannot_disable_source(self) -> None:
         manifest = ieee_manifest()

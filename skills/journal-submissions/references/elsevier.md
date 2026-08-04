@@ -52,15 +52,19 @@ Authors about what to upload, follow the screen and keep the discrepancy as evid
 ## Source archive in Editorial Manager
 
 EM expands the uploaded archive into one submission item per file, each needing an item
-type chosen by hand. Three consequences shape the archive:
+type and an order position chosen by hand. Expect this and plan the attach step for it:
 
-- Ship exactly one `.tex`. EM's expanded list gives production no way to tell a root file
-  from a chapter include, so inline every `\input` (`latexpand --empty-comments main.tex`)
-  and strip the directory prefixes the flat layout invalidates, including `\graphicspath`.
-  Keep the split tree for authoring; the archive is a generated copy.
+- Subfolders make the archive unprocessable. Everything sits at one level.
 - Figures ship as separate files inside the archive and are tagged `Figure`. EM states
   this is mandatory for production, so never embed them in a container or a subfolder.
-- Subfolders make the archive unprocessable. Everything sits at one level.
+- Per the EM/PM LaTeX Guide, order the expanded list as the root `.tex` first, then
+  `.bib`, `.bst`, `.cls` and the remaining source, then the figures. Source files take the
+  manuscript or editable-source item type; images take `Figure`.
+- A split chapter tree survives expansion — an archive of a dozen `.tex` files builds and
+  reaches production. Inlining every `\input` into one `.tex`
+  (`latexpand --empty-comments main.tex`, then strip the directory prefixes the flat
+  layout invalidates, including `\graphicspath`) is optional: it removes any question
+  about which file is the root and shortens the list you must classify by hand.
 
 `Latest editable source file` and `Tables (Editable Version)` reject PDFs, because
 typesetting reads them; the `Figure` item type accepts PDF, so vector figures are safe.

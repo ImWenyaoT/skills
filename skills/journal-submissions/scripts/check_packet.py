@@ -531,12 +531,8 @@ def check_difference_statement(manifest: PacketManifest) -> list[str]:
     return []
 
 
-def check_source_zip(path: Path, entrypoint: str, single_tex: bool = False) -> tuple[list[str], bool]:
-    """Inspect a required flat ASCII source archive and compile it when possible.
-
-    `single_tex` enforces one `.tex` in the archive, which Editorial Manager needs because
-    it expands the upload into per-file items that carry no root-file marker.
-    """
+def check_source_zip(path: Path, entrypoint: str) -> tuple[list[str], bool]:
+    """Inspect a required flat ASCII source archive and compile it when possible."""
     if not path.is_file():
         return [f"source zip does not exist: {path}"], False
     if not zipfile.is_zipfile(path):
@@ -553,12 +549,6 @@ def check_source_zip(path: Path, entrypoint: str, single_tex: bool = False) -> t
                 errors.append(f"source zip filename is not ASCII: {name}")
         if entrypoint not in names:
             errors.append(f"source entrypoint is missing from zip: {entrypoint}")
-        extra_tex = sorted(n for n in names if n.endswith(".tex") and n != entrypoint)
-        if single_tex and extra_tex:
-            errors.append(
-                "source zip must ship one .tex for Editorial Manager; inline these into "
-                f"{entrypoint}: {', '.join(extra_tex)}"
-            )
         generated_pdf = str(Path(entrypoint).with_suffix(".pdf"))
         if generated_pdf in names:
             errors.append(f"source zip contains generated manuscript PDF: {generated_pdf}")
@@ -630,7 +620,6 @@ def main() -> int:
         source_errors, source_blocked = check_source_zip(
             manifest.source_zip or base,
             manifest.source_entrypoint,
-            single_tex=manifest.publisher == "elsevier",
         )
         errors.extend(source_errors)
         blocked = blocked or source_blocked

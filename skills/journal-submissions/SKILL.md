@@ -77,8 +77,9 @@ uv run --with python-docx scripts/md_to_docx.py <files.md> --out <upload-dir>
    ASCII filenames, include every build input (dereference symlinks when staging), omit
    generated manuscript PDFs, and compile after extraction into an empty directory with zero
    missing files, undefined citations, and undefined references. The upload archive is a
-   copy, never the canonical source tree; generate it, so a split authoring tree can be
-   inlined without being disturbed.
+   copy, never the canonical source tree. Read the publisher reference for how the system
+   presents the archive at the attach step, since that decides the item types and ordering
+   you assign by hand.
 7. Produce a plain-text copy of every field the submission screen makes you paste rather
    than read from the source — abstract and keywords at minimum — generated from the
    manuscript so a later edit cannot leave a stale copy behind. The publisher reference
