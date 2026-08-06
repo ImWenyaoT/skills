@@ -81,7 +81,7 @@ npx skills add . --skill answering-reviewers
 ```text
 skills/<name>/SKILL.md     # 可安装 skills
 evals/trigger_cases.json   # 触发边界 golden cases
-scripts/                   # 仓库级校验与同步工具
+scripts/                   # 仓库级校验工具
 docs/research/             # 设计审计与研究记录
 ```
 
@@ -102,9 +102,9 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
-上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 19 个 skills。
+上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 10 个 skills。
 
-如需继续维护本地镜像，可运行 `./scripts/sync-to-local.sh`。仓库仍是唯一源，本地安装目录只是镜像。
+已安装的 skills 由 `npx skills` 管理。发布新提交后，运行 `npx skills@latest update -g` 更新全局安装。
 
 ## License
 
