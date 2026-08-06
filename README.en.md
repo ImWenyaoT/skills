@@ -109,7 +109,7 @@ GitHub Actions runs repository and bundled skill tests on Python 3.11 and 3.13, 
 coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 10 skills.
 
 Installed skills are managed by `npx skills`. After publishing new commits, run
-`npx skills update -g` to update the global installation.
+`npx skills@latest update -g` to update the global installation.
 
 ## License
 

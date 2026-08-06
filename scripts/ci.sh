@@ -17,5 +17,5 @@ while IFS= read -r file; do
   python3 -m py_compile "$file"
 done < <(find . \( -path ./.git -o -path ./.cache \) -prune -o -name '*.py' -print)
 
-bash -n scripts/ci.sh
+bash -n scripts/ci.sh scripts/coverage.sh
 git diff --check

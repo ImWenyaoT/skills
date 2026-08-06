@@ -99,7 +99,7 @@ diff AGENTS.md CLAUDE.md                    # CLAUDE.md 应是 AGENTS.md 的符�
 
 - **本仓库是唯一源**;已安装副本由 `npx skills` 管理,不要手工复制或编辑。
 - 全局安装:`npx skills add ImWenyaoT/skills --all -g`。
-- 发布新提交后更新:`npx skills update -g`。
+- 发布新提交后更新:`npx skills@latest update -g`。
 - 本机 Claude 的 `~/.claude/skills` 链接到统一的 `~/.agents/skills`;Codex 与 Claude 读取同一份安装。
 - 加载方式:Claude Code 用 `Skill` 工具加载(不要手动 `Read` skill 文件);Codex 原生加载。
 

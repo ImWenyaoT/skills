@@ -104,7 +104,7 @@ npx skills@latest add . --list
 GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
 上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 10 个 skills。
 
-已安装的 skills 由 `npx skills` 管理。发布新提交后，运行 `npx skills update -g` 更新全局安装。
+已安装的 skills 由 `npx skills` 管理。发布新提交后，运行 `npx skills@latest update -g` 更新全局安装。
 
 ## License
 
