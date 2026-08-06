@@ -84,7 +84,7 @@ npx skills add . --skill answering-reviewers
 ```text
 skills/<name>/SKILL.md     # Installable skills
 evals/trigger_cases.json   # Trigger-boundary golden cases
-scripts/                   # Repository validation and synchronization
+scripts/                   # Repository validation tools
 docs/research/             # Design audits and research notes
 ```
 
@@ -106,10 +106,10 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions runs repository and bundled skill tests on Python 3.11 and 3.13, enforces branch
-coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 19 skills.
+coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 10 skills.
 
-Run `./scripts/sync-to-local.sh` if you still maintain local mirrors. This repository remains the
-single source of truth; installed directories are mirrors.
+Installed skills are managed by `npx skills`. After publishing new commits, run
+`npx skills update -g` to update the global installation.
 
 ## License
 

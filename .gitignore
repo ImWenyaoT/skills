@@ -46,8 +46,6 @@ site/
 .env
 .env.*
 !.env.example
-.sync-local.env
-
 # OS and editors
 .DS_Store
 Thumbs.db

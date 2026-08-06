@@ -140,7 +140,7 @@ Passes when:
 Source rationale:
 
 - Anthropic's engineering article notes that skills may include executable code, which increases power and risk.
-- This repo's `AGENTS.md` treats the repository as the source for both Codex and Claude local mirrors.
+- This repo's `AGENTS.md` treats the repository as the source while `npx skills` manages the shared Codex and Claude installation.
 
 ## How To Use This Rubric
 
