@@ -22,10 +22,11 @@ or submission packaging.
 3. Run both phases when planning and producing a new paper's figure set. Skip Phase A when the
    venue requirements and figure plan are already settled.
 
-When a venue or journal is named, read its current artwork guide first and record its file type,
-physical size, resolution, colour-mode, and font requirements. Use
-[references/publication-artwork.md](references/publication-artwork.md) to classify and validate
-the output; do not transplant one venue's requirements into another.
+Export by the default in [references/publication-artwork.md](references/publication-artwork.md) —
+vector wherever the figure can be vector, 600 dpi otherwise, designed at final column width. That
+covers CVPR, ICCV, NeurIPS, and an ordinary Elsevier or IEEE submission. Read a venue's artwork
+guide only when that venue raises one of the four things that actually vary: separate artwork
+files, a stated DPI above 600, CMYK, or a physical size limit in millimetres.
 
 ## Figure design system
 
@@ -35,8 +36,7 @@ the output; do not transplant one venue's requirements into another.
   matplotlib's default cycle.
 - Use Arial or Helvetica for sans-serif elements and Times New Roman for serif annotations.
   Final figures must not depend on DejaVu or Computer Modern.
-- Prefer PDF/EPS/SVG for vector-native plots and diagrams. For raster work, the target venue's
-  artwork class controls DPI; 600 dpi is only the fallback when no stronger rule is known.
+- Prefer PDF/EPS/SVG for vector-native plots and diagrams; 600 dpi for raster work.
 - Design at final column size. Keep text at least 8 pt and strokes/symbols legible; use a compact
   canvas instead of shrinking text on an oversized canvas.
 - Encode meaning with colour plus marker shape, line style, label, or another redundant cue, so the
