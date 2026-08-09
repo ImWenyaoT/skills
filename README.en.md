@@ -44,6 +44,7 @@ matches the problem in front of you.
 | Skill | When to reach for it |
 |---|---|
 | [`training-models`](skills/training-models) | The training is wrong: loss will not fall, accuracy stalls, gradients blow up, train and eval disagree. |
+| [`comparing-runs`](skills/comparing-runs) | A pile of finished runs has to become one table that survives review: comparable arms, baseline reproduction, error bars, a row you can trace back. |
 | [`writing-papers`](skills/writing-papers) | Draft, review, or polish the prose of a technical paper. |
 | [`drawing-figures`](skills/drawing-figures) | Plan and produce publication-grade figures. |
 | [`publishing-papers`](skills/publishing-papers) | Everything after the science is settled: the journal's manuscript source and local build, the upload packet, and the point-by-point response to reviewers. |
@@ -84,7 +85,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions runs repository and bundled skill tests on Python 3.11 and 3.13, enforces branch
-coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 4 skills.
+coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 5 skills.
 
 Installed skills are managed by `npx skills`. After publishing new commits, run
 `npx skills@latest update -g` to update the global installation.

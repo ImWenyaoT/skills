@@ -416,12 +416,13 @@
       "id": "publishing-papers-positive-major-revision",
       "prompt": "We got a major revision. Reviewer 2 says our ablation does not isolate the two modules, and one of his premises about our baseline is simply wrong. How should I handle that comment?",
       "expected_skills": [
-        "publishing-papers"
+        "publishing-papers",
+        "comparing-runs"
       ],
       "forbidden_skills": [
         "writing-papers"
       ],
-      "notes": "Deciding how to answer a reviewer comment, including a wrong premise — the revision discipline, not prose work."
+      "notes": "A revision round whose comment is that the ablation does not isolate the two modules. Both skills legitimately apply: the round is a revision, the objection is about comparability. Labelled for one skill only because the other did not exist when it was written."
     },
     {
       "id": "publishing-papers-positive-zh-scope",
@@ -502,22 +503,104 @@
       "notes": "页数超限的可执行工作在模板侧；投稿侧只做核验，不做压缩。"
     },
     {
-      "id": "gap-ablation-matrix-design",
+      "id": "comparing-runs-positive-ablation-matrix",
       "prompt": "Design the ablation matrix for this paper: decide which arms to run so every arm is comparable, then build the result table.",
-      "expected_skills": [],
+      "expected_skills": [
+        "comparing-runs"
+      ],
       "forbidden_skills": [
         "training-models"
       ],
-      "notes": "Ablation design and result tables sit outside training-models' declared boundary, and no skill owns them yet. This case marks the hole."
+      "notes": "Ablation design and the result table it feeds. training-models stays forbidden: it owns one run being correct, not many runs being comparable."
     },
     {
-      "id": "gap-seed-variance-table",
+      "id": "comparing-runs-positive-seeds-table",
       "prompt": "I have five trained checkpoints. Produce the SOTA comparison table with error bars over three seeds and a consistent evaluation protocol.",
-      "expected_skills": [],
+      "expected_skills": [
+        "comparing-runs"
+      ],
       "forbidden_skills": [
         "training-models"
       ],
-      "notes": "Cross-run comparison and reporting, not the diagnosis of one run."
+      "notes": "Cross-run reporting: seeds, error bars, a consistent evaluation protocol."
+    },
+    {
+      "id": "comparing-runs-positive-baseline-below-published",
+      "prompt": "I reproduced the baseline from its official repo but my number is 0.8 dB below the published one. What do I report in the comparison table?",
+      "expected_skills": [
+        "comparing-runs"
+      ],
+      "forbidden_skills": [
+        "training-models",
+        "writing-papers"
+      ],
+      "notes": "A reproduction gap is a reporting and fairness problem, not a training bug."
+    },
+    {
+      "id": "comparing-runs-positive-zh-ablation",
+      "prompt": "消融的几个臂是在不同时间跑的,骨干网和训练轮数好像不一样,这样的消融表能放进论文吗?",
+      "expected_skills": [
+        "comparing-runs"
+      ],
+      "forbidden_skills": [
+        "training-models"
+      ],
+      "notes": "Undisclosed differences between arms — the classic invalid ablation."
+    },
+    {
+      "id": "comparing-runs-positive-provenance",
+      "prompt": "Table 3 has five rows and I can no longer tell which checkpoint produced row 4. How should runs be tracked so every number traces back?",
+      "expected_skills": [
+        "comparing-runs"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
+      "notes": "Run provenance: a number in a table nobody can regenerate."
+    },
+    {
+      "id": "comparing-runs-positive-zh-seeds",
+      "prompt": "审稿人要误差棒。我跑几个 seed 才够,只随机化 seed 行不行?",
+      "expected_skills": [
+        "comparing-runs"
+      ],
+      "forbidden_skills": [
+        "training-models"
+      ],
+      "notes": "Variance reporting; randomising only the seed is the wrong economy."
+    },
+    {
+      "id": "comparing-runs-negative-loss-not-falling",
+      "prompt": "My loss will not go below 2.3 and accuracy is stuck at chance. Check the training loop.",
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "One run is broken — diagnosis, not comparison."
+    },
+    {
+      "id": "comparing-runs-negative-write-experiments-section",
+      "prompt": "Draft the experiments section around these results and make sure each claim stays inside its evidence.",
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Turning settled results into prose is drafting, not deciding whether the results are comparable."
+    },
+    {
+      "id": "comparing-runs-negative-plot-the-comparison",
+      "prompt": "Draw the speed-accuracy scatter comparing our method against the baselines at 600 dpi.",
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Rendering a comparison is figure production."
     }
   ]
 }

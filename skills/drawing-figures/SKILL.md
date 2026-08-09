@@ -1,6 +1,6 @@
 ---
 name: drawing-figures
-description: 'Publication figure budgeting and production for academic papers, including 论文绘图/画图/架构图/结果图: reference-derived budgets, Elsevier/CVPR/ICCV/NeurIPS figures, diagrams, plots, result stitches, and publication-ready exports. Do not use for language review, caption-only edits, or submission packaging.'
+description: 'Publication figure budgeting and production for academic papers, including 论文绘图/画图/架构图/结果图: reference-derived budgets, Elsevier/CVPR/ICCV/NeurIPS figures, diagrams, plots, result stitches, and publication-ready exports. Covers scatter plots, 600 dpi exports, and baseline-comparison panels. Do not use for language review, caption-only edits, or submission packaging.'
 license: MIT
 compatibility: Requires Python 3 with matplotlib and Pillow.
 ---

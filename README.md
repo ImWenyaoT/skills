@@ -42,6 +42,7 @@ npx skills add . --skill publishing-papers
 | Skill | 什么时候拿它出来 |
 |---|---|
 | [`training-models`](skills/training-models) | 训练跑不对:loss 不下降、acc 卡住、梯度异常、训练验证不一致。 |
+| [`comparing-runs`](skills/comparing-runs) | 一堆跑完的 run 要变成一张经得起审的表:消融臂可比吗、基线复现、误差棒、每行能不能追回去。 |
 | [`writing-papers`](skills/writing-papers) | 起草、审阅或润色技术论文的正文。 |
 | [`drawing-figures`](skills/drawing-figures) | 规划并制作出版级论文图表。 |
 | [`publishing-papers`](skills/publishing-papers) | 科学做完之后的所有事:期刊模板与本地编译、投稿材料、修回逐条回应。 |
@@ -79,7 +80,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
-上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 4 个 skills。
+上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 5 个 skills。
 
 已安装的 skills 由 `npx skills` 管理。发布新提交后，运行 `npx skills@latest update -g` 更新全局安装。
 

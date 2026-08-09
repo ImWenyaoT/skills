@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import sys
 import unittest
 from pathlib import Path
@@ -59,6 +61,15 @@ class ExitCodeTests(unittest.TestCase):
         self._run = ci.run
         self.addCleanup(setattr, ci, "run", self._run)
 
+    def main(self) -> int:
+        """Call ci.main with its summary captured, so a passing suite stays quiet.
+
+        Left uncaptured, the stubbed runs print a summary that reads exactly like a
+        real failure report in the middle of the test output.
+        """
+        with contextlib.redirect_stdout(io.StringIO()):
+            return ci.main([])
+
     def test_every_check_runs_even_after_one_fails(self) -> None:
         """A shell script with `set -e` stopped at the first failure; this must not."""
         seen: list[str] = []
@@ -68,12 +79,12 @@ class ExitCodeTests(unittest.TestCase):
             return "Trigger" not in name
 
         ci.run = fake
-        self.assertEqual(ci.main([]), 1)
+        self.assertEqual(self.main(), 1)
         self.assertEqual(len(seen), len(ci.checks(with_coverage=False)))
 
     def test_all_green_exits_zero(self) -> None:
         ci.run = lambda name, argv: True
-        self.assertEqual(ci.main([]), 0)
+        self.assertEqual(self.main(), 0)
 
 
 class DiscoveryTests(unittest.TestCase):
