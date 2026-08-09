@@ -85,7 +85,7 @@
         "drawing-figures"
       ],
       "forbidden_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "notes": "Drawing paper figures, not submission packaging."
     },
@@ -123,22 +123,21 @@
       "notes": "Chinese caption-only hard negative for figure drawing."
     },
     {
-      "id": "journal-submissions-positive-editorial",
+      "id": "publishing-papers-positive-editorial",
       "prompt": "Package this finished LaTeX manuscript for Elsevier Editorial Manager with CRediT, declarations, cover letter, and flat source zip.",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "forbidden_skills": [
-        "drawing-figures",
-        "journal-articles"
+        "drawing-figures"
       ],
       "notes": "Submission packet assembly."
     },
     {
-      "id": "journal-submissions-positive-revision",
+      "id": "publishing-papers-positive-revision",
       "prompt": "Prepare the revised Elsevier submission packet and check abstract, highlights, graphical abstract, and data availability limits.",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "forbidden_skills": [
         "writing-papers"
@@ -146,10 +145,10 @@
       "notes": "Journal submission packaging."
     },
     {
-      "id": "journal-submissions-positive-zh-revision",
+      "id": "publishing-papers-positive-zh-revision",
       "prompt": "帮我把这篇 Elsevier 论文修回稿打包成 Editorial Manager 可提交的材料，包括声明、cover letter 和源码 zip。",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "forbidden_skills": [
         "writing-papers"
@@ -157,99 +156,92 @@
       "notes": "Chinese Elsevier revision packaging prompt."
     },
     {
-      "id": "journal-articles-positive-scaffold",
+      "id": "publishing-papers-positive-scaffold",
       "prompt": "Scaffold a local Elsevier elsarticle manuscript and explain whether I should use preprint, review, 1p, 3p, or 5p with single-column or twocolumn output.",
       "expected_skills": [
-        "journal-articles"
+        "publishing-papers"
       ],
       "forbidden_skills": [
-        "journal-submissions",
         "writing-papers"
       ],
       "notes": "Elsevier article template and class-option setup, not prose authoring or EM packaging."
     },
     {
-      "id": "journal-articles-positive-compile",
+      "id": "publishing-papers-positive-compile",
       "prompt": "My elsarticle paper fails under latexmk -pdf after adding natbib and a BibTeX bibliography; diagnose the local pdflatex build.",
       "expected_skills": [
-        "journal-articles"
+        "publishing-papers"
       ],
-      "forbidden_skills": [
-        "journal-submissions"
-      ],
+      "forbidden_skills": [],
       "notes": "Local elsarticle runtime and bibliography failure."
     },
     {
-      "id": "journal-articles-positive-zh-layout",
+      "id": "publishing-papers-positive-zh-layout",
       "prompt": "帮我用 elsarticle 搭一个 Elsevier 论文模板，本地要能编译，并说明单栏 preprint 和 3p,twocolumn 双栏怎么选。",
       "expected_skills": [
-        "journal-articles"
+        "publishing-papers"
       ],
       "forbidden_skills": [
-        "journal-submissions",
         "writing-papers"
       ],
       "notes": "Chinese Elsevier template and local compile setup."
     },
     {
-      "id": "journal-articles-negative-finished-packet",
+      "id": "publishing-papers-negative-finished-packet",
       "prompt": "The manuscript is finished. Build the Elsevier Editorial Manager revision packet with statements, highlights DOCX, cover letter, and the requested source zip.",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
-      "forbidden_skills": [
-        "journal-articles"
-      ],
+      "forbidden_skills": [],
       "notes": "Mature-manuscript submission packaging, not article setup."
     },
     {
-      "id": "journal-articles-negative-paper-prose",
+      "id": "publishing-papers-negative-paper-prose",
       "prompt": "Draft and rewrite the introduction, contribution paragraphs, and evidence-backed experiment narrative of my technical paper.",
       "expected_skills": [
         "writing-papers"
       ],
       "forbidden_skills": [
-        "journal-articles",
-        "journal-submissions"
+        "publishing-papers"
       ],
       "notes": "Academic prose work without Elsevier template or runtime changes."
     },
     {
-      "id": "journal-articles-negative-generic-latex",
+      "id": "publishing-papers-negative-generic-latex",
       "prompt": "Fix the margins, totals, company logo, and page numbers in this generic LaTeX invoice.",
       "expected_skills": [],
       "forbidden_skills": [
-        "journal-articles",
+        "publishing-papers",
         "writing-papers"
       ],
       "notes": "Generic non-paper LaTeX formatting must abstain."
     },
     {
-      "id": "journal-submissions-negative-review",
+      "id": "publishing-papers-negative-review",
       "prompt": "Review the LaTeX introduction for AI-tone and logical self-consistency.",
       "expected_skills": [
         "writing-papers"
       ],
       "forbidden_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "notes": "Paper review, not finished packet."
     },
     {
-      "id": "journal-submissions-negative-generic-cover-letter",
+      "id": "publishing-papers-negative-generic-cover-letter",
       "prompt": "Write a cover letter for this software engineering job application.",
       "expected_skills": [],
       "forbidden_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "notes": "Generic cover letter, not Elsevier Editorial Manager packaging."
     },
     {
-      "id": "journal-submissions-negative-author-guidelines",
+      "id": "publishing-papers-negative-author-guidelines",
       "prompt": "Compare these two academic venue websites and summarize their scope, deadlines, and formatting links so I can decide where to submit later.",
       "expected_skills": [],
       "forbidden_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "notes": "Academic-adjacent venue research without a finished Elsevier submission packet."
     },
@@ -260,7 +252,7 @@
         "writing-papers"
       ],
       "forbidden_skills": [
-        "answering-reviewers"
+        "publishing-papers"
       ],
       "notes": "Language polish of already-decided rebuttal prose — not deciding how to answer the reviewers."
     },
@@ -322,7 +314,7 @@
         "writing-papers"
       ],
       "forbidden_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "notes": "Manuscript structuring decisions, not submission packaging."
     },
@@ -406,7 +398,7 @@
       "id": "writing-resumes-negative-cover-letter",
       "prompt": "Write an Elsevier cover letter for a manuscript submission.",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
       "forbidden_skills": [],
       "notes": "Academic submission cover letter, not resume."
@@ -421,10 +413,10 @@
       "notes": "Academic figure drawing, not UI design — must not fire the HIG skill."
     },
     {
-      "id": "answering-reviewers-positive-major-revision",
+      "id": "publishing-papers-positive-major-revision",
       "prompt": "We got a major revision. Reviewer 2 says our ablation does not isolate the two modules, and one of his premises about our baseline is simply wrong. How should I handle that comment?",
       "expected_skills": [
-        "answering-reviewers"
+        "publishing-papers"
       ],
       "forbidden_skills": [
         "writing-papers"
@@ -432,10 +424,10 @@
       "notes": "Deciding how to answer a reviewer comment, including a wrong premise — the revision discipline, not prose work."
     },
     {
-      "id": "answering-reviewers-positive-zh-scope",
+      "id": "publishing-papers-positive-zh-scope",
       "prompt": "修回还剩两周,审稿人点名要的三个数据集只跑得完两个,另外我想顺手补一个他们没问的消融。现在这轮该怎么取舍?",
       "expected_skills": [
-        "answering-reviewers"
+        "publishing-papers"
       ],
       "forbidden_skills": [
         "training-models"
@@ -443,21 +435,19 @@
       "notes": "Chinese revision scope decision: downgrade vs drop, and unasked experiments — not a training-debugging question."
     },
     {
-      "id": "answering-reviewers-negative-packet",
+      "id": "publishing-papers-negative-packet",
       "prompt": "Assemble the revised Elsevier manuscript into the Editorial Manager upload set with the declarations, highlights DOCX, and a flat source zip.",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
-      "forbidden_skills": [
-        "answering-reviewers"
-      ],
+      "forbidden_skills": [],
       "notes": "Packaging the revision upload is submission work, not deciding what to answer."
     },
     {
-      "id": "answering-reviewers-positive-experiment-backfires",
+      "id": "publishing-papers-positive-experiment-backfires",
       "prompt": "受控对照跑完了,结果审稿人是对的 —— 我们的色彩空间确实不如他点名的那个,差 1.5 dB。可整篇论文都建在这个空间上,不可能换。这条意见现在怎么答?",
       "expected_skills": [
-        "answering-reviewers"
+        "publishing-papers"
       ],
       "forbidden_skills": [
         "training-models"
@@ -465,58 +455,50 @@
       "notes": "The demanded comparison confirmed the reviewer's doubt; the question is how to answer, not how to debug the run."
     },
     {
-      "id": "answering-reviewers-negative-draft-section",
+      "id": "publishing-papers-negative-draft-section",
       "prompt": "Draft the related-work section and the contribution bullets for my paper from scratch.",
       "expected_skills": [
         "writing-papers"
       ],
       "forbidden_skills": [
-        "answering-reviewers"
+        "publishing-papers"
       ],
       "notes": "No revision decision in play — ordinary drafting."
     },
     {
-      "id": "journal-submissions-positive-ieee-portal",
+      "id": "publishing-papers-positive-ieee-portal",
       "prompt": "Package this manuscript for the IEEE Author Portal: EDICS, the 13-page limit check on the two-column PDF, supplemental material, and the LaTeX source archive.",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
-      "forbidden_skills": [
-        "journal-articles"
-      ],
+      "forbidden_skills": [],
       "notes": "IEEE 投稿口径：EDICS、页数核验、归档。合并前的金标完全没有 IEEE 覆盖。"
     },
     {
-      "id": "journal-submissions-positive-zh-ieee-revision",
+      "id": "publishing-papers-positive-zh-ieee-revision",
       "prompt": "帮我把这篇 TMM 修回稿的投稿材料准备好，包括 response 和会议扩展的差异说明。",
       "expected_skills": [
-        "journal-submissions"
+        "publishing-papers"
       ],
-      "forbidden_skills": [
-        "journal-articles"
-      ],
+      "forbidden_skills": [],
       "notes": "中文触发 + IEEE 会议扩展 difference statement。"
     },
     {
-      "id": "journal-articles-positive-ieeetran-scaffold",
+      "id": "publishing-papers-positive-ieeetran-scaffold",
       "prompt": "Scaffold an IEEEtran journal-mode paper: the \\thanks block for funding, \\markboth running heads, and IEEEtran.bst.",
       "expected_skills": [
-        "journal-articles"
+        "publishing-papers"
       ],
-      "forbidden_skills": [
-        "journal-submissions"
-      ],
+      "forbidden_skills": [],
       "notes": "IEEEtran 宏词汇与 elsarticle 不相交，必须能路由到模板侧而不是投稿侧。"
     },
     {
-      "id": "journal-articles-positive-zh-page-limit",
+      "id": "publishing-papers-positive-zh-page-limit",
       "prompt": "双栏排版下页数超限了，怎么在不动正文的情况下压回 13 页？",
       "expected_skills": [
-        "journal-articles"
+        "publishing-papers"
       ],
-      "forbidden_skills": [
-        "journal-submissions"
-      ],
+      "forbidden_skills": [],
       "notes": "页数超限的可执行工作在模板侧；投稿侧只做核验，不做压缩。"
     },
     {

@@ -1,15 +1,23 @@
----
-name: answering-reviewers
-description: Answers reviewer comments on a major/minor revision — treats each comment as a spec to implement, not a claim to debate, and holds the work to that spec's scope. Use when the user has a revision decision, reviewer comments, an editor's summary, a point-by-point response to reviewers, 修回, 返稿, 逐条回应, 审稿意见, or asks how to handle a specific reviewer point. Also use when the user is deciding which requested experiments to run, is about to argue that a reviewer is wrong, is considering extra experiments nobody asked for, or asks where the revision stands (进展, 现在怎么说, what now). Does not draft or polish the manuscript prose itself, and does not assemble the Editorial Manager upload packet.
-license: MIT
-compatibility: Requires Python 3 and a full TeX Live: tcolorbox with the [most] option and its breakable library, which small distributions omit.
----
+# Answering a revision decision
 
-# Answering Reviewers
+A revision decision means the editor already decided the paper can be saved. The reviewers have
+told you what they will not accept. Your job is to remove each objection — **the ask is the spec**.
 
-A revision decision means the editor already decided the paper can be saved. The reviewers have told you what they will not accept. Your job is to remove each objection — **the ask is the spec**.
+The failure this file prevents: an author who is technically right and rejected anyway.
 
-The failure this skill prevents: an author who is technically right and rejected anyway.
+## Contents
+
+- [Working order](#working-order)
+- [The page](#the-page)
+- [The ask is the spec](#the-ask-is-the-spec)
+- [Doing beats arguing](#doing-beats-arguing)
+- [Not doing it is the exception](#not-doing-it-is-the-exception)
+- [The spec bounds the work in both directions](#the-spec-bounds-the-work-in-both-directions)
+- [When the honest answer costs you something](#when-the-honest-answer-costs-you-something)
+- [Land each change in every manuscript location it governs](#land-each-change-in-every-manuscript-location-it-governs)
+- [The response letter](#the-response-letter)
+- [Consistency is a second reviewer](#consistency-is-a-second-reviewer)
+- [Rendering the letter](#rendering-the-letter)
 
 ## Working order
 
@@ -38,7 +46,7 @@ for it reads like a neutral request.
 Offer two or three routes per open comment rather than one instruction, and let the page record
 which one the author picks. They know which GPU is free and how much of the deadline is real.
 
-See [references/html-report.md](references/html-report.md) for the format, and
+See [html-report.md](html-report.md) for the format, and
 [`assets/revision-page-example.html`](assets/revision-page-example.html) for the smallest page the
 generator accepts — it carries only the anchors, so it is the fastest way to check that a real
 page still parses.
@@ -101,7 +109,7 @@ The same bound applies when the reviewer named a concern but prescribed no remed
 Four comments cannot be answered by running what was asked, because answering them means conceding
 something first: your novelty overlaps a component you adopted, the reviewer's premise is factually
 wrong, a baseline's provenance cannot be recovered, or the experiment returns the answer they
-predicted and you feared. Read [conceding.md](references/conceding.md) when a comment is one of
+predicted and you feared. Read [conceding.md](conceding.md) when a comment is one of
 those four — each has a technique that gives the point away without giving away the paper.
 
 ## Land each change in every manuscript location it governs

@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "imwenyaot-skills",
   "version": "1.0.0",
-  "description": "Agent Skills for academic paper work — drafting, review, figures, journal templates, submission packaging, and reviewer responses — plus training-pipeline diagnosis and skill-library curation.",
+  "description": "Agent Skills for academic paper work: training-pipeline diagnosis, drafting and review, publication figures, and getting a manuscript through a journal — source, packet, and response to reviewers.",
   "author": {
     "name": "Tian Wenyao",
     "url": "https://github.com/ImWenyaoT"

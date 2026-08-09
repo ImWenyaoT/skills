@@ -44,9 +44,7 @@ npx skills add . --skill answering-reviewers
 | [`training-models`](skills/training-models) | 训练跑不对:loss 不下降、acc 卡住、梯度异常、训练验证不一致。 |
 | [`writing-papers`](skills/writing-papers) | 起草、审阅或润色技术论文的正文。 |
 | [`drawing-figures`](skills/drawing-figures) | 规划并制作出版级论文图表。 |
-| [`journal-articles`](skills/journal-articles) | 手稿要用 `elsarticle` / `IEEEtran`,或本地编译坏了。 |
-| [`journal-submissions`](skills/journal-submissions) | 手稿定稿了,要拼 Elsevier / IEEE 的上传材料。 |
-| [`answering-reviewers`](skills/answering-reviewers) | 拿到修回决定,逐条把审稿意见当 spec 实现。 |
+| [`publishing-papers`](skills/publishing-papers) | 科学做完之后的所有事:期刊模板与本地编译、投稿材料、修回逐条回应。 |
 
 ## 设计原则
 
@@ -81,7 +79,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
-上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 6 个 skills。
+上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 4 个 skills。
 
 已安装的 skills 由 `npx skills` 管理。发布新提交后，运行 `npx skills@latest update -g` 更新全局安装。
 
