@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""从参考图像素提取"出现过的所有颜色", 形成通用取色库。
+"""Pull "every colour that ever appears" out of the reference-image pixels, as a general palette.
 
-口径: 把指定目录的参考图里出现过的所有颜色(含渐变范围内的中间色)纳入取色范围,
-渐变只是提供"可取的范围"而非作图用渐变。做法: 每图自适应量化到较多颜色 ->
-跨图汇总 -> 近似色聚类去重 -> 按色相分组输出 hex(供 layout 色彩系统与作图取色)。
-黑/白单独保留。
+Scope: every colour present in the reference images under the given directory (including the
+in-between colours inside a gradient) counts as pickable; a gradient only supplies a "range you
+may pick from", it is not a gradient to draw with. Method: quantize each image adaptively to a
+generous number of colours -> pool across images -> cluster near-duplicates away -> emit hex
+grouped by hue (for the layout colour system and for picking while drawing).
+Black and white are kept on their own.
 """
 
 from __future__ import annotations
@@ -16,28 +18,28 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-# 默认超参 —— 可通过命令行覆盖
-QUANT_PER_IMG = 32      # 每图量化色数(取多, 覆盖渐变)
-MIN_SHARE = 0.004       # 单图内占比阈值(滤噪点)
-MERGE_DIST = 22         # 跨图近似色合并的欧氏距离阈值
+# Default hyper-parameters —— overridable from the command line
+QUANT_PER_IMG = 32      # quantized colours per image (generous, to cover gradients)
+MIN_SHARE = 0.004       # share threshold within one image (filters noise pixels)
+MERGE_DIST = 22         # Euclidean distance at which near-duplicate colours merge across images
 
 
 def parse_args():
-    """命令行:取色图源目录与输出 md 必填;量化色数/合并距离可调。"""
+    """CLI: source directory and output md are required; quantized colour count / merge distance are tunable."""
     import argparse
-    p = argparse.ArgumentParser(description="从参考图像素提取取色库")
-    p.add_argument("--src", type=Path, required=True, help="color_pick 图源目录")
-    p.add_argument("--out", type=Path, required=True, help="输出取色 md 路径")
-    p.add_argument("--n-colors", dest="n_colors", type=int, default=32, help="每图量化色数")
-    p.add_argument("--merge-dist", dest="merge_dist", type=float, default=22.0, help="近似色合并欧氏距离")
+    p = argparse.ArgumentParser(description="Extract a palette from reference-image pixels")
+    p.add_argument("--src", type=Path, required=True, help="color_pick source image directory")
+    p.add_argument("--out", type=Path, required=True, help="output palette md path")
+    p.add_argument("--n-colors", dest="n_colors", type=int, default=32, help="quantized colours per image")
+    p.add_argument("--merge-dist", dest="merge_dist", type=float, default=22.0, help="Euclidean distance for merging near-duplicate colours")
     return p.parse_args()
 
 
 def image_colors(path: Path, n_colors: int = QUANT_PER_IMG,
                  min_share: float = MIN_SHARE) -> list[tuple[tuple[int, int, int], float]]:
-    """对单图自适应量化, 返回 [(rgb, 占比)], 已滤掉低占比噪点。"""
+    """Quantize a single image adaptively, returning [(rgb, share)] with low-share noise already dropped."""
     im = Image.open(path).convert("RGB")
-    im.thumbnail((400, 400))  # 降采样提速
+    im.thumbnail((400, 400))  # downsample for speed
     q = im.quantize(colors=n_colors, method=Image.Quantize.MEDIANCUT)
     pal = q.getpalette()
     counts = Counter(q.getdata())
@@ -53,19 +55,19 @@ def image_colors(path: Path, n_colors: int = QUANT_PER_IMG,
 
 
 def merge_colors(colors: list[tuple], dist: float) -> list[tuple]:
-    """把颜色列表按欧氏距离聚类去重, 返回代表色列表(不含权重)。
+    """Cluster a colour list by Euclidean distance, returning the representative colours (no weights).
 
-    参数:
-        colors: [(r, g, b), ...] 形式的颜色列表。
-        dist:   合并阈值, 欧氏距离小于此值的颜色视为同簇。
+    Args:
+        colors: colour list in the form [(r, g, b), ...].
+        dist:   merge threshold; colours closer than this count as one cluster.
 
-    返回:
-        去重后代表色列表, 每项为 (r, g, b) 整型元组。
+    Returns:
+        Deduplicated representative colours, each an (r, g, b) int tuple.
     """
     if not colors:
         return []
 
-    # 统一权重为 1.0, 贪心从头聚类
+    # weight everything at 1.0, then cluster greedily from the top
     reps: list[list] = []  # [sum_rgb*w, w]
     for rgb in colors:
         arr = np.array(rgb, dtype=float)
@@ -85,7 +87,7 @@ def merge_colors(colors: list[tuple], dist: float) -> list[tuple]:
 
 def merge(colors: list[tuple[tuple[int, int, int], float]],
           merge_dist: float = MERGE_DIST) -> list[tuple[tuple[int, int, int], float]]:
-    """把所有图的颜色(含权重)按欧氏距离聚类去重, 代表色取簇内加权均值, 权重累加。"""
+    """Cluster the colours from every image (weights included) by Euclidean distance; each representative is the weighted mean of its cluster, and weights accumulate."""
     reps: list[list] = []  # [sum_rgb*w, w]
     for rgb, w in sorted(colors, key=lambda c: -c[1]):
         arr = np.array(rgb, dtype=float)
@@ -104,7 +106,7 @@ def merge(colors: list[tuple[tuple[int, int, int], float]],
 
 
 def family(rgb: tuple[int, int, int]) -> str:
-    """按 HSV 把颜色归到色族, 便于 layout 语义映射。"""
+    """Bucket a colour into a family by HSV, so layout can map families onto semantics."""
     r, g, b = (v / 255 for v in rgb)
     h, s, v = colorsys.rgb_to_hsv(r, g, b)
     if v >= 0.93 and s <= 0.06:
@@ -132,12 +134,12 @@ def family(rgb: tuple[int, int, int]) -> str:
 
 
 def hexof(rgb: tuple[int, int, int]) -> str:
-    """RGB -> #RRGGBB(大写)。"""
+    """RGB -> #RRGGBB (uppercase)."""
     return "#{:02X}{:02X}{:02X}".format(*rgb)
 
 
 def main() -> None:
-    """主流程: 逐图量化 -> 汇总合并 -> 分族 -> 写 markdown 取色库 + 控制台打印。"""
+    """Main flow: quantize image by image -> pool and merge -> group into families -> write the markdown palette + print to console."""
     args = parse_args()
     src: Path = args.src
     out: Path = args.out
