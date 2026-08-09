@@ -1,9 +1,10 @@
 {
   "version": 1,
-  "purpose": "Golden prompts for checking whether this repository's skill descriptions have clear trigger boundaries. These cases are not a full model trace; they define the expected trigger contract for classifier, sub-agent, or platform-trace evals.",
+  "purpose": "Golden prompts for checking whether this repository's skill descriptions have clear trigger boundaries. Split 60/40 into train and validation: revise descriptions against train failures only. A validation failure means the description was fitted to the train cases, and the fix is a better description rather than a patch aimed at the case that failed — which is why the evaluator does not print which validation case it was.",
   "cases": [
     {
       "id": "writing-papers-negative-md-edit-no-export",
+      "split": "validation",
       "prompt": "Rewrite this Markdown section to make the argument clearer, but do not export anything.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -13,6 +14,7 @@
     },
     {
       "id": "training-models-positive-loss",
+      "split": "train",
       "prompt": "My PyTorch model's loss is not decreasing and accuracy is stuck. Check the training loop for train/eval mode, zero_grad, logits, and shape bugs.",
       "expected_skills": [
         "training-models"
@@ -24,6 +26,7 @@
     },
     {
       "id": "training-models-positive-overfit",
+      "split": "train",
       "prompt": "Help me sanity-check this deep learning training code by overfitting one batch and checking gradients.",
       "expected_skills": [
         "training-models"
@@ -33,6 +36,7 @@
     },
     {
       "id": "training-models-positive-zh-loss",
+      "split": "validation",
       "prompt": "我的 PyTorch 训练 loss 不下降，acc 卡住了，帮我检查 train/eval、zero_grad、梯度和 logits 这些训练循环问题。",
       "expected_skills": [
         "training-models"
@@ -42,6 +46,7 @@
     },
     {
       "id": "training-models-positive-recipe-setup",
+      "split": "validation",
       "prompt": "I'm setting up a new image-classification training run from scratch — what disciplined order should I follow (verify loss at init, overfit one batch, input-independent baseline) so bugs are easy to catch?",
       "expected_skills": [
         "training-models"
@@ -51,6 +56,7 @@
     },
     {
       "id": "training-models-positive-recipe-zh",
+      "split": "validation",
       "prompt": "从零搭一个神经网络训练 pipeline,按什么顺序做 sanity check(固定随机种子、验证 init loss、overfit 单 batch)才不容易踩坑?",
       "expected_skills": [
         "training-models"
@@ -60,6 +66,7 @@
     },
     {
       "id": "training-models-negative-data-pipeline",
+      "split": "train",
       "prompt": "Set up a data ingestion pipeline that loads CSV files into a feature store on a daily schedule.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -69,6 +76,7 @@
     },
     {
       "id": "drawing-figures-positive-figkit",
+      "split": "train",
       "prompt": "For this Elsevier journal paper, derive a figure-count and palette budget from references, then draw architecture and Ours-vs-baseline plots.",
       "expected_skills": [
         "drawing-figures"
@@ -80,6 +88,7 @@
     },
     {
       "id": "drawing-figures-positive-600dpi",
+      "split": "train",
       "prompt": "Generate the 600 dpi result stitch and efficiency plot for our manuscript using the shared matplotlib figure kit.",
       "expected_skills": [
         "drawing-figures"
@@ -91,6 +100,7 @@
     },
     {
       "id": "drawing-figures-positive-zh-architecture",
+      "split": "validation",
       "prompt": "帮我给这篇 CVPR 论文画方法架构图和 Ours-vs-baseline 散点图，要求 600 dpi、配色统一、可直接放进 LaTeX。",
       "expected_skills": [
         "drawing-figures"
@@ -102,6 +112,7 @@
     },
     {
       "id": "drawing-figures-negative-caption",
+      "split": "train",
       "prompt": "Rewrite this Figure 3 caption and verify the text-table linkage.",
       "expected_skills": [
         "writing-papers"
@@ -113,6 +124,7 @@
     },
     {
       "id": "drawing-figures-negative-zh-caption-only",
+      "split": "train",
       "prompt": "只帮我重写 Figure 2 的 caption，并检查正文里对这张图的引用是否逻辑自洽，不要画新图。",
       "expected_skills": [
         "writing-papers"
@@ -124,6 +136,7 @@
     },
     {
       "id": "publishing-papers-positive-editorial",
+      "split": "train",
       "prompt": "Package this finished LaTeX manuscript for Elsevier Editorial Manager with CRediT, declarations, cover letter, and flat source zip.",
       "expected_skills": [
         "publishing-papers"
@@ -135,6 +148,7 @@
     },
     {
       "id": "publishing-papers-positive-revision",
+      "split": "train",
       "prompt": "Prepare the revised Elsevier submission packet and check abstract, highlights, graphical abstract, and data availability limits.",
       "expected_skills": [
         "publishing-papers"
@@ -146,6 +160,7 @@
     },
     {
       "id": "publishing-papers-positive-zh-revision",
+      "split": "validation",
       "prompt": "帮我把这篇 Elsevier 论文修回稿打包成 Editorial Manager 可提交的材料，包括声明、cover letter 和源码 zip。",
       "expected_skills": [
         "publishing-papers"
@@ -157,6 +172,7 @@
     },
     {
       "id": "publishing-papers-positive-scaffold",
+      "split": "train",
       "prompt": "Scaffold a local Elsevier elsarticle manuscript and explain whether I should use preprint, review, 1p, 3p, or 5p with single-column or twocolumn output.",
       "expected_skills": [
         "publishing-papers"
@@ -168,6 +184,7 @@
     },
     {
       "id": "publishing-papers-positive-compile",
+      "split": "train",
       "prompt": "My elsarticle paper fails under latexmk -pdf after adding natbib and a BibTeX bibliography; diagnose the local pdflatex build.",
       "expected_skills": [
         "publishing-papers"
@@ -177,6 +194,7 @@
     },
     {
       "id": "publishing-papers-positive-zh-layout",
+      "split": "validation",
       "prompt": "帮我用 elsarticle 搭一个 Elsevier 论文模板，本地要能编译，并说明单栏 preprint 和 3p,twocolumn 双栏怎么选。",
       "expected_skills": [
         "publishing-papers"
@@ -188,6 +206,7 @@
     },
     {
       "id": "publishing-papers-negative-finished-packet",
+      "split": "train",
       "prompt": "The manuscript is finished. Build the Elsevier Editorial Manager revision packet with statements, highlights DOCX, cover letter, and the requested source zip.",
       "expected_skills": [
         "publishing-papers"
@@ -197,6 +216,7 @@
     },
     {
       "id": "publishing-papers-negative-paper-prose",
+      "split": "train",
       "prompt": "Draft and rewrite the introduction, contribution paragraphs, and evidence-backed experiment narrative of my technical paper.",
       "expected_skills": [
         "writing-papers"
@@ -208,6 +228,7 @@
     },
     {
       "id": "publishing-papers-negative-generic-latex",
+      "split": "validation",
       "prompt": "Fix the margins, totals, company logo, and page numbers in this generic LaTeX invoice.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -218,6 +239,7 @@
     },
     {
       "id": "publishing-papers-negative-review",
+      "split": "train",
       "prompt": "Review the LaTeX introduction for AI-tone and logical self-consistency.",
       "expected_skills": [
         "writing-papers"
@@ -229,6 +251,7 @@
     },
     {
       "id": "publishing-papers-negative-generic-cover-letter",
+      "split": "train",
       "prompt": "Write a cover letter for this software engineering job application.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -238,6 +261,7 @@
     },
     {
       "id": "publishing-papers-negative-author-guidelines",
+      "split": "train",
       "prompt": "Compare these two academic venue websites and summarize their scope, deadlines, and formatting links so I can decide where to submit later.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -247,6 +271,7 @@
     },
     {
       "id": "writing-papers-positive-rebuttal",
+      "split": "validation",
       "prompt": "Polish this NeurIPS rebuttal paragraph and remove AI-sounding phrasing without changing the technical claims.",
       "expected_skills": [
         "writing-papers"
@@ -258,6 +283,7 @@
     },
     {
       "id": "writing-papers-positive-figure-table",
+      "split": "train",
       "prompt": "Check this paper's experiment narrative, Figure/Table captions, and evidence-bound conclusions for logical consistency.",
       "expected_skills": [
         "writing-papers"
@@ -269,6 +295,7 @@
     },
     {
       "id": "writing-papers-positive-zh-polish",
+      "split": "validation",
       "prompt": "帮我润色这段 NeurIPS 论文 LaTeX，去掉 AI 味，但不要改变技术主张。",
       "expected_skills": [
         "writing-papers"
@@ -278,6 +305,7 @@
     },
     {
       "id": "writing-papers-positive-zh-figures",
+      "split": "validation",
       "prompt": "检查这篇论文的实验叙事、图表 caption 和结论是否证据自洽。",
       "expected_skills": [
         "writing-papers"
@@ -289,6 +317,7 @@
     },
     {
       "id": "writing-papers-negative-general-english",
+      "split": "train",
       "prompt": "Make this business email sound more natural in English.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -298,6 +327,7 @@
     },
     {
       "id": "writing-papers-positive-draft-intro",
+      "split": "train",
       "prompt": "I have experiment results for a new external-sort algorithm but haven't started writing. Help me draft the paper's introduction and structure the contributions.",
       "expected_skills": [
         "writing-papers"
@@ -309,6 +339,7 @@
     },
     {
       "id": "writing-papers-positive-draft-structure",
+      "split": "train",
       "prompt": "I'm starting a technical paper from scratch — how should I organize the sections, what goes in the abstract vs the introduction, and should related work go before or after the body?",
       "expected_skills": [
         "writing-papers"
@@ -320,6 +351,7 @@
     },
     {
       "id": "writing-papers-positive-zh-draft",
+      "split": "validation",
       "prompt": "我要从零开始写一篇 CVPR 论文，帮我搭引言的五段式结构、摘要该写什么、相关工作放前面还是后面。",
       "expected_skills": [
         "writing-papers"
@@ -331,6 +363,7 @@
     },
     {
       "id": "writing-papers-positive-zh-outline",
+      "split": "validation",
       "prompt": "帮我起草这篇论文的 introduction 和 contributions bullet 列表。",
       "expected_skills": [
         "writing-papers"
@@ -340,6 +373,7 @@
     },
     {
       "id": "writing-papers-negative-blog-draft",
+      "split": "train",
       "prompt": "Help me draft a blog post and a project README from scratch.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -349,6 +383,7 @@
     },
     {
       "id": "writing-papers-negative-latex-invoice",
+      "split": "validation",
       "prompt": "Fix the LaTeX template for this invoice so the totals align and the company logo stays in the header.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -358,6 +393,7 @@
     },
     {
       "id": "writing-papers-negative-academic-admin",
+      "split": "train",
       "prompt": "Summarize the department seminar schedule and turn it into an email announcement for grad students.",
       "expected_skills": [],
       "forbidden_skills": [
@@ -367,6 +403,7 @@
     },
     {
       "id": "writing-papers-positive-core-contribution",
+      "split": "train",
       "prompt": "Help me pin down the single core contribution of my paper and restructure the intro around it, instead of a laundry list of everything I did.",
       "expected_skills": [
         "writing-papers"
@@ -378,6 +415,7 @@
     },
     {
       "id": "writing-papers-positive-zh-language",
+      "split": "validation",
       "prompt": "帮我把论文里 study/investigate/pipeline/combine 这些词换成更像顶会的写法，并检查每段是否首句点题。",
       "expected_skills": [
         "writing-papers"
@@ -387,6 +425,7 @@
     },
     {
       "id": "training-models-positive-greenfield-loop",
+      "split": "train",
       "prompt": "Debug why this neural network training run has exploding gradients.",
       "expected_skills": [
         "training-models"
@@ -396,6 +435,7 @@
     },
     {
       "id": "writing-resumes-negative-cover-letter",
+      "split": "validation",
       "prompt": "Write an Elsevier cover letter for a manuscript submission.",
       "expected_skills": [
         "publishing-papers"
@@ -405,6 +445,7 @@
     },
     {
       "id": "apple-hig-negative-paper-figure",
+      "split": "train",
       "prompt": "Draw a publication-quality architecture diagram and a speed-accuracy scatter plot at 600 dpi for my CVPR paper.",
       "expected_skills": [
         "drawing-figures"
@@ -414,6 +455,7 @@
     },
     {
       "id": "publishing-papers-positive-major-revision",
+      "split": "train",
       "prompt": "We got a major revision. Reviewer 2 says our ablation does not isolate the two modules, and one of his premises about our baseline is simply wrong. How should I handle that comment?",
       "expected_skills": [
         "publishing-papers",
@@ -426,6 +468,7 @@
     },
     {
       "id": "publishing-papers-positive-zh-scope",
+      "split": "validation",
       "prompt": "修回还剩两周,审稿人点名要的三个数据集只跑得完两个,另外我想顺手补一个他们没问的消融。现在这轮该怎么取舍?",
       "expected_skills": [
         "publishing-papers"
@@ -437,6 +480,7 @@
     },
     {
       "id": "publishing-papers-negative-packet",
+      "split": "train",
       "prompt": "Assemble the revised Elsevier manuscript into the Editorial Manager upload set with the declarations, highlights DOCX, and a flat source zip.",
       "expected_skills": [
         "publishing-papers"
@@ -446,6 +490,7 @@
     },
     {
       "id": "publishing-papers-positive-experiment-backfires",
+      "split": "train",
       "prompt": "受控对照跑完了,结果审稿人是对的 —— 我们的色彩空间确实不如他点名的那个,差 1.5 dB。可整篇论文都建在这个空间上,不可能换。这条意见现在怎么答?",
       "expected_skills": [
         "publishing-papers"
@@ -457,6 +502,7 @@
     },
     {
       "id": "publishing-papers-negative-draft-section",
+      "split": "train",
       "prompt": "Draft the related-work section and the contribution bullets for my paper from scratch.",
       "expected_skills": [
         "writing-papers"
@@ -468,6 +514,7 @@
     },
     {
       "id": "publishing-papers-positive-ieee-portal",
+      "split": "train",
       "prompt": "Package this manuscript for the IEEE Author Portal: EDICS, the 13-page limit check on the two-column PDF, supplemental material, and the LaTeX source archive.",
       "expected_skills": [
         "publishing-papers"
@@ -477,6 +524,7 @@
     },
     {
       "id": "publishing-papers-positive-zh-ieee-revision",
+      "split": "validation",
       "prompt": "帮我把这篇 TMM 修回稿的投稿材料准备好，包括 response 和会议扩展的差异说明。",
       "expected_skills": [
         "publishing-papers"
@@ -486,6 +534,7 @@
     },
     {
       "id": "publishing-papers-positive-ieeetran-scaffold",
+      "split": "train",
       "prompt": "Scaffold an IEEEtran journal-mode paper: the \\thanks block for funding, \\markboth running heads, and IEEEtran.bst.",
       "expected_skills": [
         "publishing-papers"
@@ -495,6 +544,7 @@
     },
     {
       "id": "publishing-papers-positive-zh-page-limit",
+      "split": "validation",
       "prompt": "双栏排版下页数超限了，怎么在不动正文的情况下压回 13 页？",
       "expected_skills": [
         "publishing-papers"
@@ -504,6 +554,7 @@
     },
     {
       "id": "comparing-runs-positive-ablation-matrix",
+      "split": "train",
       "prompt": "Design the ablation matrix for this paper: decide which arms to run so every arm is comparable, then build the result table.",
       "expected_skills": [
         "comparing-runs"
@@ -515,6 +566,7 @@
     },
     {
       "id": "comparing-runs-positive-seeds-table",
+      "split": "train",
       "prompt": "I have five trained checkpoints. Produce the SOTA comparison table with error bars over three seeds and a consistent evaluation protocol.",
       "expected_skills": [
         "comparing-runs"
@@ -526,6 +578,7 @@
     },
     {
       "id": "comparing-runs-positive-baseline-below-published",
+      "split": "train",
       "prompt": "I reproduced the baseline from its official repo but my number is 0.8 dB below the published one. What do I report in the comparison table?",
       "expected_skills": [
         "comparing-runs"
@@ -538,6 +591,7 @@
     },
     {
       "id": "comparing-runs-positive-zh-ablation",
+      "split": "validation",
       "prompt": "消融的几个臂是在不同时间跑的,骨干网和训练轮数好像不一样,这样的消融表能放进论文吗?",
       "expected_skills": [
         "comparing-runs"
@@ -549,6 +603,7 @@
     },
     {
       "id": "comparing-runs-positive-provenance",
+      "split": "train",
       "prompt": "Table 3 has five rows and I can no longer tell which checkpoint produced row 4. How should runs be tracked so every number traces back?",
       "expected_skills": [
         "comparing-runs"
@@ -560,6 +615,7 @@
     },
     {
       "id": "comparing-runs-positive-zh-seeds",
+      "split": "validation",
       "prompt": "审稿人要误差棒。我跑几个 seed 才够,只随机化 seed 行不行?",
       "expected_skills": [
         "comparing-runs"
@@ -571,6 +627,7 @@
     },
     {
       "id": "comparing-runs-negative-loss-not-falling",
+      "split": "train",
       "prompt": "My loss will not go below 2.3 and accuracy is stuck at chance. Check the training loop.",
       "expected_skills": [
         "training-models"
@@ -582,6 +639,7 @@
     },
     {
       "id": "comparing-runs-negative-write-experiments-section",
+      "split": "train",
       "prompt": "Draft the experiments section around these results and make sure each claim stays inside its evidence.",
       "expected_skills": [
         "writing-papers"
@@ -593,6 +651,7 @@
     },
     {
       "id": "comparing-runs-negative-plot-the-comparison",
+      "split": "train",
       "prompt": "Draw the speed-accuracy scatter comparing our method against the baselines at 600 dpi.",
       "expected_skills": [
         "drawing-figures"
@@ -601,6 +660,90 @@
         "comparing-runs"
       ],
       "notes": "Rendering a comparison is figure production."
+    },
+    {
+      "id": "comparing-runs-negative-module-made-it-worse",
+      "split": "train",
+      "prompt": "I added a second module and the training loss got worse from the first epoch. Check the loop and the tensor shapes at the seam.",
+      "expected_skills": [
+        "training-models"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Near miss: adding a module sounds like an arm, but a loss that breaks immediately is one run being wrong."
+    },
+    {
+      "id": "comparing-runs-negative-reformat-ablation-table",
+      "split": "train",
+      "prompt": "The reviewer wants the ablation table reformatted to the journal template's two-column width and the font matched to the rest of the paper.",
+      "expected_skills": [
+        "publishing-papers"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Near miss: an ablation table, but the work is layout under a template."
+    },
+    {
+      "id": "comparing-runs-negative-interpret-ablation-prose",
+      "split": "train",
+      "prompt": "Write the paragraph that interprets this ablation table and says what each row means for our contribution.",
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Near miss: the table is settled; turning it into prose is drafting."
+    },
+    {
+      "id": "drawing-figures-positive-qualitative-panel",
+      "split": "validation",
+      "prompt": "Build the qualitative comparison panel: three methods across five scenes, crops aligned, sized for a two-column layout.",
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
+      "notes": "Qualitative stitching is figure production."
+    },
+    {
+      "id": "comparing-runs-negative-figure-of-ablation",
+      "split": "train",
+      "prompt": "Plot the ablation as a grouped bar chart with the three arms side by side, colour-blind safe.",
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Near miss: the arms are settled; drawing them is figure production. Moved out of validation after being read during a split audit: a held-out case you have looked at and acted on is no longer held out."
+    },
+    {
+      "id": "comparing-runs-negative-cover-letter-results",
+      "split": "validation",
+      "prompt": "Summarise our headline results in the cover letter to the editor for the Elsevier submission.",
+      "expected_skills": [
+        "publishing-papers"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Near miss: results are named, but the deliverable is a submission document."
+    },
+    {
+      "id": "comparing-runs-negative-figure-legend",
+      "split": "validation",
+      "prompt": "Redo the legend and axis labels on the efficiency figure so the three variants are distinguishable in greyscale print.",
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "comparing-runs"
+      ],
+      "notes": "Replaces the case retired from validation. Variants are named, but the work is legibility of a rendered figure."
     }
   ]
 }

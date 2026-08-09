@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """Check that every skill's trigger boundary is declared and non-overlapping.
 
+The cases are split 60/40 into train and validation. Revise descriptions against
+train failures only; the validation half exists to answer a different question —
+did the revision generalise, or was it fitted to the cases in front of you? That
+is why a validation failure is reported as a count and never as a case: knowing
+which one failed is exactly what lets you patch for it, and a patch aimed at one
+held-out prompt destroys the only estimate you have.
+
 Three offline checks, no model and no network:
   1. Contract  — every skill has >=2 positive and >=2 forbidden cases in
                  evals/trigger_cases.json, and every label names a real skill.
@@ -34,6 +41,12 @@ SKILLS_ROOT = ROOT / "skills"
 EVALS = ROOT / "evals" / "trigger_cases.json"
 SKIP = {"scripts", ".git", ".github", "evals"}
 NONE_LABEL = "<none>"  # explicit abstain class so "fire nothing" is first-class
+SPLITS = ("train", "validation")
+# The validation half is a rate, not a checklist. Requiring every held-out case to
+# pass would force you to read which one failed, and reading it is what turns the
+# held-out half into more training data. A floor catches a description that stopped
+# generalising without ever telling you which prompt to patch.
+VALIDATION_FLOOR = 0.85
 # "Does not apply to ..." is as common as "Do not use for ..." in this library, and
 # matching only the latter silently scored three skills' anti-scope as attraction.
 # The marker must start a sentence: a description listing symptoms says "the loss
@@ -101,6 +114,7 @@ class Case:
     expected_skills: tuple[str, ...]
     forbidden_skills: tuple[str, ...]
     notes: str
+    split: str
 
     @property
     def is_abstain(self) -> bool:
@@ -161,6 +175,7 @@ def load_cases(path: Path = EVALS) -> list[Case]:
                 expected_skills=tuple(item.get("expected_skills", [])),
                 forbidden_skills=tuple(item.get("forbidden_skills", [])),
                 notes=item.get("notes", ""),
+                split=item.get("split", "train"),
             )
         )
     return cases
@@ -250,25 +265,28 @@ def validate_case_contract(cases: list[Case], skills: dict[str, Skill]) -> list[
     for case_id in duplicate_ids:
         failures.append(f"duplicate case id: {case_id}")
 
-    positive_counts: Counter[str] = Counter()
-    negative_counts: Counter[str] = Counter()
+    positive_counts: Counter[tuple[str, str]] = Counter()
+    negative_counts: Counter[tuple[str, str]] = Counter()
     for case in cases:
+        if case.split not in SPLITS:
+            failures.append(f"{case.id}: unknown split {case.split!r}")
         referenced = set(case.expected_skills) | set(case.forbidden_skills)
         unknown = sorted(referenced - skill_names)
         if unknown:
             failures.append(f"{case.id}: unknown skills {unknown}")
         for skill in case.expected_skills:
-            positive_counts[skill] += 1
+            positive_counts[(skill, case.split)] += 1
         for skill in case.forbidden_skills:
-            negative_counts[skill] += 1
+            negative_counts[(skill, case.split)] += 1
         if set(case.expected_skills) & set(case.forbidden_skills):
             failures.append(f"{case.id}: skill appears in both expected and forbidden")
 
     for skill_name in sorted(skill_names):
-        if positive_counts[skill_name] < 2:
-            failures.append(f"{skill_name}: needs at least 2 positive trigger cases")
-        if negative_counts[skill_name] < 2:
-            failures.append(f"{skill_name}: needs at least 2 forbidden/negative cases")
+        for split in SPLITS:
+            if positive_counts[(skill_name, split)] < 2:
+                failures.append(f"{skill_name}: needs at least 2 positive cases in {split}")
+            if negative_counts[(skill_name, split)] < 2:
+                failures.append(f"{skill_name}: needs at least 2 forbidden cases in {split}")
     return failures
 
 
@@ -340,19 +358,23 @@ def validate_antiscope(cases: list[Case], skills: dict[str, Skill]) -> list[str]
 
 
 def print_summary(cases: list[Case], skills: dict[str, Skill]) -> None:
-    """Print coverage counts so maintainers can see weak eval areas."""
-    positive_counts: Counter[str] = Counter()
-    negative_counts: Counter[str] = Counter()
+    """Print per-split coverage so maintainers can see weak eval areas."""
+    counts: Counter[tuple[str, str, str]] = Counter()
     for case in cases:
-        positive_counts.update(case.expected_skills)
-        negative_counts.update(case.forbidden_skills)
+        for skill in case.expected_skills:
+            counts[(skill, case.split, "pos")] += 1
+        for skill in case.forbidden_skills:
+            counts[(skill, case.split, "forb")] += 1
 
-    print(f"Loaded {len(skills)} skills and {len(cases)} trigger cases.")
+    per_split = Counter(case.split for case in cases)
+    print(
+        f"Loaded {len(skills)} skills and {len(cases)} cases "
+        f"({per_split['train']} train / {per_split['validation']} validation)."
+    )
     for skill_name in sorted(skills):
-        print(
-            f"- {skill_name}: positives={positive_counts[skill_name]} "
-            f"forbidden={negative_counts[skill_name]}"
-        )
+        train = f"{counts[(skill_name, 'train', 'pos')]}+/{counts[(skill_name, 'train', 'forb')]}-"
+        val = f"{counts[(skill_name, 'validation', 'pos')]}+/{counts[(skill_name, 'validation', 'forb')]}-"
+        print(f"- {skill_name}: train {train}   validation {val}")
 
 
 
@@ -367,21 +389,57 @@ def main(argv: Iterable[str] | None = None) -> int:
         action="store_true",
         help="Only validate labels and coverage; skip the metadata-overlap smoke test",
     )
+    parser.add_argument(
+        "--show-validation",
+        action="store_true",
+        help="Name the failing validation cases. Reading them is how a description "
+             "gets fitted to the held-out half; use only to audit the split itself.",
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     skills = load_skills()
     cases = load_cases(args.cases)
     print_summary(cases, skills)
 
-    failures = validate_case_contract(cases, skills)
-    failures.extend(validate_antiscope(cases, skills))
-    if not args.skip_smoke:
-        failures.extend(smoke_test_metadata(cases, skills))
+    structural = validate_case_contract(cases, skills) + validate_antiscope(cases, skills)
 
-    if failures:
-        print("\nTrigger health failures:")
-        for failure in failures:
+    train = [case for case in cases if case.split == "train"]
+    held_out = [case for case in cases if case.split == "validation"]
+    train_failures: list[str] = []
+    held_out_failures: list[str] = []
+    if not args.skip_smoke:
+        train_failures = smoke_test_metadata(train, skills)
+        held_out_failures = smoke_test_metadata(held_out, skills)
+
+    if structural:
+        print("\nStructural failures:")
+        for failure in structural:
             print(f"ERROR {failure}")
+
+    if train_failures:
+        print("\nTrain failures — revise the descriptions against these:")
+        for failure in train_failures:
+            print(f"ERROR {failure}")
+
+    held_out_short = False
+    if held_out:
+        passed = len(held_out) - len(held_out_failures)
+        rate = passed / len(held_out)
+        held_out_short = rate < VALIDATION_FLOOR
+        print(f"\nValidation: {passed}/{len(held_out)} passed ({rate:.0%}, "
+              f"floor {VALIDATION_FLOOR:.0%}).")
+    if held_out_failures:
+        if args.show_validation:
+            for failure in held_out_failures:
+                print(f"ERROR {failure}")
+        else:
+            print(
+                "Which cases failed is withheld. A drop here means the description "
+                "was fitted to the train half; the fix is a description that "
+                "generalises, not a patch aimed at whichever held-out prompt broke."
+            )
+
+    if structural or train_failures or held_out_short:
         return 1
 
     print("\nTrigger health checks passed.")

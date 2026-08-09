@@ -1,6 +1,6 @@
 ---
 name: writing-papers
-description: Academic-paper drafting, review, and polishing. Use when experiment results or an algorithm need a paper structure; to draft an introduction, abstract, related work, or contribution bullets; to polish manuscript LaTeX or a NeurIPS paragraph while preserving technical claims; to review logical self-consistency, experiment narrative, captions, figure-text linkage, and evidence-bound conclusions; or to remove AI tone. Chinese triggers include 从零开始写论文, 写摘要, 写引言, 相关工作, 起草论文, 贡献列表, 润色论文 LaTeX, 去掉 AI 味, 不改变技术主张, 首句点题, 图表 caption, 证据自洽, and 终稿红线. Do not use for answering reviewer comments on a revision, generic editing, standalone figure production, or submission packaging.
+description: Academic-paper drafting, review, and polishing. Use when experiment results or an algorithm need a paper structure; to draft an introduction, abstract, related work, or contribution bullets; to polish manuscript LaTeX or a NeurIPS paragraph while preserving technical claims; to review logical self-consistency, experiment narrative, captions, figure-text linkage, and evidence-bound conclusions; to write the paragraph interpreting what a result means for the contribution; or to remove AI tone. Chinese triggers include 从零开始写论文, 写摘要, 写引言, 相关工作, 起草论文, 贡献列表, 润色论文 LaTeX, 去掉 AI 味, 不改变技术主张, 首句点题, 图表 caption, 证据自洽, and 终稿红线. Do not use for answering reviewer comments on a revision, generic editing, standalone figure production, or submission packaging.
 license: MIT
 ---
 

@@ -20,6 +20,10 @@ class TriggerEvaluatorTests(unittest.TestCase):
     def skill(self, name: str, description: str, user_invoked: bool = False):
         return evaluator.Skill(name, Path(f"/{name}/SKILL.md"), description, user_invoked)
 
+    def case(self, case_id, prompt, expected=(), forbidden=(), split="train"):
+        """Build a Case without pinning every test to the field order."""
+        return evaluator.Case(case_id, prompt, tuple(expected), tuple(forbidden), "", split)
+
     def test_tokenize_supports_words_and_cjk_bigrams(self) -> None:
         tokens = evaluator.tokenize("Debug training 梯度异常")
         self.assertIn("debug", tokens)
@@ -57,18 +61,18 @@ class TriggerEvaluatorTests(unittest.TestCase):
 
     def test_antiscope_must_exist_and_be_exercised(self) -> None:
         skills = {"alpha-skill": self.skill("alpha-skill", "Alpha routing with no boundary")}
-        case = evaluator.Case("one", "alpha", (), ("alpha-skill",), "")
+        case = self.case("one", "alpha", (), ("alpha-skill",))
         self.assertTrue(
             any("declares no anti-scope" in f for f in evaluator.validate_antiscope([case], skills))
         )
 
         skills = {"alpha-skill": self.skill("alpha-skill", "Alpha routing. Do not use for invoices.")}
-        untested = evaluator.Case("one", "alpha routing please", (), ("alpha-skill",), "")
+        untested = self.case("one", "alpha routing please", (), ("alpha-skill",))
         self.assertTrue(
             any("no forbidden case exercises" in f
                 for f in evaluator.validate_antiscope([untested], skills))
         )
-        tested = evaluator.Case("two", "fix my invoices", (), ("alpha-skill",), "")
+        tested = self.case("two", "fix my invoices", (), ("alpha-skill",))
         self.assertEqual(evaluator.validate_antiscope([untested, tested], skills), [])
 
     def test_smoke_stays_silent_inside_the_tie_band(self) -> None:
@@ -77,10 +81,10 @@ class TriggerEvaluatorTests(unittest.TestCase):
             "beta-skill": self.skill("beta-skill", "shared routing beta. Do not use for y."),
         }
         # "shared routing" hits both almost equally: a verdict here would read noise.
-        tie = evaluator.Case("tie", "shared routing", ("beta-skill",), ("alpha-skill",), "")
+        tie = self.case("tie", "shared routing", ("beta-skill",), ("alpha-skill",))
         self.assertEqual(evaluator.smoke_test_metadata([tie], skills), [])
         # A prompt made only of alpha's own words is outside the band and must fail.
-        clear = evaluator.Case("clear", "alpha alpha", ("beta-skill",), (), "")
+        clear = self.case("clear", "alpha alpha", ("beta-skill",), ())
         self.assertTrue(evaluator.smoke_test_metadata([clear], skills))
 
     def test_user_invoked_skill_only_ranks_when_named(self) -> None:
@@ -93,16 +97,35 @@ class TriggerEvaluatorTests(unittest.TestCase):
         self.assertNotIn("paper-workflow", unnamed)
         self.assertIn("paper-workflow", named)
 
-    def test_contract_requires_two_positive_and_negative_cases(self) -> None:
+    def test_contract_requires_two_of_each_in_both_splits(self) -> None:
+        """A split with one case in it cannot judge anything, so demand two per side."""
         skills = {"alpha-skill": self.skill("alpha-skill", "alpha")}
-        case = evaluator.Case("one", "alpha", ("alpha-skill",), (), "")
+        case = self.case("one", "alpha", ("alpha-skill",), ())
         failures = evaluator.validate_case_contract([case], skills)
-        self.assertIn("alpha-skill: needs at least 2 positive trigger cases", failures)
-        self.assertIn("alpha-skill: needs at least 2 forbidden/negative cases", failures)
+        for split in ("train", "validation"):
+            self.assertIn(f"alpha-skill: needs at least 2 positive cases in {split}", failures)
+            self.assertIn(f"alpha-skill: needs at least 2 forbidden cases in {split}", failures)
+
+    def test_contract_rejects_an_unknown_split(self) -> None:
+        skills = {"alpha-skill": self.skill("alpha-skill", "alpha")}
+        case = self.case("one", "alpha", ("alpha-skill",), (), split="holdout")
+        self.assertTrue(
+            any("unknown split" in f for f in evaluator.validate_case_contract([case], skills))
+        )
+
+    def test_validation_failures_are_counted_not_named(self) -> None:
+        """Naming them is how the held-out half turns into more training data."""
+        import contextlib, io
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            evaluator.main([])
+        printed = buffer.getvalue()
+        self.assertIn("Validation:", printed)
+        self.assertNotIn("ERROR publishing-papers", printed)
 
     def test_contract_rejects_unknown_and_conflicting_labels(self) -> None:
         skills = {"alpha-skill": self.skill("alpha-skill", "alpha")}
-        case = evaluator.Case("bad", "alpha", ("alpha-skill", "missing"), ("alpha-skill",), "")
+        case = self.case("bad", "alpha", ("alpha-skill", "missing"), ("alpha-skill",))
         failures = evaluator.validate_case_contract([case, case], skills)
         self.assertTrue(any("duplicate case id" in failure for failure in failures))
         self.assertTrue(any("unknown skills" in failure for failure in failures))
@@ -151,8 +174,8 @@ class TriggerEvaluatorTests(unittest.TestCase):
             "paper-workflow": self.skill("paper-workflow", "paper workflow", True),
         }
         cases = [
-            evaluator.Case("alpha", "alpha routing", ("alpha-skill",), (), ""),
-            evaluator.Case("orchestrator", "run paper workflow", ("paper-workflow",), (), ""),
+            self.case("alpha", "alpha routing", ("alpha-skill",), ()),
+            self.case("orchestrator", "run paper workflow", ("paper-workflow",), ()),
         ]
         self.assertEqual(evaluator.smoke_test_metadata(cases, skills), [])
 

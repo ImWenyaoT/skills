@@ -71,11 +71,17 @@ grader。这两层曾经实现过 375 行 + 一个 DeepSeek 路由器,在仓库�
 
 工具与契约:
 
-- `evals/trigger_cases.json`:每个 skill **≥2 条 positive + ≥2 条 forbidden** 用例;用**相邻 skill 做 hard negative**(如 writing-papers vs drawing-figures、writing-papers vs publishing-papers);路径专用 skill 的 positive 必须带路径/仓库/唯一站点信号、negative 覆盖泛化场景。
+- `evals/trigger_cases.json`:按 **60/40 划分 train / validation**,每条用例带 `split` 字段。每个 skill 在**两个 split 里各自** ≥2 条 positive + ≥2 条 forbidden——一个 split 里只有一条,判不出任何东西。用**相邻 skill 做 hard negative**(如 writing-papers vs drawing-figures、comparing-runs vs training-models);官方建议负例用**近似命中**(共享关键词但需求不同),而不是明显无关的东西——后者什么也测不出。
 - `scripts/evaluate_skill_triggers.py`:三件事——**契约**(标签指向真实 skill、每个 skill 两向覆盖齐)、**anti-scope**(每条描述都得声明反向边界,且该边界被某条 forbidden 用例真正踩到)、**smoke**(prompt 与「路由器读 SKILL.md 之前能看到的那半边元数据」做词面重叠)。
 - **反向边界必须写,而且必须被测。** 官方文档与实测都指向同一件事:缺反例的描述路由准确率明显下降,「做不到什么」往往比「能做什么」更能防误触发。词袋无法表示否定,所以反向边界不进正面打分(否则它的词会把 skill 往它自己排除的 prompt 上拽),而是单独跟 goldens 对账——**写了没人测的边界会被判失败**——曾经有一条反例指着两轮前就删掉的 skill,没有任何检查会对它有反应,于是一直活着。
 - **smoke 的边界要知道**:它没有词干还原(`rewrite` 匹配不上 `rewriting`);中文只按「连续汉字段内的二元组」切,跨标点不成词;两个 skill 分数比值高于 `TIE_RATIO`(0.80)时**不下判决**,因为词面打分在那个区间读的是噪声(该阈值由本库 73 条正确案例的分布标定:干扰项/赢家的比值 95% 在 0.75 以下)。abstain 用例的 0.25 门槛在当前数据上几乎没有分辨力(abstain 最高 0.170,正例中位 0.159)——它挡的是灾难,不是精度。**smoke 过了不等于真实路由器会这么路由。**
 - **改了任何 `description` 后重跑它**,并且看的是「相邻 skill 有没有被挤下去」,不是绝对分值。
+- **只用 train 的失败去改描述。** validation 那半是用来回答另一个问题的:这次修改是泛化了,还是只是贴合了眼前这批用例?
+  所以判分器**只报 validation 的合格率、不报是哪条失败的**——知道是哪条,正是让你去为它打补丁的东西,而一个针对留出用例的补丁会把你唯一的泛化估计毁掉。
+  低于 `VALIDATION_FLOOR`(85%)才失败:它挡的是描述整体不再泛化,不是单条漂移。
+- **不要把失败用例里的词直接抄进描述**——那是过拟合。找那批用例代表的**一般类别**,改那个。
+- `--show-validation` 只有一个正当用途:**审计划分本身**(怀疑某条标注错了)。看过的留出用例就不再是留出的,
+  必须挪进 train 并补一条新的进 validation。这一步要写进 commit。
 - **改描述的 commit 不要同时改已有 golden。** 新增用例随时可以;修改或删除一条已有用例,是在动判分的基准,得单独成一次改动并写清理由——否则「描述改挂了顺手把用例改绿」和「修好了」在历史里长得一模一样。
 
 ## 提交前(与 CI 同款)
