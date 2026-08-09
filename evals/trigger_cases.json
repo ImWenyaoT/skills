@@ -3,96 +3,6 @@
   "purpose": "Golden prompts for checking whether this repository's skill descriptions have clear trigger boundaries. These cases are not a full model trace; they define the expected trigger contract for classifier, sub-agent, or platform-trace evals.",
   "cases": [
     {
-      "id": "curating-skills-positive-import",
-      "prompt": "I found an open-source agent skill on GitHub. Help me decide whether to import it as-is, adapt it, or clean-room rewrite it with attribution.",
-      "expected_skills": [
-        "curating-skills"
-      ],
-      "forbidden_skills": [],
-      "notes": "External skill adoption with provenance and license decisions."
-    },
-    {
-      "id": "curating-skills-positive-fork",
-      "prompt": "Audit this community skill before I fork it into my personal skills library. I need license, provenance, and attribution guidance.",
-      "expected_skills": [
-        "curating-skills"
-      ],
-      "forbidden_skills": [],
-      "notes": "Fork/import workflow should trigger adoption discipline."
-    },
-    {
-      "id": "curating-skills-positive-new-from-notes",
-      "prompt": "Create a brand new skill from my own workflow notes and add it to this repo.",
-      "expected_skills": [
-        "curating-skills"
-      ],
-      "forbidden_skills": [],
-      "notes": "合并后改判：SKILL.md 第 4 步「Merge before creating」正是「该新建还是打补丁」的决策，「加进这个库」必须先过这一关。合并前 importing-skills 只管外部引入，这条才是负例。"
-    },
-    {
-      "id": "agent-runtime-positive-adapter",
-      "prompt": "During this migration, wrap the old sanitizer service behind a compatibility adapter and keep the fallback path alive.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Legacy service adapter and fallback lane."
-    },
-    {
-      "id": "agent-runtime-positive-build-before-import",
-      "prompt": "The agent runtime imports the legacy templates before they are built. Design a build-before-import bridge behind the compatibility adapter, without rewriting the old module.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Legacy lane integration, not SDK abstraction. The prompt used to name no agent concept at all — inherited from the deleted bridging-legacy skill — so no router could have been expected to reach agent-runtime from it."
-    },
-    {
-      "id": "agent-runtime-positive-delete-proven-fallback",
-      "prompt": "The replacement lane now owns production and passes deterministic plus integration baselines. Migrate still-valid behavior contracts, then remove the unused legacy fallback, parser, switches, and legacy-only tests without widening scope.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "A compatibility migration includes a deletion gate, not permanent fallback retention."
-    },
-    {
-      "id": "agent-runtime-negative-greenfield",
-      "prompt": "Build a new stateless agent loop from scratch with terminal states and bounded turns.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "No legacy compatibility path."
-    },
-    {
-      "id": "agent-runtime-positive-stateless",
-      "prompt": "Implement an agent loop inside a stateless request handler so each HTTP request advances one bounded step.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "One-step-per-request loop contract."
-    },
-    {
-      "id": "agent-runtime-positive-terminality",
-      "prompt": "Fix this agent route so terminality, handoff states, and post-tool continuation are explicit instead of an unbounded while loop.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Loop control, not tool policy."
-    },
-    {
-      "id": "agent-runtime-negative-tool-policy",
-      "prompt": "Add approval gates and deterministic stubs to the agent tool registry.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Tool runtime policy only."
-    },
-    {
       "id": "writing-papers-negative-md-edit-no-export",
       "prompt": "Rewrite this Markdown section to make the argument clearer, but do not export anything.",
       "expected_skills": [],
@@ -100,35 +10,6 @@
         "writing-papers"
       ],
       "notes": "Editing Markdown prose with no export is not manuscript review."
-    },
-    {
-      "id": "curating-skills-positive-mine",
-      "prompt": "Scan my past Codex sessions and turn recurring workflow friction into new or improved skills.",
-      "expected_skills": [
-        "curating-skills"
-      ],
-      "forbidden_skills": [],
-      "notes": "Mine local sessions for skill opportunities."
-    },
-    {
-      "id": "curating-skills-positive-transcripts",
-      "prompt": "Use the transcript history to decide what belongs in memory versus a reusable skill.",
-      "expected_skills": [
-        "curating-skills"
-      ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
-      "notes": "Skill-vs-memory triage from transcripts."
-    },
-    {
-      "id": "curating-skills-negative-external",
-      "prompt": "Import this public skill repository and preserve license attribution.",
-      "expected_skills": [
-        "curating-skills"
-      ],
-      "forbidden_skills": [],
-      "notes": "External adoption, not mining own sessions."
     },
     {
       "id": "training-models-positive-loss",
@@ -147,9 +28,7 @@
       "expected_skills": [
         "training-models"
       ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
+      "forbidden_skills": [],
       "notes": "Training sanity checks."
     },
     {
@@ -158,21 +37,8 @@
       "expected_skills": [
         "training-models"
       ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
+      "forbidden_skills": [],
       "notes": "Chinese neural network training failure prompt."
-    },
-    {
-      "id": "training-models-negative-agent-eval",
-      "prompt": "Set up an evaluator for agent turns and export golden failure cases.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [
-        "training-models"
-      ],
-      "notes": "Agent eval, not neural training."
     },
     {
       "id": "training-models-positive-recipe-setup",
@@ -180,9 +46,7 @@
       "expected_skills": [
         "training-models"
       ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
+      "forbidden_skills": [],
       "notes": "Karpathy recipe / from-scratch training setup methodology."
     },
     {
@@ -191,9 +55,7 @@
       "expected_skills": [
         "training-models"
       ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
+      "forbidden_skills": [],
       "notes": "Chinese: from-scratch NN training recipe / sanity-check order."
     },
     {
@@ -204,33 +66,6 @@
         "training-models"
       ],
       "notes": "Generic data/ETL pipeline setup, not neural-network training correctness."
-    },
-    {
-      "id": "agent-runtime-positive-approval",
-      "prompt": "Design the agent tool registry with risk-tiered approval gates and POJO-validated playbooks.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Runtime tool policy vocabulary."
-    },
-    {
-      "id": "agent-runtime-positive-stubs",
-      "prompt": "Add deterministic stubs for dangerous tools and define which actions require user approval.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Policy gate, not persistence."
-    },
-    {
-      "id": "agent-runtime-negative-sdk",
-      "prompt": "Hide the OpenAI Agents SDK behind one import site and map runner output onto our step contract.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "SDK runner boundary, not tool registry policy."
     },
     {
       "id": "drawing-figures-positive-figkit",
@@ -419,42 +254,6 @@
       "notes": "Academic-adjacent venue research without a finished Elsevier submission packet."
     },
     {
-      "id": "agent-runtime-positive-sqlite",
-      "prompt": "Migrate agent session state, memory snapshots, and trace rows from JSON files into SQLite with a fallback path.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Agent persistence migration."
-    },
-    {
-      "id": "agent-runtime-positive-traces",
-      "prompt": "Add structured trace persistence for eval and debug fields without putting evidence into long-term memory.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Trace/memory storage boundary."
-    },
-    {
-      "id": "agent-runtime-positive-ui-hydration",
-      "prompt": "The agent messages are present in SQLite, but they disappear when I switch conversations or restart the Next.js dev server. Close the UI-to-API-to-database hydration loop and keep tests isolated.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Stored rows are incomplete until the product can read and hydrate them."
-    },
-    {
-      "id": "agent-runtime-negative-golden",
-      "prompt": "Export golden cases from low-scoring agent turns and set score thresholds.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Eval lifecycle, not persistence."
-    },
-    {
       "id": "writing-papers-positive-rebuttal",
       "prompt": "Polish this NeurIPS rebuttal paragraph and remove AI-sounding phrasing without changing the technical claims.",
       "expected_skills": [
@@ -595,73 +394,13 @@
       "notes": "Chinese: good-vs-bad academic words + paragraph-first-sentence discipline."
     },
     {
-      "id": "agent-runtime-positive-fire-and-forget",
-      "prompt": "Build an async fire-and-forget evaluator that scores agent turns after the user-facing response and exports golden failures.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Agent eval loop."
-    },
-    {
-      "id": "agent-runtime-positive-thresholds",
-      "prompt": "Add score thresholds, failure-case lifecycle, and regression harness reviews for agent responses.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [
-        "training-models"
-      ],
-      "notes": "Agent regression evaluation."
-    },
-    {
-      "id": "agent-runtime-positive-deterministic-before-judge",
-      "prompt": "Our golden suite fails whenever the LLM judge times out even though action and contains assertions pass. Separate deterministic product checks from judge-only score thresholds and report per-scenario timing.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [
-        "training-models"
-      ],
-      "notes": "Judge availability must not erase deterministic regression evidence."
-    },
-    {
-      "id": "agent-runtime-negative-model-training",
+      "id": "training-models-positive-greenfield-loop",
       "prompt": "Debug why this neural network training run has exploding gradients.",
       "expected_skills": [
         "training-models"
       ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
+      "forbidden_skills": [],
       "notes": "ML training eval is not agent turn scoring."
-    },
-    {
-      "id": "agent-runtime-positive-openai",
-      "prompt": "Integrate the OpenAI Agents SDK behind a single import site with feature-flag opt-in and bounded runner turns.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Vendor SDK runner abstraction."
-    },
-    {
-      "id": "agent-runtime-positive-provider",
-      "prompt": "Add multi-provider agent runner config and map the SDK output onto our loop step contract.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Provider SDK boundary."
-    },
-    {
-      "id": "agent-runtime-negative-policy",
-      "prompt": "Define which tool calls require approval and which are safe deterministic stubs.",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [],
-      "notes": "Tool policy, not vendor SDK wiring."
     },
     {
       "id": "writing-resumes-negative-cover-letter",
@@ -737,17 +476,6 @@
       "notes": "No revision decision in play — ordinary drafting."
     },
     {
-      "id": "curating-skills-negative-runtime-storage",
-      "prompt": "Where should my agent write its session transcripts so the UI can rehydrate them after a restart?",
-      "expected_skills": [
-        "agent-runtime"
-      ],
-      "forbidden_skills": [
-        "curating-skills"
-      ],
-      "notes": "扫会话找 skill 候选 vs 设计会话存储，是两件事。合并后仍需分得开。"
-    },
-    {
       "id": "journal-submissions-positive-ieee-portal",
       "prompt": "Package this manuscript for the IEEE Author Portal: EDICS, the 13-page limit check on the two-column PDF, supplemental material, and the LaTeX source archive.",
       "expected_skills": [
@@ -792,13 +520,22 @@
       "notes": "页数超限的可执行工作在模板侧；投稿侧只做核验，不做压缩。"
     },
     {
-      "id": "curating-skills-negative-paper-figure",
-      "prompt": "Redraw this experiment comparison figure with a colour-blind-safe palette, vector output at 600 DPI, and axis labels naming the real metrics.",
+      "id": "gap-ablation-matrix-design",
+      "prompt": "Design the ablation matrix for this paper: decide which arms to run so every arm is comparable, then build the result table.",
       "expected_skills": [],
       "forbidden_skills": [
-        "curating-skills"
+        "training-models"
       ],
-      "notes": "与库管理无关的日常请求，用来确认它不会因为出现「skill」相关词就泛触发。"
+      "notes": "Ablation design and result tables sit outside training-models' declared boundary, and no skill owns them yet. This case marks the hole."
+    },
+    {
+      "id": "gap-seed-variance-table",
+      "prompt": "I have five trained checkpoints. Produce the SOTA comparison table with error bars over three seeds and a consistent evaluation protocol.",
+      "expected_skills": [],
+      "forbidden_skills": [
+        "training-models"
+      ],
+      "notes": "Cross-run comparison and reporting, not the diagnosis of one run."
     }
   ]
 }

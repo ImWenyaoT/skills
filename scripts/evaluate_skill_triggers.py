@@ -36,8 +36,12 @@ SKIP = {"scripts", ".git", ".github", "evals"}
 NONE_LABEL = "<none>"  # explicit abstain class so "fire nothing" is first-class
 # "Does not apply to ..." is as common as "Do not use for ..." in this library, and
 # matching only the latter silently scored three skills' anti-scope as attraction.
+# The marker must start a sentence: a description listing symptoms says "the loss
+# does not decrease", and matching that mid-clause cuts the trigger vocabulary off
+# at the knees and files it under the boundary.
 ANTISCOPE_MARKER = re.compile(
-    r"\bDo(?:es)? not\b|\bDon't\b|不要|不应|不负责|不处理", re.IGNORECASE
+    r"(?:^|(?<=[.;!。；！])\s*)(Do(?:es)? not\b|Don't\b|不要|不应|不负责|不处理)",
+    re.IGNORECASE,
 )
 # Word overlap cannot separate two skills that score within a few percent of each
 # other, so a verdict there reads noise. Measured on this library's 73 correctly
@@ -192,7 +196,8 @@ def split_description(description: str) -> tuple[str, str]:
     match = ANTISCOPE_MARKER.search(description)
     if not match:
         return description, ""
-    return description[: match.start()], description[match.start() :]
+    cut = match.start(1)
+    return description[:cut], description[cut:]
 
 
 def metadata_tokens(skill: Skill) -> set[str]:

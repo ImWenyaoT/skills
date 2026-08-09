@@ -52,18 +52,11 @@ One path from results to submitted: write, draw, typeset, package, revise.
 | [`journal-articles`](skills/journal-articles) | Maintain a reproducibly compiled `elsarticle` or `IEEEtran` manuscript. |
 | [`journal-submissions`](skills/journal-submissions) | Build and verify an Elsevier or IEEE submission packet. |
 
-### Supporting
+### Experiments
 
 | Skill | Purpose |
 |---|---|
 | [`training-models`](skills/training-models) | Build, review, and debug neural-network training workflows — where the paper's numbers come from. |
-| [`agent-runtime`](skills/agent-runtime) | Bounded agent loops, tool policy and approval gates, async scoring, session/trace persistence, and legacy-lane deletion gates. |
-
-### Skill maintenance
-
-| Skill | Purpose |
-|---|---|
-| [`curating-skills`](skills/curating-skills) | Decide whether a candidate capability enters the library, whether it was mined from sessions or written by someone else. |
 
 ## Design principles
 
@@ -101,7 +94,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions runs repository and bundled skill tests on Python 3.11 and 3.13, enforces branch
-coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 8 skills.
+coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 6 skills.
 
 Installed skills are managed by `npx skills`. After publishing new commits, run
 `npx skills@latest update -g` to update the global installation.

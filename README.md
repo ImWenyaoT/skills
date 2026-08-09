@@ -51,18 +51,11 @@ npx skills add . --skill answering-reviewers
 | [`journal-articles`](skills/journal-articles) | 维护可复现编译的 `elsarticle` / `IEEEtran` 手稿。 |
 | [`journal-submissions`](skills/journal-submissions) | 构建并检查 Elsevier / IEEE 投稿包。 |
 
-### 支撑
+### 实验
 
 | Skill | 用途 |
 |---|---|
 | [`training-models`](skills/training-models) | 搭建、审查和诊断神经网络训练流程——论文里的数字从这里来。 |
-| [`agent-runtime`](skills/agent-runtime) | 有界 agent loop、工具策略与审批、异步评分、会话/trace 持久化,以及遗留通道的退役闸门。 |
-
-### Skill 维护
-
-| Skill | 用途 |
-|---|---|
-| [`curating-skills`](skills/curating-skills) | 判定一个候选能力该不该进库:从会话里挖,或审核别人写的 skill。 |
 
 ## 设计原则
 
@@ -97,7 +90,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
-上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 8 个 skills。
+上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 6 个 skills。
 
 已安装的 skills 由 `npx skills` 管理。发布新提交后，运行 `npx skills@latest update -g` 更新全局安装。
 

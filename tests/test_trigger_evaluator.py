@@ -42,6 +42,13 @@ class TriggerEvaluatorTests(unittest.TestCase):
             self.assertIn("beta", negative)
         self.assertEqual(evaluator.split_description("Alpha only"), ("Alpha only", ""))
 
+    def test_split_ignores_a_mid_sentence_negation(self) -> None:
+        """A symptom list says "the loss does not decrease" — that is not a boundary."""
+        described = "Use when a run goes wrong: the loss does not decrease. Do not use for tables."
+        positive, negative = evaluator.split_description(described)
+        self.assertIn("decrease", positive)
+        self.assertEqual(negative, "Do not use for tables.")
+
     def test_antiscope_tokens_drop_words_shared_with_the_positive_half(self) -> None:
         skill = self.skill("alpha-skill", "Alpha routing. Do not use for alpha invoices.")
         self.assertIn("invoices", evaluator.antiscope_tokens(skill))
