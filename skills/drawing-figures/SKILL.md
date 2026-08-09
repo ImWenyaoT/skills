@@ -53,6 +53,9 @@ the output; do not transplant one venue's requirements into another.
 
 - [Budget workflow](references/budget-workflow.md): commands, dependencies, outputs, and Phase A
   completion criteria.
+- [Chart selection](references/chart-selection.md): which chart form fits which data shape, what to
+  do when values span orders of magnitude, and the five things an architecture diagram must specify
+  before it is drawn.
 - [Figure script reference](references/figure-script-reference.md): diagram, plot, stitch,
   measurement, and annotation APIs with runnable examples.
 - [Publication artwork](references/publication-artwork.md): artwork classification and export QA.

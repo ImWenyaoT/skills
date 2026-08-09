@@ -1,67 +1,72 @@
-# 输出模式详解
+# Output modes
 
-不指定时默认「Mode 1 综合审查模式」。
+What the deliverable looks like, once the review or polish work is done. Mode 1 is the default when
+the user names no mode.
+
+Modes 2, 3, and 5 emit a Chinese back-translation beside the English LaTeX. That is deliberate: a
+literal translation is how the author checks that polishing preserved the technical meaning, and it
+is the only place in this skill where the output is bilingual.
 
 ## Contents
 
-- [Mode 1: 综合审查](#mode-1-综合审查)
-- [Mode 2: LaTeX 润色](#mode-2-latex-润色)
-- [Mode 3: 去 AI 味](#mode-3-去-ai-味)
-- [Mode 4: 终稿红线](#mode-4-终稿红线)
-- [Mode 5: 实验分析](#mode-5-实验分析)
-- [Mode 6: 图表推荐](#mode-6-图表推荐)
-- [Mode 7: Figure/Table 标题](#mode-7-figuretable-标题)
-- [Mode 8: 架构图 Prompt](#mode-8-架构图-prompt)
+- [Mode 1: full review](#mode-1-full-review)
+- [Mode 2: LaTeX polish](#mode-2-latex-polish)
+- [Mode 3: strip AI tone](#mode-3-strip-ai-tone)
+- [Mode 4: final-pass redline](#mode-4-final-pass-redline)
+- [Mode 5: experiment analysis](#mode-5-experiment-analysis)
+- [Mode 6: figure and table captions](#mode-6-figure-and-table-captions)
 
-## Mode 1: 综合审查
+## Mode 1: full review
 
-- **A. 总体判断**：一段说明当前最大问题，只说影响接收/理解/说服力的，不空泛评价。
-- **B. 主要问题清单**：按严重程度；每条含「问题类型 / 原文位置 / 为何是问题 / 最小修改建议」。
-- **C. 语言与 AI 味问题**：重复表达、机械连接词、过度解释、加粗/括号滥用、缩写重复定义；必要时给可直接替换的句子。
-- **D. 逻辑自洽问题**：前后矛盾、概念跳跃、因果不清、证据不足、结论越界；不攻击创新性。
-- **E. 图表与正文联动**：哪些内容留正文、哪些交给图表/图注。
-- **F. 可直接替换的修改稿**：对问题明显段落给替换版，优先最小必要修改、不大幅重写。
-- **G. 字数与风险提醒**：可能影响字数、逻辑、图表引用、术语一致或 LaTeX 编译的地方。
+- **A. Overall judgement** — one paragraph on the single largest problem. Only what affects
+  acceptance, comprehension, or persuasiveness; no generic appraisal.
+- **B. Problem list** — ordered by severity. Each entry carries the problem type, the location in
+  the source, why it is a problem, and the smallest repair that fixes it.
+- **C. Language and AI tone** — repeated phrasings, mechanical connectives, over-explanation,
+  abuse of bold and parentheses, an abbreviation defined twice. Give drop-in replacement sentences
+  where they help.
+- **D. Logical self-consistency** — contradictions, concept jumps, unclear causality, thin
+  evidence, conclusions past their evidence. Do not attack novelty.
+- **E. Figure-text linkage** — what stays in the prose and what the figures and captions should
+  carry.
+- **F. Drop-in replacements** — for the paragraphs with obvious problems, give a replacement
+  version. Prefer the smallest necessary edit over a rewrite.
+- **G. Length and risk notes** — anything that may affect word count, logic, figure references,
+  terminology consistency, or the LaTeX build.
 
-## Mode 2: LaTeX 润色
+## Mode 2: LaTeX polish
 
-- **Part 1 [LaTeX]**：只输出润色后的英文 LaTeX，保留公式/引用/标签/必要命令，正确处理 `%`、`_`、`&`，不加无关格式指令。
-- **Part 2 [Translation]**：中文直译核对含义，中文不反复括号标英文。
-- **Part 3 [Modification Log]**：中文简述主要修改（修语法/压冗余/降 AI 味/删重复缩写/增强逻辑连接）。
+- **Part 1 [LaTeX]** — the polished English LaTeX only. Preserve equations, citations, labels, and
+  the commands that matter; handle `%`, `_`, and `&` correctly; add no unrelated formatting.
+- **Part 2 [Translation]** — a literal Chinese translation for meaning-checking, without
+  parenthesised English scattered through it.
+- **Part 3 [Modification log]** — a short account of the main edits: grammar, compression, AI tone,
+  duplicate abbreviations, logical connectives strengthened.
 
-## Mode 3: 去 AI 味
+## Mode 3: strip AI tone
 
-- **Part 1 [LaTeX]**：重写后的英文 LaTeX；若原文已自然地道则输出原文。
-- **Part 2 [Translation]**：中文直译。
-- **Part 3 [Modification Log]**：说明删去了哪些机械化表达；未修改则直接输出 `[检测通过] 原文表达地道自然，无明显 AI 味，建议保留。`
+- **Part 1 [LaTeX]** — the rewritten English LaTeX. If the source already reads naturally, emit it
+  unchanged.
+- **Part 2 [Translation]** — a literal Chinese translation.
+- **Part 3 [Modification log]** — which mechanical constructions were removed. When nothing needed
+  changing, emit `[PASS — no substantive issues]` and say the source already reads naturally.
 
-## Mode 4: 终稿红线
+## Mode 4: final-pass redline
 
-无必须修改的问题 → 直接输出 `[检测通过，无实质性问题]`；有则用中文简列，只报致命逻辑、术语一致性或严重语法问题。
+With nothing that must change, emit `[PASS — no substantive issues]`. Otherwise list the findings
+briefly, restricted to fatal logic problems, terminology inconsistency, and serious grammar
+errors.
 
-## Mode 5: 实验分析
+## Mode 5: experiment analysis
 
-- **Part 1 [LaTeX]**：用 `\paragraph{核心结论}` + 分析文本的英文 LaTeX 段落；不用列表，不用 `\textbf{}` 或 `\emph{}`。
-- **Part 2 [Translation]**：中文直译。
-- **Part 3 [Data Check]**：结论严格来自哪些数据；数据不足、趋势不明显或不能支撑强结论时明确说明。
+- **Part 1 [LaTeX]** — an English LaTeX paragraph opening with `\paragraph{Key finding}` followed
+  by the analysis. No lists, no `\textbf{}` or `\emph{}`.
+- **Part 2 [Translation]** — a literal Chinese translation.
+- **Part 3 [Data check]** — exactly which data each conclusion rests on. Say so plainly when the
+  data is insufficient, the trend is weak, or the numbers cannot support a strong conclusion.
 
-## Mode 6: 图表推荐
+## Mode 6: figure and table captions
 
-1. **推荐方案**：图表名称。
-2. **核心理由**：为何该图最符合当前学术叙事。
-3. **视觉设计规范**：坐标轴 / 尺度处理 / 统计要素 / 配色与样式。
-4. **与正文联动建议**：正文应如何引用该图、图注应补足哪些信息。
-
-## Mode 7: Figure/Table 标题
-
-图题直接输出英文标题，不加 `Figure 1:` 前缀；表题不加 `Table 1:` 前缀。名词性短语用 Title Case、末尾不加句号；完整句子用 sentence case、末尾加句号。避免 `The figure shows`、`This diagram illustrates`、`showcase`、`depict` 等冗余或 AI 腔表达。
-
-## Mode 8: 架构图 Prompt
-
-1. 画面布局
-2. 模块清单
-3. 箭头语义
-4. 标注与张量形状
-5. 配色建议
-6. 验收标准
-7. 需要作者补充的信息
+Emit the English caption with no `Figure 1:` or `Table 1:` prefix. A noun phrase takes title case
+and no final period; a full sentence takes sentence case and a period. Avoid `The figure shows`,
+`This diagram illustrates`, `showcase`, and `depict` — padding, and the AI register.

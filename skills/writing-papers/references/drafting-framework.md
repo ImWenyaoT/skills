@@ -1,144 +1,214 @@
-# 起草框架(从零写一篇技术论文)
+# Drafting framework (a technical paper from nothing)
 
-## 来源与署名
+## Source and attribution
 
-骨架取自 **Jennifer Widom,《Tips for Writing Technical Papers》**(Stanford InfoLab,2006-01;2009 重讲时少量修订,2012 重讲未改)——原文:<https://cs.stanford.edu/people/widom/paper-writing.html>。本文件把其方法论复述、并按本库房规(顶会 CVPR/ICCV/NeurIPS/ICLR/ICML/ACL 风格、LaTeX、去 AI 味、证据约束)做了适配与补充;关键金句按原文短引。整篇原文未逐字转载,引用其方法时请保留以上署名。
+The skeleton comes from **Jennifer Widom, "Tips for Writing Technical Papers"** (Stanford InfoLab,
+January 2006; lightly revised for the 2009 retelling, unchanged in 2012) — original:
+<https://cs.stanford.edu/people/widom/paper-writing.html>. This file restates that methodology and
+adapts it to the conventions used here (CVPR/ICCV/NeurIPS/ICLR/ICML/ACL style, LaTeX, no AI tone,
+claims bound to evidence); its key lines are quoted short and marked. The original is not
+reproduced in full — keep this attribution when you use the method.
 
 ## Contents
 
-- [起草总原则](#起草总原则)
-- [1. 标题 Title](#1-标题-title)
-- [2. 摘要 Abstract](#2-摘要-abstract)
-- [3. 引言 Introduction(五段式)](#3-引言-introduction五段式)
-- [4. 相关工作 Related Work](#4-相关工作-related-work)
-- [5. 正文 Body](#5-正文-body)
-- [6. 性能实验 Experiments](#6-性能实验-experiments)
-- [7. 结论 Conclusions](#7-结论-conclusions)
-- [8. 未来工作 Future Work](#8-未来工作-future-work)
-- [9. 致谢 / 引用 / 附录](#9-致谢--引用--附录)
-- [10. 语法与小尺度表达](#10-语法与小尺度表达)
-- [11. 排版机制 Mechanics](#11-排版机制-mechanics)
-- [12. 版本与分发 Versions](#12-版本与分发-versions)
-- [起草自查清单](#起草自查清单)
+- [Drafting principles](#drafting-principles)
+- [1. Title](#1-title)
+- [2. Abstract](#2-abstract)
+- [3. Introduction (five paragraphs)](#3-introduction-five-paragraphs)
+- [4. Related work](#4-related-work)
+- [5. Body](#5-body)
+- [6. Experiments](#6-experiments)
+- [7. Conclusions](#7-conclusions)
+- [8. Future work](#8-future-work)
+- [9. Acknowledgements, citations, appendices](#9-acknowledgements-citations-appendices)
+- [10. Grammar and small-scale writing](#10-grammar-and-small-scale-writing)
+- [11. Mechanics](#11-mechanics)
+- [12. Versions and distribution](#12-versions-and-distribution)
+- [Drafting checklist](#drafting-checklist)
 
-## 起草总原则
+## Drafting principles
 
-- **目标不是更花哨,是更像能被收的 paper**:语言自然、逻辑自洽、图表承担信息密度、结论严格基于证据。
-- **铁律(与审阅一致):不编造**任何数据、实验、引用、结论或方法细节;缺什么就标 `[作者补充]`,绝不替作者杜撰。
-- **一上来就去 AI 味**:别在初稿里堆 `novel`/`state-of-the-art`/`it is worth noting`;用 `improves SR by 1.8%` 这种可核验表述代替空洞自夸。
-- **概念首次用「全称(缩写)」**,后文只用缩写;术语/记号像程序变量一样,用前先定义、且只定义一次。
+- **The goal is not a fancier paper but one that reads as acceptable**: natural language, coherent
+  logic, figures carrying the information density, conclusions bound strictly to evidence.
+- **The hard rule, shared with review: invent nothing.** No data, experiment, citation, conclusion,
+  or method detail. Mark what is missing as `[AUTHOR INPUT]` rather than writing it for the author.
+- **Strip AI tone in the first draft, not later**: no piles of `novel` / `state-of-the-art` /
+  `it is worth noting`. A checkable statement such as `improves SR by 1.8%` replaces the empty
+  self-praise.
+- **Spell out a concept once as "full form (abbreviation)"**, then use the abbreviation. Treat
+  terms and notation like program variables: define before use, and define exactly once.
 
-## 1. 标题 Title
+## 1. Title
 
-三种可选,按投稿气质选其一:
+Three shapes; pick by the temperament of the venue.
 
-- **描述性长标题**:`Linear-Time External Multipass Sorting with Approximation Guarantees`。
-- **简短型**:`Approximate External Sort`。
-- **中庸 + 记忆点**(给方法起个好记的名字):`Floosh: A Linear-Time Algorithm for Approximate External Sort`。
+- **Descriptive and long**: `Linear-Time External Multipass Sorting with Approximation Guarantees`.
+- **Short**: `Approximate External Sort`.
+- **Middle, with a handle** (give the method a memorable name): `Floosh: A Linear-Time Algorithm
+  for Approximate External Sort`.
 
-房规:顶会偏好「记忆点方法名 + 一句话定位」;别把标题写成关键词堆砌。
+House rule: top venues favour "memorable method name + one line of positioning". A title that is a
+pile of keywords is not a title.
 
-## 2. 摘要 Abstract
+## 2. Abstract
 
-> 原文要点:陈述「问题 / 你的方法与解决方案 / 论文主要贡献」,几乎不写背景与动机;事实但完整;**摘要里的话不要在正文里逐字重复**。
+> From the original: state the problem, your approach and solution, and the paper's main
+> contributions, with almost no background or motivation; factual but complete; **do not repeat the
+> abstract verbatim in the body.**
 
-房规:摘要末尾可落一句定量主结果(如 `cuts sorting cost from O(n log n) to O(n) with bounded unsortedness`),但只能用论文真有的数。
+House rule: the abstract may close on one quantitative headline result (`cuts sorting cost from
+O(n log n) to O(n) with bounded unsortedness`), using only numbers the paper actually has.
 
-## 3. 引言 Introduction(五段式)
+## 3. Introduction (five paragraphs)
 
-引言**极其重要**:审稿人读完引言基本已经在心里决定收还是拒,后面只是找证据支撑这个判断;随性读者也靠引言决定要不要读下去。
+The introduction decides the paper. A reviewer has usually made up their mind by the end of it and
+spends the rest of the paper looking for evidence to support that judgement; a casual reader uses
+it to decide whether to read at all.
 
-Stanford InfoLab 的「五段式」——除非有充分理由,引言就是五段,各回答一个问题(原文逐字):
+The Stanford InfoLab five-paragraph structure — absent a good reason, the introduction is five
+paragraphs, each answering one question (quoted from the original):
 
 1. **What is the problem?**
 2. **Why is it interesting and important?**
 3. **Why is it hard? (E.g., why do naive approaches fail?)**
-4. **Why hasn't it been solved before? (Or, what's wrong with previous proposed solutions? How does mine differ?)**
-5. **What are the key components of my approach and results? Also include any specific limitations.**
+4. **Why hasn't it been solved before? (Or, what's wrong with previous proposed solutions? How does
+   mine differ?)**
+5. **What are the key components of my approach and results? Also include any specific
+   limitations.**
 
-然后加一段(或小节)**「Summary of Contributions」**:用 bullet 列主要贡献,并标明各在哪一节——这份 bullet 同时充当全文 outline,省篇幅、去冗余。
+Then add a paragraph or subsection, **"Summary of Contributions"**: the main contributions as
+bullets, each naming the section that delivers it. That bullet list doubles as the paper's outline,
+which saves space and removes a redundant paragraph.
 
-房规:第 ⑤ 点务必诚实写出局限;贡献 bullet 用 `\item`,与正文 `\section` 编号呼应。
+House rule: item 5 states the limitations honestly. Contribution bullets use `\item` and echo the
+`\section` numbering of the body.
 
-## 4. 相关工作 Related Work
+## 4. Related work
 
-放**前**还是放**后**,看情况:
+Whether it goes **early** or **late** depends on the paper.
 
-- **放前**(引言末小节或第 2 节):相关工作能写得既短又到位,或必须一开篇就对前作表明强硬的防御立场时。
-- **放后**(结论前,可叫「Discussion and Related Work」):早处(引言/Preliminaries)能一句话带过,或充分对比需要先讲完本文技术内容时。
+- **Early** (a subsection at the end of the introduction, or section 2): when related work can be
+  both short and sufficient, or when the paper must take a defensive stance against prior work from
+  the first page.
+- **Late** (before the conclusion, often "Discussion and Related Work"): when a sentence in the
+  introduction or preliminaries covers it for now, or when a fair comparison needs the paper's own
+  technical content first.
 
-房规:对比前作只陈述事实差异,不贬低;别把 Related Work 写成文献流水账。
+House rule: state factual differences from prior work; do not disparage it. Related work is not a
+list of everything published.
 
-## 5. 正文 Body
+## 5. Body
 
-两条适用于每篇论文的 Guideline(原文逐字):
+Two guidelines that apply to every paper (quoted from the original):
 
-- **Guideline #1**:`A clear new important technical contribution should have been articulated by the time the reader finishes page 3`(即全文 1/4 处之前,清晰的新技术贡献必须已经点明)。
-- **Guideline #2**:`Every section of the paper should tell a story.` 故事要线性、每步都勾着读者往下读、**不出现重大打断**(打断进附录)。注意常见坑:别讲「你是怎么一路摸索得到结果的」,只讲**结果本身**的故事。
+- **Guideline #1**: `A clear new important technical contribution should have been articulated by
+  the time the reader finishes page 3` — that is, before the first quarter of the paper.
+- **Guideline #2**: `Every section of the paper should tell a story.` The story is linear, each
+  step pulls the reader to the next, and **nothing interrupts it** (interruptions go to the
+  appendix). The common trap: telling the story of how you groped your way to the result. Tell the
+  story of **the result**.
 
-正文随内容而变,但常见组件:
+The body varies with content, but the usual components are:
 
-- **Running Example**:尽量全程用一个贯穿示例,可放引言末小节或第 2/3 节。
-- **Preliminaries**:放**非原创但必需**的记号与术语,作用是划清「哪些不是本文贡献」;务必简洁(记住 Guideline #1)。
-- **Content**(算法/系统/新构造/分析):尽量 **top-down** 叙述——让读者看得到走向、能跳读也抓得住主旨。
+- **Running example**: one example carried through the whole paper where possible, introduced at
+  the end of the introduction or in section 2 or 3.
+- **Preliminaries**: the notation and terminology that are **necessary but not yours**, which is
+  what marks off "not a contribution of this paper". Keep it short — remember Guideline #1.
+- **Content** (algorithm, system, new construction, analysis): narrate **top-down**, so the reader
+  can see where it is going and still catch the point when skimming.
 
-## 6. 性能实验 Experiments
+## 6. Experiments
 
-多数顶会期望有实验。容易踩两个坑:做 **hokey(空洞)实验**;以及只挑能让自己好看的设置。想清楚两件事:
+Most venues expect experiments. Two traps: running a **hokey** experiment, and reporting only the
+settings that flatter you. Settle two questions first:
 
-- **measure 什么**:纯运行时间 / 对关键参数的敏感性 / 各维度可扩展性(数据规模、问题复杂度……)。
-- **show 什么**:绝对性能(可用/可接受)/ 相对 naive 方法 / 相对前作 / 自家不同方案之间。
+- **What to measure**: raw running time, sensitivity to a key parameter, scalability along each
+  dimension (data size, problem complexity, and so on).
+- **What to show**: absolute performance (usable, acceptable), performance against a naive method,
+  against prior work, or across your own variants.
 
-房规:报增益要给基线、设置一致性、必要时误差线/置信区间/显著性;别报账式罗列数字,要解释差异对主张意味着什么。
+House rule: a reported gain carries its baseline, a consistent setting, and error bars, confidence
+intervals, or significance where they apply. Do not recite numbers like a ledger — say what each
+difference means for the claim.
 
-## 7. 结论 Conclusions
+## 7. Conclusions
 
-一般一小段收尾即可,**绝不照抄摘要或引言**。可借定量结果把当初的主张说得更具体(如用实测加速比回扣引言里的承诺)。
+Usually one short paragraph, and **never a copy of the abstract or introduction**. Use the
+quantitative results to say the original claim more concretely — a measured speedup redeeming the
+promise the introduction made.
 
-## 8. 未来工作 Future Work
+## 8. Future work
 
-体现论文如何开辟新方向,推荐 bullet。两点:
+This is where the paper shows what it opens up; bullets suit it. Two points:
 
-- 在做的后续**明说**(`We are currently extending the algorithm to…, and preliminary results are encouraging.`)——这是在**占坑**(mark your territory)。
-- 有人从你的 Future Work 找选题,视为恭维,不必设防。
+- State the follow-up you are already running (`We are currently extending the algorithm to…, and
+  preliminary results are encouraging.`). This marks your territory.
+- Someone taking a topic from your future work is a compliment, not a threat.
 
-## 9. 致谢 / 引用 / 附录
+## 9. Acknowledgements, citations, appendices
 
-- **致谢**:别漏,否则伤感情;讨论、读稿反馈、实现帮助等都该谢;拿不准就谢。
-- **引用**:务必**完整且一致**;别从网上乱抄不一致的 BibTeX 了事,终稿逐条核对。
-- **附录**:只放详细证明与算法。准则:① 附录不含理解论文贡献所必需的内容;② 把多数读者不感兴趣的细节都收进附录(超长论文尤其靠它)。
+- **Acknowledgements**: do not skip them, or you cause offence. Discussions, feedback on drafts,
+  implementation help all belong. When in doubt, thank.
+- **Citations**: complete and consistent. Do not paste inconsistent BibTeX off the web and call it
+  done; check every entry in the final pass.
+- **Appendices**: detailed proofs and algorithms only. Two rules: (1) the appendix holds nothing
+  needed to understand the paper's contribution; (2) detail most readers will not care about goes
+  there — which is what keeps an over-long paper in bounds.
 
-## 10. 语法与小尺度表达
+## 10. Grammar and small-scale writing
 
-强烈建议读 Strunk & White《The Elements of Style》。常见 pet peeves:
+Strunk & White, *The Elements of Style*, is worth reading. Common pet peeves:
 
-- 所有「变量」(术语/记号)用前先定义、且只定义一次(长间隔后可善意重述);全局定义归 Preliminaries,其余就近定义。
-- **不要用「etc.」**,除非剩下的项完全显而易见。可:`phases 1, 3, 5, 7, etc.`;不可:`factors such as volatility, scalability, etc.`
-- **不要写「for various reasons」**——把理由讲出来。
-- 避免无指代的 `this/that/these/it`(Ullman pet peeve):要求显式写出 `this` 指什么,逼出清晰表达。
-- 斜体用于**定义或引用,不用于强调**(Gries pet peeve);强调应由上下文自然给出。
-- `that` vs `which`:`that` 限定(defining),`which` 非限定(nondefining)。`The algorithms that are easy to implement all run in linear time.` ↔ `The algorithms, which are easy to implement, all run in linear time.`
+- Every "variable" (term, notation) is defined before use and defined once. A restatement after a
+  long gap is a kindness. Global definitions live in Preliminaries; the rest are defined nearby.
+- **Avoid "etc."** unless the remaining items are entirely obvious. Fine: `phases 1, 3, 5, 7, etc.`
+  Not fine: `factors such as volatility, scalability, etc.`
+- **Avoid "for various reasons"** — give the reasons.
+- Avoid `this` / `that` / `these` / `it` with no referent (Ullman's pet peeve). Requiring `this`
+  to be followed by what it refers to forces the sentence to become clear.
+- Italics mark a definition or a quotation, **not emphasis** (Gries's pet peeve). Emphasis should
+  fall out of the context.
+- `that` versus `which`: `that` is defining, `which` is not. `The algorithms that are easy to
+  implement all run in linear time.` against `The algorithms, which are easy to implement, all run
+  in linear time.`
 
-## 11. 排版机制 Mechanics
+## 11. Mechanics
 
-- 终稿**必跑拼写检查**,没有借口。
-- 草稿/技术报告用 11pt、宽行距、1" 页边、单栏;别用会议双栏的小字挤版折磨读者。
-- 图内字号约等于正文字号。
-- 表/图/曲线/算法**置于页或栏顶**,除非极小可融入文流。
-- 每个表/图/曲线/算法应出现在**首次引用的同页或次页**(LaTeX 允许的话)。
-- 终稿提交/发表前**打印一遍**看看——纸面常与屏幕大不相同。
+- **Spell-check the final version.** There is no excuse.
+- Drafts and technical reports: 11pt, generous line spacing, 1" margins, single column. Do not
+  punish readers with the cramped two-column conference layout.
+- Font size inside a figure roughly matches the body text.
+- Tables, figures, plots, and algorithms go at the **top of a page or column**, unless they are
+  small enough to sit in the text flow.
+- Each of them appears on the same page as its first reference, or the next one, where LaTeX
+  allows.
+- **Print the paper once** before submitting or publishing. Paper often reads differently from a
+  screen.
 
-## 12. 版本与分发 Versions
+## 12. Versions and distribution
 
-- 常有「会议版(后正式发表)+ 网上完整版技术报告」。建议:完整版 = 会议版 + 附录;对外只保留完整版(会议论文集除外),与最终会议版同步,改完整版时覆盖所有公开旧版。
-- 论文一完成就可挂网,注明日期、按技术报告引用(不必有正式编号)。**绝不**把只是投稿的论文挂上会议版权声明,**绝不**以「submitted to conference X」引用自己的论文——一两年后它发在会议 Y 上时只会自找尴尬。
+- The usual arrangement is a conference version, later formally published, plus a full technical
+  report online. Make the full version the conference version plus appendices; keep only the full
+  version public (outside the proceedings), keep it in sync with the final conference version, and
+  overwrite every public older copy when you revise it.
+- A finished paper can go online immediately, dated, cited as a technical report — no formal number
+  needed. **Never** put a conference copyright notice on a paper that has only been submitted, and
+  **never** cite your own paper as "submitted to conference X": a year later, when it appears at
+  conference Y, the citation embarrasses only you.
 
-## 起草自查清单
+## Drafting checklist
 
-- 引言是否按五段式回答了「是什么/为何重要/为何难/为何未解决/我的方法与局限」,并有贡献 bullet 兼作 outline?
-- 第 3 页前是否已点明清晰的新技术贡献(Guideline #1)?
-- 每节是否讲一个线性、不被打断的 story(Guideline #2),且讲的是结果而非摸索过程?
-- 摘要/引言/结论是否互不照抄?结论是否用定量结果回扣主张?
-- 实验是否说清 measure 什么、show 什么,有基线与一致设置?
-- 引用是否完整一致?致谢是否齐?附录是否只放非必需细节?
-- 全文是否已去 AI 味、缩写规范、记号先定义后用?**是否没有编造任何数据/实验/引用/结论?**
+- Does the introduction answer, in five paragraphs, what the problem is, why it matters, why it is
+  hard, why it is unsolved, and what your approach and limitations are — with contribution bullets
+  that double as the outline?
+- Is a clear new technical contribution articulated before page 3 (Guideline #1)?
+- Does every section tell one linear, uninterrupted story (Guideline #2), and is that the story of
+  the result rather than of the search?
+- Do the abstract, introduction, and conclusion avoid copying each other, and does the conclusion
+  redeem the claim with a quantitative result?
+- Do the experiments say what is measured and what is shown, with baselines and consistent
+  settings?
+- Are citations complete and consistent, acknowledgements present, and the appendix free of
+  anything necessary?
+- Is the AI tone gone, are abbreviations handled, is every notation defined before use? **Has
+  nothing been invented — no data, experiment, citation, or conclusion?**
