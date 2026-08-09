@@ -159,9 +159,9 @@ def main() -> None:
     for rgb, w in merged:
         by_fam.setdefault(family(rgb), []).append((rgb, w))
 
-    lines = ["# color_pick 取色库（像素提取）", "",
-             f"自适应量化每图 {n_colors} 色、跨图合并(dist<{merge_dist})、滤占比<{MIN_SHARE}。",
-             "渐变=可取范围；下列为离散代表色。", ""]
+    lines = ["# color_pick palette (extracted from pixels)", "",
+             f"Adaptive quantization to {n_colors} colours per image, merged across images (dist<{merge_dist}), shares<{MIN_SHARE} filtered out.",
+             "A gradient = a range you may pick from; below are the discrete representative colours.", ""]
     print(f"{'family':<20}{'hex':<10}{'weight%':>8}")
     for f in fam_order:
         items = sorted(by_fam.get(f, []), key=lambda c: -c[1])
@@ -174,7 +174,7 @@ def main() -> None:
         lines.append("")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines), encoding="utf-8")
-    print(f"\n写出: {out}  (共 {len(merged)} 个代表色)")
+    print(f"\nwrote: {out}  ({len(merged)} representative colours)")
 
 
 if __name__ == "__main__":

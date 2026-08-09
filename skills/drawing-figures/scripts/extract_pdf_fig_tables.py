@@ -129,17 +129,17 @@ def paper_label(pdf_path: Path) -> str:
 
 
 def render_markdown(rows: list[tuple[Path, list[Caption], list[Caption]]]) -> str:
-    """Render the extraction results into the Chinese Markdown audit-file string."""
+    """Render the extraction results into the Markdown audit-file string."""
     lines = [
-        "# 论文图表审计",
+        "# Paper figure/table audit",
         "",
-        "本文档从指定 PDF 目录批量抽取 Figure/Table caption，用于快速观察论文通常画哪些图、放哪些表。",
+        "This document batch-extracts Figure/Table captions from the given PDF directory, so you can see at a glance which figures papers usually draw and which tables they usually include.",
         "",
-        "说明：caption 保留论文原文英文，方便后续回到 PDF 核对；自动抽取结果可能包含换行、断词或少量正文误匹配，正式引用前需要人工复核。",
+        "Note: captions keep the paper's original English, so you can check them back against the PDF; the automatic extraction may contain line breaks, split words, or the odd body-text false match, so review them by hand before citing anything.",
         "",
-        f"PDF 总数：{len(rows)}",
+        f"Total PDFs: {len(rows)}",
         "",
-        "| 论文 | 图数量 | 表数量 |",
+        "| Paper | Figures | Tables |",
         "| --- | ---: | ---: |",
     ]
     for pdf_path, figures, tables in rows:
@@ -149,19 +149,19 @@ def render_markdown(rows: list[tuple[Path, list[Caption], list[Caption]]]) -> st
     for pdf_path, figures, tables in rows:
         lines.append(f"## {paper_label(pdf_path)}")
         lines.append("")
-        lines.append("图：")
+        lines.append("Figures:")
         if figures:
             for cap in figures:
                 lines.append(f"- Fig. {cap.number}: {cap.text}")
         else:
-            lines.append("- 未抽取到图 caption")
+            lines.append("- no figure caption extracted")
         lines.append("")
-        lines.append("表：")
+        lines.append("Tables:")
         if tables:
             for cap in tables:
                 lines.append(f"- Table {cap.number}: {cap.text}")
         else:
-            lines.append("- 未抽取到表 caption")
+            lines.append("- no table caption extracted")
         lines.append("")
     return "\n".join(lines)
 

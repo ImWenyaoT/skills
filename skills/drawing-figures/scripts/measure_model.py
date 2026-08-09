@@ -176,17 +176,17 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    print("measure_model.py：通用效率测量工具")
-    print("请在调用脚本中 import measure_model 并传入已实例化的模型。")
+    print("measure_model.py: general-purpose efficiency measurement")
+    print("Import measure_model in your calling script and pass in an already-instantiated model.")
     print(f"input-shape = {args.input_shape}")
     print(f"device      = {args.device}")
     print(f"iters       = {args.iters}, warmup = {args.warmup}")
     print()
-    print("示例用法：")
+    print("Example usage:")
     print("  import measure_model as mm")
     print("  params  = mm.count_params(model)")
     print("  runtime = mm.measure_runtime(model, tuple(input_shape), device=device)")
-    print("  gmacs   = mm.measure_flops(model, tuple(input_shape))  # GMACs（thop 返回 MAC 数,FLOPs≈2×MAC）")
+    print("  gmacs   = mm.measure_flops(model, tuple(input_shape))  # GMACs (thop returns MAC counts, FLOPs≈2×MAC)")
 
 
 if __name__ == "__main__":

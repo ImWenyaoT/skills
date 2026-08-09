@@ -42,7 +42,7 @@ def stitch_row(
         height = image height + label_h
     """
     if not images:
-        raise ValueError("images 列表不能为空")
+        raise ValueError("the images list must not be empty")
 
     n = len(images)
 
@@ -128,7 +128,7 @@ def main() -> None:
     imgs = [Image.open(p).convert("RGB") for p in args.images]
     result = stitch_row(imgs, labels=args.labels, gap=args.gap, label_h=args.label_h)
     result.save(args.out)
-    print(f"已保存拼接图至 {args.out}（尺寸 {result.width}×{result.height}）")
+    print(f"saved the stitched image to {args.out} ({result.width}×{result.height})")
 
 
 if __name__ == "__main__":

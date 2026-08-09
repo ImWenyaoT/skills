@@ -232,7 +232,7 @@ def main() -> None:
         w.writerows(summ)
 
     # console output
-    print(f"语料: {total} 篇方法论文 (已排除: {args.exclude})\n")
+    print(f"corpus: {total} method papers (excluded: {args.exclude})\n")
     print(f"{'section':<13}{'cover':<8}{'median':>8}{'IQR(Q1-Q3)':>16}"
           f"{'mean':>8}{'std':>7}{'trim_mean':>11}")
     for d in summ:
@@ -241,7 +241,7 @@ def main() -> None:
                   f"{str(d['Q1'])+'-'+str(d['Q3']):>16}{d['mean']:>8}"
                   f"{d['std']:>7}{d['trimmed_mean']:>11}")
         else:
-            print(f"{d['section']:<13}{d['coverage']:<8}  (覆盖不足, 跳过统计)")
+            print(f"{d['section']:<13}{d['coverage']:<8}  (coverage too low, statistics skipped)")
 
 
 if __name__ == "__main__":
