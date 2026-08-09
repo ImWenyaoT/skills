@@ -38,25 +38,17 @@ npx skills add . --skill answering-reviewers
 
 ## Skills
 
-### The paper line
+These skills are **not a pipeline** and do not depend on each other. Install whichever one
+matches the problem in front of you.
 
-One path from results to submitted: write, draw, typeset, package, revise.
-
-### Academic papers
-
-| Skill | Purpose |
+| Skill | When to reach for it |
 |---|---|
-| [`writing-papers`](skills/writing-papers) | Draft, review, and polish technical papers. |
-| [`answering-reviewers`](skills/answering-reviewers) | Implement reviewer comments as a spec and render the revision board. |
-| [`drawing-figures`](skills/drawing-figures) | Plan and produce publication-ready figures. |
-| [`journal-articles`](skills/journal-articles) | Maintain a reproducibly compiled `elsarticle` or `IEEEtran` manuscript. |
-| [`journal-submissions`](skills/journal-submissions) | Build and verify an Elsevier or IEEE submission packet. |
-
-### Experiments
-
-| Skill | Purpose |
-|---|---|
-| [`training-models`](skills/training-models) | Build, review, and debug neural-network training workflows — where the paper's numbers come from. |
+| [`training-models`](skills/training-models) | The training is wrong: loss will not fall, accuracy stalls, gradients blow up, train and eval disagree. |
+| [`writing-papers`](skills/writing-papers) | Draft, review, or polish the prose of a technical paper. |
+| [`drawing-figures`](skills/drawing-figures) | Plan and produce publication-grade figures. |
+| [`journal-articles`](skills/journal-articles) | The manuscript needs `elsarticle` or `IEEEtran`, or the local build is broken. |
+| [`journal-submissions`](skills/journal-submissions) | The manuscript is final and the Elsevier or IEEE upload set has to be assembled. |
+| [`answering-reviewers`](skills/answering-reviewers) | A revision decision arrived; each reviewer comment is a spec to implement. |
 
 ## Design principles
 

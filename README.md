@@ -37,25 +37,16 @@ npx skills add . --skill answering-reviewers
 
 ## Skills
 
-### 论文主线
+这些 skill **不是一套流程**,彼此不依赖。按当下手头的问题装其中一个就能用。
 
-从结果到投出去的一条路:写 → 画 → 排版 → 打包 → 修回。
-
-### 学术论文
-
-| Skill | 用途 |
+| Skill | 什么时候拿它出来 |
 |---|---|
-| [`writing-papers`](skills/writing-papers) | 起草、审阅和润色技术论文。 |
-| [`answering-reviewers`](skills/answering-reviewers) | 把审稿意见当 spec 逐条实现,并渲染修回看板。 |
+| [`training-models`](skills/training-models) | 训练跑不对:loss 不下降、acc 卡住、梯度异常、训练验证不一致。 |
+| [`writing-papers`](skills/writing-papers) | 起草、审阅或润色技术论文的正文。 |
 | [`drawing-figures`](skills/drawing-figures) | 规划并制作出版级论文图表。 |
-| [`journal-articles`](skills/journal-articles) | 维护可复现编译的 `elsarticle` / `IEEEtran` 手稿。 |
-| [`journal-submissions`](skills/journal-submissions) | 构建并检查 Elsevier / IEEE 投稿包。 |
-
-### 实验
-
-| Skill | 用途 |
-|---|---|
-| [`training-models`](skills/training-models) | 搭建、审查和诊断神经网络训练流程——论文里的数字从这里来。 |
+| [`journal-articles`](skills/journal-articles) | 手稿要用 `elsarticle` / `IEEEtran`,或本地编译坏了。 |
+| [`journal-submissions`](skills/journal-submissions) | 手稿定稿了,要拼 Elsevier / IEEE 的上传材料。 |
+| [`answering-reviewers`](skills/answering-reviewers) | 拿到修回决定,逐条把审稿意见当 spec 实现。 |
 
 ## 设计原则
 
