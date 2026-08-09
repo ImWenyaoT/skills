@@ -93,43 +93,13 @@
       "notes": "Tool runtime policy only."
     },
     {
-      "id": "markdown-pdf-positive-printable",
-      "prompt": "Convert this Markdown report into a polished printable PDF with a cover page, table of contents, code highlighting, and page numbers.",
-      "expected_skills": [
-        "markdown-pdf"
-      ],
-      "forbidden_skills": [],
-      "notes": "Markdown to PDF output."
-    },
-    {
-      "id": "markdown-pdf-positive-presentable",
-      "prompt": "I have a .md file and need a presentable PDF version for sharing.",
-      "expected_skills": [
-        "markdown-pdf"
-      ],
-      "forbidden_skills": [
-        "journal-submissions"
-      ],
-      "notes": "Generic Markdown PDF conversion."
-    },
-    {
-      "id": "markdown-pdf-positive-zh-export",
-      "prompt": "把这个 Markdown 报告导出成适合打印和分享的 PDF，需要目录、代码高亮和页码。",
-      "expected_skills": [
-        "markdown-pdf"
-      ],
-      "forbidden_skills": [],
-      "notes": "Chinese Markdown-to-PDF conversion prompt."
-    },
-    {
-      "id": "markdown-pdf-negative-doc-edit",
+      "id": "writing-papers-negative-md-edit-no-export",
       "prompt": "Rewrite this Markdown section to make the argument clearer, but do not export anything.",
       "expected_skills": [],
       "forbidden_skills": [
-        "markdown-pdf",
         "writing-papers"
       ],
-      "notes": "Generic Markdown prose editing — not PDF conversion, and not academic-paper writing/review."
+      "notes": "Editing Markdown prose with no export is not manuscript review."
     },
     {
       "id": "curating-skills-positive-mine",
@@ -625,55 +595,6 @@
       "notes": "Chinese: good-vs-bad academic words + paragraph-first-sentence discipline."
     },
     {
-      "id": "adversarial-review-positive-readiness",
-      "prompt": "Before we call this implementation done, run an independent read-only adversarial review for blockers and weak evidence.",
-      "expected_skills": [
-        "adversarial-review"
-      ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
-      "notes": "Explicit pre-completion adversarial review."
-    },
-    {
-      "id": "adversarial-review-positive-is-done",
-      "prompt": "Is this actually done? Have a separate reviewer attack the scope and correctness claims.",
-      "expected_skills": [
-        "adversarial-review"
-      ],
-      "forbidden_skills": [],
-      "notes": "Readiness challenge."
-    },
-    {
-      "id": "adversarial-review-positive-remote-delivery",
-      "prompt": "Local tests are green and the branch was pushed. Before release, independently inspect the remote CI conclusion, failed-step logs, annotations, and ahead-behind state for blockers.",
-      "expected_skills": [
-        "adversarial-review"
-      ],
-      "forbidden_skills": [
-        "agent-runtime"
-      ],
-      "notes": "High-risk release readiness needs remote evidence, not local self-attestation."
-    },
-    {
-      "id": "adversarial-review-negative-normal-work",
-      "prompt": "Implement the requested feature and run the normal unit tests.",
-      "expected_skills": [],
-      "forbidden_skills": [
-        "adversarial-review"
-      ],
-      "notes": "Normal implementation should not automatically trigger adversarial review."
-    },
-    {
-      "id": "adversarial-review-negative-summary",
-      "prompt": "Summarize what changed and list the tests that passed.",
-      "expected_skills": [],
-      "forbidden_skills": [
-        "adversarial-review"
-      ],
-      "notes": "Routine completion summary should not trigger an adversarial sub-agent."
-    },
-    {
       "id": "agent-runtime-positive-fire-and-forget",
       "prompt": "Build an async fire-and-forget evaluator that scores agent turns after the user-facing response and exports golden failures.",
       "expected_skills": [
@@ -752,15 +673,6 @@
       "notes": "Academic submission cover letter, not resume."
     },
     {
-      "id": "writing-resumes-negative-pdf-layout-only",
-      "prompt": "My resume content is final in Markdown; just export it as a one-page PDF with better margins, fonts, and page breaks.",
-      "expected_skills": [
-        "markdown-pdf"
-      ],
-      "forbidden_skills": [],
-      "notes": "Resume PDF/layout-only work belongs to Markdown PDF conversion, not resume content editing."
-    },
-    {
       "id": "apple-hig-negative-paper-figure",
       "prompt": "Draw a publication-quality architecture diagram and a speed-accuracy scatter plot at 600 dpi for my CVPR paper.",
       "expected_skills": [
@@ -834,15 +746,6 @@
         "curating-skills"
       ],
       "notes": "扫会话找 skill 候选 vs 设计会话存储，是两件事。合并后仍需分得开。"
-    },
-    {
-      "id": "markdown-pdf-negative-text-only-edit",
-      "prompt": "帮我把这份 README 的措辞改顺一点，不用导出，也不用排版。",
-      "expected_skills": [],
-      "forbidden_skills": [
-        "markdown-pdf"
-      ],
-      "notes": "源是 Markdown 但没有 PDF 产出诉求，不该触发。"
     },
     {
       "id": "journal-submissions-positive-ieee-portal",

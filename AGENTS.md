@@ -28,7 +28,7 @@
 本库 house style:
 
 - **两段式 `x-y`(单连字符)**、简短可扫读;名字要**具体可发现**,避免 `helper`/`utils`/`data`/`tools` 这类泛名。
-- 例:`training-models`、`writing-papers`、`agent-runtime`、`markdown-pdf`。
+- 例:`training-models`、`writing-papers`、`journal-submissions`、`drawing-figures`。
 
 ## 描述 `description`(Anthropic SDO)
 
@@ -73,7 +73,7 @@ grader。这两层曾经实现过 375 行 + 一个 DeepSeek 路由器,在仓库�
 
 - `evals/trigger_cases.json`:每个 skill **≥2 条 positive + ≥2 条 forbidden** 用例;用**相邻 skill 做 hard negative**(如 writing-papers vs drawing-figures、journal-articles vs journal-submissions);路径专用 skill 的 positive 必须带路径/仓库/唯一站点信号、negative 覆盖泛化场景。
 - `scripts/evaluate_skill_triggers.py`:三件事——**契约**(标签指向真实 skill、每个 skill 两向覆盖齐)、**anti-scope**(每条描述都得声明反向边界,且该边界被某条 forbidden 用例真正踩到)、**smoke**(prompt 与「路由器读 SKILL.md 之前能看到的那半边元数据」做词面重叠)。
-- **反向边界必须写,而且必须被测。** 官方文档与实测都指向同一件事:缺反例的描述路由准确率明显下降,「做不到什么」往往比「能做什么」更能防误触发。词袋无法表示否定,所以反向边界不进正面打分(否则它的词会把 skill 往它自己排除的 prompt 上拽),而是单独跟 goldens 对账——**写了没人测的边界会被判失败**,`markdown-pdf` 那条指向已删 skill 的反例就是这么活了两轮没被发现的。
+- **反向边界必须写,而且必须被测。** 官方文档与实测都指向同一件事:缺反例的描述路由准确率明显下降,「做不到什么」往往比「能做什么」更能防误触发。词袋无法表示否定,所以反向边界不进正面打分(否则它的词会把 skill 往它自己排除的 prompt 上拽),而是单独跟 goldens 对账——**写了没人测的边界会被判失败**——曾经有一条反例指着两轮前就删掉的 skill,没有任何检查会对它有反应,于是一直活着。
 - **smoke 的边界要知道**:它没有词干还原(`rewrite` 匹配不上 `rewriting`);中文只按「连续汉字段内的二元组」切,跨标点不成词;两个 skill 分数比值高于 `TIE_RATIO`(0.80)时**不下判决**,因为词面打分在那个区间读的是噪声(该阈值由本库 73 条正确案例的分布标定:干扰项/赢家的比值 95% 在 0.75 以下)。abstain 用例的 0.25 门槛在当前数据上几乎没有分辨力(abstain 最高 0.170,正例中位 0.159)——它挡的是灾难,不是精度。**smoke 过了不等于真实路由器会这么路由。**
 - **改了任何 `description` 后重跑它**,并且看的是「相邻 skill 有没有被挤下去」,不是绝对分值。
 - **改描述的 commit 不要同时改已有 golden。** 新增用例随时可以;修改或删除一条已有用例,是在动判分的基准,得单独成一次改动并写清理由——否则「描述改挂了顺手把用例改绿」和「修好了」在历史里长得一模一样。
@@ -109,5 +109,5 @@ diff AGENTS.md CLAUDE.md                    # 符号链接是否退化(ci.sh 查
 - Agent Skills 开放标准(`name`/结构规范):<https://agentskills.io/specification>
 - Anthropic 工程博客 — Equipping agents with Agent Skills:<https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills>
 - Anthropic — Demystifying evals for AI agents:<https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents>
-- OpenAI Codex — Agent Skills(同 agentskills 标准,Codex 读 `AGENTS.md` + `SKILL.md`):<https://developers.openai.com/codex/skills>
+- OpenAI Codex — Agent Skills(同 agentskills 标准,Codex 读 `AGENTS.md` + `SKILL.md`):<https://learn.chatgpt.com/docs/build-skills>
 - OpenAI — Evals / Graders:<https://developers.openai.com/api/docs/guides/evals>

@@ -38,12 +38,9 @@ npx skills add . --skill answering-reviewers
 
 ## Skills
 
-### Agent engineering
+### The paper line
 
-| Skill | Purpose |
-|---|---|
-| [`agent-runtime`](skills/agent-runtime) | Bounded agent loops, tool policy and approval gates, async scoring, session/trace persistence, and legacy-lane deletion gates. |
-| [`adversarial-review`](skills/adversarial-review) | Dispatch an independent read-only subagent for final verification. |
+One path from results to submitted: write, draw, typeset, package, revise.
 
 ### Academic papers
 
@@ -55,12 +52,12 @@ npx skills add . --skill answering-reviewers
 | [`journal-articles`](skills/journal-articles) | Maintain a reproducibly compiled `elsarticle` or `IEEEtran` manuscript. |
 | [`journal-submissions`](skills/journal-submissions) | Build and verify an Elsevier or IEEE submission packet. |
 
-### Machine learning and documents
+### Supporting
 
 | Skill | Purpose |
 |---|---|
-| [`training-models`](skills/training-models) | Build, review, and debug neural-network training workflows. |
-| [`markdown-pdf`](skills/markdown-pdf) | Convert Markdown into a polished printable PDF. |
+| [`training-models`](skills/training-models) | Build, review, and debug neural-network training workflows — where the paper's numbers come from. |
+| [`agent-runtime`](skills/agent-runtime) | Bounded agent loops, tool policy and approval gates, async scoring, session/trace persistence, and legacy-lane deletion gates. |
 
 ### Skill maintenance
 
@@ -104,7 +101,7 @@ npx skills@latest add . --list
 ```
 
 GitHub Actions runs repository and bundled skill tests on Python 3.11 and 3.13, enforces branch
-coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 10 skills.
+coverage on 3.13, and separately verifies that the official `skills` CLI discovers all 8 skills.
 
 Installed skills are managed by `npx skills`. After publishing new commits, run
 `npx skills@latest update -g` to update the global installation.
