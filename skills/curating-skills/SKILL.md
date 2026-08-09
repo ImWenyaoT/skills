@@ -1,6 +1,7 @@
 ---
 name: curating-skills
 description: 'Triage a candidate before it enters the skill library: mine past Codex or Claude transcripts for recurring friction worth capturing, or vet a skill someone else published for provenance and license. Decides skill vs memory vs neither, and whether to patch a near-duplicate rather than add one. Trigger on "auto-create skills from my transcripts", "scan my history and update skills", 从会话里提炼 skill, 引入或审核开源 skill. Do not use for authoring new skill prose from scratch, or for designing how an application stores its own sessions, transcripts, or memory.'
+license: MIT
 ---
 
 # Curating the Skill Library

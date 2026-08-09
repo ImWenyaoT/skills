@@ -1,9 +1,10 @@
-"""figkit.plot_helpers —— 全实验共享的 matplotlib 辅助:统一出图 DPI/格式、
-坐标轴样式、以及反复出现的「Ours(红) vs baselines(青)」散点。
+"""figkit.plot_helpers — matplotlib helpers shared across every experiment: one
+export DPI and format, one axis style, and the recurring "Ours (red) vs
+baselines (teal)" scatter.
 
-各论文 figures/scripts/draw_*.py 统一:
+Every paper's figures/scripts/draw_*.py imports the same three:
     from figkit.plot_helpers import save_fig, style_axes, scatter_ours_vs_base
-保证所有论文图风格一致。
+which is what keeps the figures of different papers looking like one set.
 """
 from __future__ import annotations
 
@@ -17,14 +18,19 @@ from figkit.palette_base import (
 
 
 def save_fig(fig, out_path, dpi=600):
-    """统一保存:600 DPI、紧边距、页面底色。out_path 后缀决定格式(png/pdf/eps)。"""
+    """Save at 600 DPI with tight margins and the page backdrop.
+
+    The suffix of out_path picks the format (png, pdf, eps).
+    """
     fig.patch.set_facecolor(BG)
     fig.savefig(out_path, dpi=dpi, bbox_inches="tight", facecolor=BG)
     plt.close(fig)
 
 
 def style_axes(ax, xlabel="", ylabel="", title=""):
-    """统一坐标轴外观:绘图区底色、淡网格、去顶右脊、统一字号。"""
+    """Apply the shared axis look: panel backdrop, faint grid, no top or right
+    spine, one font size.
+    """
     ax.set_facecolor(PANEL)
     ax.grid(True, color=RULE, linewidth=0.6, alpha=0.8)
     ax.set_axisbelow(True)
@@ -44,11 +50,11 @@ def style_axes(ax, xlabel="", ylabel="", title=""):
 
 def scatter_ours_vs_base(ax, ours_xy, base_xy, ours_label="Ours",
                          base_labels=None, annotate=True):
-    """画「我们 vs baseline」散点:Ours 用红色实心强调,baselines 用青色。
+    """Draw the "ours vs baselines" scatter: ours in solid red, baselines in teal.
 
-    ours_xy:   (x, y) 单点
-    base_xy:   [(x, y), ...] baseline 多点
-    base_labels: 与 base_xy 对应的名字列表(annotate 时标注)
+    ours_xy:     a single (x, y) point
+    base_xy:     [(x, y), ...] for the baselines
+    base_labels: names matching base_xy, used when annotate is on
     """
     bx = [p[0] for p in base_xy]
     by = [p[1] for p in base_xy]

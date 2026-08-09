@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -64,6 +65,26 @@ class ValidateSkillsTests(unittest.TestCase):
         )
         self.assertEqual((code, errors), (0, []))
         self.assertEqual(len(warnings), 1)
+
+
+class PluginManifestTests(unittest.TestCase):
+    def test_plugin_manifest_matches_the_closed_schema(self) -> None:
+        """plugin.json makes the repo installable as an Agent Plugins package."""
+        root = Path(__file__).resolve().parents[1]
+        manifest = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        allowed = {
+            "$schema", "name", "version", "description", "author",
+            "homepage", "repository", "license", "keywords", "extensions",
+        }
+        self.assertEqual(set(manifest) - allowed, set(), "schema is closed")
+        self.assertIn("$schema", manifest)
+        name = manifest["name"]
+        self.assertRegex(name, r"^[a-z0-9][a-z0-9.-]*[a-z0-9]$")
+        self.assertNotIn("--", name)
+        self.assertNotIn("..", name)
+        self.assertLessEqual(len(name), 64)
+        # The package layout the spec expects: skills/<skill-name>/SKILL.md
+        self.assertTrue(any((root / "skills").glob("*/SKILL.md")))
 
 
 if __name__ == "__main__":

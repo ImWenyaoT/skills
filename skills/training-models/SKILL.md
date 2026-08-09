@@ -1,6 +1,8 @@
 ---
 name: training-models
 description: Staged setup and silent-failure diagnosis for neural network training. Use when you start a new training pipeline, when you review a training loop, or when a run goes wrong — the loss does not decrease, accuracy stalls, gradients explode or vanish, train and eval disagree, inference is wrong, or a one-batch overfit fails. Chinese triggers include 从零搭训练流程, 检查训练循环, loss 不下降, acc 卡住, 梯度异常, 训练验证不一致, and 推理错误. Do not use for experiment orchestration, ablation matrices, or result tables.
+license: MIT
+compatibility: Sample code and the sanity check require PyTorch.
 ---
 
 # Training Neural Networks

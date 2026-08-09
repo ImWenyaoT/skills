@@ -1,6 +1,7 @@
 ---
 name: agent-runtime
 description: 'Agent runtime work in a product codebase: bounded per-request agent loops, terminality and handoff states, vendor agent SDK behind a provider seam, runtime tool registries with risk-tiered approval gates, async turn scoring with golden and failure-case lifecycles, session/memory/trace persistence and transcript hydration, and compatibility adapters plus fallback deletion gates for legacy lanes. Use when a loop contract, tool policy, evaluator wiring, storage or hydration path, or legacy migration lane changes. Do not use for training or fine-tuning a model.'
+license: MIT
 ---
 
 # Engineering the Agent Runtime

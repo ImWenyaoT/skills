@@ -1,6 +1,8 @@
 ---
 name: journal-articles
 description: Triggers on 期刊模板, 双栏 layout, 页数超限, and local `elsarticle` or `IEEEtran` manuscript sources — template scaffolding, frontmatter and author metadata (`\ead`/`\corref` or `\thanks`/`\markboth`), class options (`preprint`, `review`, `3p`, `journal`, `conference`, `onecolumn`), bibliography style (`natbib`, `IEEEtran.bst`), figure formats, and `pdflatex`/`latexmk`/BibTeX compile diagnosis. Does not apply to assembling upload files for a submission screen or writing and reviewing the paper's prose.
+license: MIT
+compatibility: Requires a LaTeX runtime (latexmk or pdflatex) with the elsarticle or IEEEtran class available.
 ---
 
 # Authoring Journal Articles

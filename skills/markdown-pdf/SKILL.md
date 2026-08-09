@@ -1,6 +1,8 @@
 ---
 name: markdown-pdf
 description: 'Markdown-to-PDF conversion for presentable printable documents/reports: cover page, generated table of contents, syntax-highlighted code, styled tables, and page-number footer. Use only when the source is Markdown and the requested output is PDF. Do not use for editing or rewriting Markdown text with no export step, or for converting a source that is not Markdown.'
+license: MIT
+compatibility: Requires a Markdown-to-HTML renderer and an HTML-to-PDF step (a headless browser or an engine such as weasyprint).
 ---
 
 # Converting Markdown to PDF

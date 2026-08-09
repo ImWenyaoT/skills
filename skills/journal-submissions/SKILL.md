@@ -1,6 +1,8 @@
 ---
 name: journal-submissions
 description: Triggers on 投稿, 修回稿, 投稿材料, and journal submission packaging for a mature manuscript — Elsevier Editorial Manager, IEEE Author Portal or ScholarOne, cover letter, highlights DOCX, required statements, EDICS, supplemental material, page-limit verification, source zip, revision response, and the final upload checklist. Does not apply to creating or editing manuscript LaTeX source, class options, template scaffolding, local compile repair, or reviewing the paper's prose.
+license: MIT
+compatibility: Requires Python 3; pdfinfo (poppler-utils) for page counts, latexmk for the standalone source compile, and python-docx for the Markdown-to-DOCX step.
 ---
 
 # Packaging Journal Submissions

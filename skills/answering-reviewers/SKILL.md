@@ -1,6 +1,8 @@
 ---
 name: answering-reviewers
 description: Answers reviewer comments on a major/minor revision — treats each comment as a spec to implement, not a claim to debate, and holds the work to that spec's scope. Use when the user has a revision decision, reviewer comments, an editor's summary, a point-by-point response to reviewers, 修回, 返稿, 逐条回应, 审稿意见, or asks how to handle a specific reviewer point. Also use when the user is deciding which requested experiments to run, is about to argue that a reviewer is wrong, is considering extra experiments nobody asked for, or asks where the revision stands (进展, 现在怎么说, what now). Does not draft or polish the manuscript prose itself, and does not assemble the Editorial Manager upload packet.
+license: MIT
+compatibility: Requires Python 3 and a full TeX Live: tcolorbox with the [most] option and its breakable library, which small distributions omit.
 ---
 
 # Answering Reviewers

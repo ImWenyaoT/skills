@@ -77,6 +77,11 @@ def main() -> int:
                 errors.append(f"{name}: name 超过 64 字符")
             if not NAME_RE.match(nm):
                 errors.append(f"{name}: name 含非法字符(仅允许小写字母/数字/连字符)")
+            # agentskills.io/specification 的 name 规则,此前只有 AGENTS.md 写着、代码不查
+            if nm.startswith("-") or nm.endswith("-"):
+                errors.append(f"{name}: name 不能以连字符开头或结尾")
+            if "--" in nm:
+                errors.append(f"{name}: name 不能含连续连字符")
             if any(r in nm.lower() for r in RESERVED):
                 errors.append(f"{name}: name 含保留词(anthropic/claude)")
 
@@ -85,9 +90,15 @@ def main() -> int:
         elif len(desc) > 1024:
             errors.append(f"{name}: description 超过 1024 字符({len(desc)})")
 
+        if len(fm.get("compatibility", "")) > 500:
+            errors.append(f"{name}: compatibility 超过 500 字符")
+
         body_lines = text.count("\n") + 1
         if body_lines > 500:
             errors.append(f"{name}: SKILL.md 超过 500 行({body_lines})")
+        # 规范建议正文 <5000 token;没有 tokenizer,按 4 字符≈1 token 粗估,只告警
+        if len(text) / 4 > 5000:
+            warnings.append(f"{name}: SKILL.md 正文约 {int(len(text)/4)} token,规范建议 <5000")
 
         refdir = os.path.join(d, "references")
         if os.path.isdir(refdir):

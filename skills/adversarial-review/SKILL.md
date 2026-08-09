@@ -1,6 +1,7 @@
 ---
 name: adversarial-review
 description: 'Adversarial review for explicitly requested independent verification: read-only reviewer, "is this actually done", blocker hunting, high-risk release readiness, or remote CI conclusion/annotation and pushed-branch verification. Do not use for ordinary implementation, routine tests, or normal completion summaries.'
+license: MIT
 ---
 
 # Running Adversarial Subagent Reviews
