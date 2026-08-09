@@ -79,10 +79,8 @@ grader。这两层曾经实现过 375 行 + 一个 DeepSeek 路由器,在仓库�
 ## 提交前(与 CI 同款)
 
 ```bash
-python scripts/validate_skills.py          # frontmatter / 目录名一致 / 正文≤500行 / 长引用需 Contents
-python scripts/evaluate_skill_triggers.py  # 触发 goldens 契约 + smoke
-python -m py_compile $(find . -path ./.git -prune -o -name '*.py' -print)
-diff AGENTS.md CLAUDE.md                    # CLAUDE.md 应是 AGENTS.md 的符号链接(diff 为空;非空 = 符号链接退化了)
+./scripts/ci.sh                             # CI 跑的全部检查,以脚本为准,不在这里抄一份
+diff AGENTS.md CLAUDE.md                    # 符号链接是否退化(ci.sh 查不到这条;diff 为空即正常)
 ```
 
 要求 **0 错误 0 警告**。每次 push/PR 由 `.github/workflows/validate-skills.yml` 自动校验。
@@ -102,20 +100,6 @@ diff AGENTS.md CLAUDE.md                    # CLAUDE.md 应是 AGENTS.md 的符�
 - 发布新提交后更新:`npx skills@latest update -g`。
 - 本机 Claude 的 `~/.claude/skills` 链接到统一的 `~/.agents/skills`;Codex 与 Claude 读取同一份安装。
 - 加载方式:Claude Code 用 `Skill` 工具加载(不要手动 `Read` skill 文件);Codex 原生加载。
-
-## Agent skills
-
-### Issue tracker
-
-Issues are tracked in GitHub Issues for `ImWenyaoT/skills`; external PRs are not a triage request surface. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Use the default five-label vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix`. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-This is a single-context repo: read root `CONTEXT.md` and root `docs/adr/` if they exist. See `docs/agents/domain.md`.
 
 ## 参考
 

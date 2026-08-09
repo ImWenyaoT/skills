@@ -8,10 +8,8 @@ A composable collection of Agent Skills maintained by Tian Wenyao for Codex, Cla
 tools compatible with the [Agent Skills](https://agentskills.io) specification.
 
 The skills come from real workflows and emphasize predictable processes, explicit completion
-criteria, and progressive disclosure. The collection has two layers:
-
-- **Orchestrator skills** are invoked explicitly by the user and compose lower-level disciplines.
-- **Discipline skills** are selected by the model when their task-specific trigger matches.
+criteria, and progressive disclosure. Every skill is selected by the model when its task-specific
+trigger matches, keeps a boundary that does not overlap its neighbours, and installs on its own.
 
 ## Install
 
@@ -74,8 +72,8 @@ npx skills add . --skill answering-reviewers
 
 - One directory containing `SKILL.md` is one installable skill; scripts, references, and assets stay
   co-located with it.
-- Orchestrators set `disable-model-invocation: true`, compose disciplines, and do not duplicate their rules.
-- Discipline skills keep precise descriptions, their own completion criteria, and a single source of truth.
+- Each skill is self-contained: it references no other skill, so sharing it alone still works.
+- Each skill keeps a precise description, its own completion criteria, and a single source of truth.
 - Split only disciplines with an independent trigger or genuine reuse across workflows; disclose local
   branches through `references/` instead.
 

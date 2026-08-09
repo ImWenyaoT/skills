@@ -7,10 +7,8 @@
 由 Tian Wenyao 维护的一组可组合 Agent Skills，适用于 Codex、Claude Code 及其他兼容
 [Agent Skills](https://agentskills.io) 的工具。
 
-这些 skills 来自真实工作流，强调可预测的过程、明确的完成标准和渐进披露。仓库采用两层设计：
-
-- **编排 skills** 由用户显式调用，负责选择和组合下层能力。
-- **能力 skills** 由模型按任务触发，提供可复用的执行纪律。
+这些 skills 来自真实工作流，强调可预测的过程、明确的完成标准和渐进披露。每个 skill 都由模型按任务触发，
+边界互不重叠，也可以单独安装、单独分享。
 
 ## 安装
 
@@ -72,8 +70,8 @@ npx skills add . --skill answering-reviewers
 ## 设计原则
 
 - 一个含 `SKILL.md` 的目录就是一个可安装 skill；scripts、references 和 assets 与其共置。
-- 编排 skill 设置 `disable-model-invocation: true`，只组织能力，不复制下层规则。
-- 能力 skill 保留精确的 `description`、自己的完成标准和单一事实来源。
+- 每个 skill 自洽：不引用别的 skill，单独发给别人也能用。
+- 每个 skill 保留精确的 `description`、自己的完成标准和单一事实来源。
 - 只有具备独立触发或跨流程复用价值的纪律才拆成 skill；局部分支放进 `references/`。
 
 ## 仓库结构
