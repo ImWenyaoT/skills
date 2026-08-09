@@ -34,21 +34,12 @@ jobs:
       - name: Install test dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-ci.txt
 
-      - name: Run repository and skill tests
-        run: ./scripts/ci.sh
+      - name: Run every check
+        run: python scripts/ci.py
 
       - name: Enforce branch coverage
         if: matrix.python-version == '3.13'
-        run: ./scripts/coverage.sh
-
-      - name: Upload coverage report
-        if: matrix.python-version == '3.13'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-python-${{ matrix.python-version }}
-          path: coverage.xml
-          if-no-files-found: error
-          retention-days: 14
+        run: python scripts/ci.py --coverage
 
   skills-cli:
     name: skills CLI discovery
@@ -64,12 +55,4 @@ jobs:
           package-manager-cache: false
 
       - name: Discover every installable skill
-        run: |
-          # 期望值从文件系统推导:CLI 必须发现仓库里的每一个 skill。
-          # 写死数量会让每次新增 skill 都红一次,而那不是回归。
-          expected="$(find skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l)"
-          echo "Expecting the CLI to discover ${expected} skills."
-          output="$(npx --yes skills@latest add . --list)"
-          printf '%s\n' "$output"
-          clean="$(printf '%s' "$output" | sed -E $'s/\\x1B\\[[0-9;?]*[ -/]*[@-~]//g')"
-          grep -F "Found ${expected} skills" <<<"$clean"
+        run: python3 scripts/check_cli_discovery.py

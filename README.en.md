@@ -74,10 +74,10 @@ containing a valid `SKILL.md`.
 
 ```bash
 # Full local equivalent of CI (requires matplotlib and Pillow)
-./scripts/ci.sh
+python3 scripts/ci.py
 
 # Core repository-script branch coverage, minimum 70%
-./scripts/coverage.sh
+python3 scripts/ci.py --coverage
 
 # Official installer discovery
 npx skills@latest add . --list

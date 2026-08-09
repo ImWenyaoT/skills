@@ -81,9 +81,11 @@ grader。这两层曾经实现过 375 行 + 一个 DeepSeek 路由器,在仓库�
 ## 提交前(与 CI 同款)
 
 ```bash
-./scripts/ci.sh                             # CI 跑的全部检查,以脚本为准,不在这里抄一份
-diff AGENTS.md CLAUDE.md                    # 符号链接是否退化(ci.sh 查不到这条;diff 为空即正常)
+python3 scripts/ci.py            # CI 跑的全部检查,以脚本为准,不在这里抄一份
 ```
+
+`scripts/ci.py --coverage` 追加 `scripts/` 的 branch coverage 门槛(需要 `coverage` 包);
+CI 只在一个解释器上跑它。符号链接是否退化也在 `ci.py` 里查,不必手动 `diff`。
 
 要求 **0 错误 0 警告**。每次 push/PR 由 `.github/workflows/validate-skills.yml` 自动校验。
 

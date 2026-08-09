@@ -69,10 +69,10 @@ docs/research/             # 设计审计与研究记录
 
 ```bash
 # 与 CI 相同的完整检查（需要 matplotlib 和 Pillow）
-./scripts/ci.sh
+python3 scripts/ci.py
 
-# 核心仓库脚本 branch coverage，最低 70%
-./scripts/coverage.sh
+# 追加 scripts/ 的 branch coverage 门槛（最低 70%，需要 coverage 包）
+python3 scripts/ci.py --coverage
 
 # 官方安装器 discovery
 npx skills@latest add . --list
