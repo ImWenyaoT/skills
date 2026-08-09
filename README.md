@@ -69,7 +69,7 @@ docs/research/             # 设计审计与研究记录
 ## 维护
 
 ```bash
-# 与 CI 相同的完整检查（需要 matplotlib 和 Pillow）
+# 与 CI 相同的完整检查（装了 uv 就自动带齐依赖）
 python3 scripts/ci.py
 
 # 追加 scripts/ 的 branch coverage 门槛（最低 70%，需要 coverage 包）

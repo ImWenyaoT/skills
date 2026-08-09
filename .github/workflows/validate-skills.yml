@@ -28,11 +28,13 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: requirements-ci.txt
 
-      - name: Install test dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-ci.txt
+      # scripts/ci.py supplies requirements-ci.txt per run through uv, pinned to
+      # the interpreter above, so nothing is installed into the job's Python.
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: requirements-ci.txt
 
       - name: Run every check
         run: python scripts/ci.py

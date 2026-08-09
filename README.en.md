@@ -74,7 +74,7 @@ containing a valid `SKILL.md`.
 ## Maintain
 
 ```bash
-# Full local equivalent of CI (requires matplotlib and Pillow)
+# Full local equivalent of CI (uv supplies the dependencies)
 python3 scripts/ci.py
 
 # Core repository-script branch coverage, minimum 70%

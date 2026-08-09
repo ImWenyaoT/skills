@@ -56,6 +56,32 @@ class CheckPlanTests(unittest.TestCase):
         self.assertFalse([c for _, c in ci.checks(True) if "xml" in c])
 
 
+class InterpreterTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._which = ci.shutil.which
+        self.addCleanup(setattr, ci.shutil, "which", self._which)
+
+    def test_uv_supplies_the_dependencies_and_pins_the_interpreter(self) -> None:
+        ci.shutil.which = lambda name: "/usr/bin/uv" if name == "uv" else None
+        argv = ci.interpreter()
+        self.assertEqual(argv[:2], ["uv", "run"])
+        self.assertIn(ci.REQUIREMENTS, argv)
+        # Without --python, a CI matrix over several versions would test one.
+        self.assertIn("--python", argv)
+        self.assertIn(sys.executable, argv)
+
+    def test_without_uv_it_falls_back_to_this_interpreter(self) -> None:
+        ci.shutil.which = lambda name: None
+        self.assertEqual(ci.interpreter(), [sys.executable])
+
+    def test_stdlib_only_checks_do_not_go_through_uv(self) -> None:
+        ci.shutil.which = lambda name: "/usr/bin/uv" if name == "uv" else None
+        plan = dict(ci.checks(with_coverage=False))
+        self.assertEqual(plan["Skill frontmatter and structure"][0], sys.executable)
+        tests = [cmd for name, cmd in ci.checks(False) if name.startswith("Tests:")][0]
+        self.assertEqual(tests[0], "uv")
+
+
 class ExitCodeTests(unittest.TestCase):
     def setUp(self) -> None:
         self._run = ci.run

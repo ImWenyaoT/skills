@@ -13,12 +13,30 @@ machine may not have; CI runs it on one interpreter only.
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 COVERAGE_FLOOR = 70
+REQUIREMENTS = "requirements-ci.txt"
+
+
+def interpreter() -> list[str]:
+    """The command that runs Python with this repository's test dependencies.
+
+    Several checks need matplotlib, Pillow, or coverage, and a machine that has
+    none of them should not have to install them globally to run the suite. When
+    uv is on PATH it supplies them per-run from requirements-ci.txt; otherwise
+    fall back to this interpreter and let the import error say what is missing.
+    """
+    if shutil.which("uv"):
+        # --python pins uv to the interpreter already running, so a CI matrix over
+        # several Python versions still tests each one.
+        return ["uv", "run", "--python", sys.executable,
+                "--with-requirements", REQUIREMENTS, "--quiet", "python"]
+    return [sys.executable]
 
 
 def run(name: str, argv: list[str]) -> bool:
@@ -54,19 +72,20 @@ def test_suites() -> list[Path]:
 
 def checks(with_coverage: bool) -> list[tuple[str, list[str]]]:
     """Build the ordered list of (name, argv) checks to run."""
-    py = sys.executable
+    py = [sys.executable]           # stdlib-only checks need nothing extra
+    dep = interpreter()             # checks that need the test dependencies
     planned: list[tuple[str, list[str]]] = [
-        ("Skill frontmatter and structure", [py, "scripts/validate_skills.py"]),
-        ("Trigger contract, anti-scope, smoke", [py, "scripts/evaluate_skill_triggers.py"]),
+        ("Skill frontmatter and structure", [*py, "scripts/validate_skills.py"]),
+        ("Trigger contract, anti-scope, smoke", [*py, "scripts/evaluate_skill_triggers.py"]),
     ]
     for suite in test_suites():
         planned.append((
             f"Tests: {suite.relative_to(ROOT)}",
-            [py, "-W", "error::ResourceWarning", "-m", "unittest", "discover",
+            [*dep, "-W", "error::ResourceWarning", "-m", "unittest", "discover",
              "-s", str(suite.relative_to(ROOT)), "-p", "test_*.py"],
         ))
     planned += [
-        ("Every Python file compiles", [py, "-m", "py_compile", *python_files()]),
+        ("Every Python file compiles", [*py, "-m", "py_compile", *python_files()]),
         # CLAUDE.md is a symlink to AGENTS.md. On a checkout that cannot make
         # symlinks it degrades into a plain file, and the two silently diverge.
         ("CLAUDE.md is still a symlink to AGENTS.md", ["diff", "AGENTS.md", "CLAUDE.md"]),
@@ -74,11 +93,11 @@ def checks(with_coverage: bool) -> list[tuple[str, list[str]]]:
     ]
     if with_coverage:
         planned += [
-            ("Branch coverage: erase", [py, "-m", "coverage", "erase"]),
-            ("Branch coverage: run", [py, "-m", "coverage", "run", "--branch",
+            ("Branch coverage: erase", [*dep, "-m", "coverage", "erase"]),
+            ("Branch coverage: run", [*dep, "-m", "coverage", "run", "--branch",
                                       "--source=scripts", "-m", "unittest",
                                       "discover", "-s", "tests"]),
-            ("Branch coverage: report", [py, "-m", "coverage", "report",
+            ("Branch coverage: report", [*dep, "-m", "coverage", "report",
                                          "--show-missing",
                                          f"--fail-under={COVERAGE_FLOOR}"]),
         ]
