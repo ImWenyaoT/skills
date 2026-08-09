@@ -40,12 +40,12 @@
     },
     {
       "id": "agent-runtime-positive-build-before-import",
-      "prompt": "The new code imports the legacy templates before they are built. Design a build-before-import bridge without rewriting the old module.",
+      "prompt": "The agent runtime imports the legacy templates before they are built. Design a build-before-import bridge behind the compatibility adapter, without rewriting the old module.",
       "expected_skills": [
         "agent-runtime"
       ],
       "forbidden_skills": [],
-      "notes": "Legacy integration, not SDK abstraction."
+      "notes": "Legacy lane integration, not SDK abstraction. The prompt used to name no agent concept at all — inherited from the deleted bridging-legacy skill — so no router could have been expected to reach agent-runtime from it."
     },
     {
       "id": "agent-runtime-positive-delete-proven-fallback",

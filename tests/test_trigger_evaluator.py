@@ -26,6 +26,56 @@ class TriggerEvaluatorTests(unittest.TestCase):
         self.assertIn("梯度", tokens)
         self.assertIn("异常", tokens)
 
+    def test_cjk_bigrams_stay_inside_one_run(self) -> None:
+        tokens = evaluator.tokenize("写摘要, 写引言")
+        self.assertIn("摘要", tokens)
+        self.assertIn("写引", tokens)
+        self.assertNotIn("要写", tokens)  # would span the comma
+
+    def test_split_description_matches_both_boundary_phrasings(self) -> None:
+        for description in (
+            "Alpha routing. Do not use for beta work.",
+            "Alpha routing. Does not apply to beta work.",
+        ):
+            positive, negative = evaluator.split_description(description)
+            self.assertEqual(positive.strip(), "Alpha routing.")
+            self.assertIn("beta", negative)
+        self.assertEqual(evaluator.split_description("Alpha only"), ("Alpha only", ""))
+
+    def test_antiscope_tokens_drop_words_shared_with_the_positive_half(self) -> None:
+        skill = self.skill("alpha-skill", "Alpha routing. Do not use for alpha invoices.")
+        self.assertIn("invoices", evaluator.antiscope_tokens(skill))
+        self.assertNotIn("alpha", evaluator.antiscope_tokens(skill))
+        self.assertNotIn("for", evaluator.antiscope_tokens(skill))  # matches every prompt
+
+    def test_antiscope_must_exist_and_be_exercised(self) -> None:
+        skills = {"alpha-skill": self.skill("alpha-skill", "Alpha routing with no boundary")}
+        case = evaluator.Case("one", "alpha", (), ("alpha-skill",), "")
+        self.assertTrue(
+            any("declares no anti-scope" in f for f in evaluator.validate_antiscope([case], skills))
+        )
+
+        skills = {"alpha-skill": self.skill("alpha-skill", "Alpha routing. Do not use for invoices.")}
+        untested = evaluator.Case("one", "alpha routing please", (), ("alpha-skill",), "")
+        self.assertTrue(
+            any("no forbidden case exercises" in f
+                for f in evaluator.validate_antiscope([untested], skills))
+        )
+        tested = evaluator.Case("two", "fix my invoices", (), ("alpha-skill",), "")
+        self.assertEqual(evaluator.validate_antiscope([untested, tested], skills), [])
+
+    def test_smoke_stays_silent_inside_the_tie_band(self) -> None:
+        skills = {
+            "alpha-skill": self.skill("alpha-skill", "shared routing alpha. Do not use for x."),
+            "beta-skill": self.skill("beta-skill", "shared routing beta. Do not use for y."),
+        }
+        # "shared routing" hits both almost equally: a verdict here would read noise.
+        tie = evaluator.Case("tie", "shared routing", ("beta-skill",), ("alpha-skill",), "")
+        self.assertEqual(evaluator.smoke_test_metadata([tie], skills), [])
+        # A prompt made only of alpha's own words is outside the band and must fail.
+        clear = evaluator.Case("clear", "alpha alpha", ("beta-skill",), (), "")
+        self.assertTrue(evaluator.smoke_test_metadata([clear], skills))
+
     def test_user_invoked_skill_only_ranks_when_named(self) -> None:
         skills = {
             "paper-workflow": self.skill("paper-workflow", "paper workflow", True),
