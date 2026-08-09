@@ -32,7 +32,7 @@ npx skills add ImWenyaoT/skills --all
 
 ```bash
 npx skills add . --list
-npx skills add . --skill answering-reviewers
+npx skills add . --skill publishing-papers
 ```
 
 ## Skills

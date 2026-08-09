@@ -33,7 +33,7 @@ Validate or install from a local checkout:
 
 ```bash
 npx skills add . --list
-npx skills add . --skill answering-reviewers
+npx skills add . --skill publishing-papers
 ```
 
 ## Skills
