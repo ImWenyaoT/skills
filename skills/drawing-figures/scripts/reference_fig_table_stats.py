@@ -1,10 +1,10 @@
-"""统计参考论文实验章节中的图/表数量。
+"""Count the figures/tables in the experiments section of reference papers.
 
-用法:
+Usage:
     python reference_fig_table_stats.py \\
-        --corpus <PDF根目录> \\
-        --text-root <pdftotext文本目录> \\
-        --out <输出CSV路径>
+        --corpus <PDF root directory> \\
+        --text-root <pdftotext text directory> \\
+        --out <output CSV path>
 """
 
 from __future__ import annotations
@@ -18,40 +18,40 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-# 排除综述/基准类论文的文件名正则
+# Filename regex that excludes review/benchmark papers
 EXCLUDE_NAME_PATTERN = re.compile(
     r"(review|survey|benchmark|revisiting|comprehensive_review|experimental_comparison|dynamic_rgbt_tracking)",
     re.IGNORECASE,
 )
-# 实验章节标题匹配(带编号形式)
+# Experiments-section heading match (numbered form)
 EXPERIMENT_HEADING_PATTERN = re.compile(
     r"^\s*(?:[0-9]+(?:\.[0-9]+)*|[IVX]+)\.?\s+"
     r"(?:Experiments?|Experimental\s+(?:Results?|Evaluation|Setup)|Evaluation|Results\s+and\s+Discussion)\b",
     re.IGNORECASE,
 )
-# 实验章节标题回退匹配(无编号形式)
+# Experiments-section heading fallback match (unnumbered form)
 EXPERIMENT_FALLBACK_PATTERN = re.compile(
     r"^\s*(?:Experiments?|EXPERIMENTS|Experimental\s+Results|"
     r"[A-Z]\.\s+(?:Datasets?\s+and\s+Evaluation|Evaluation\s+Dataset|Experimental\s+Settings|"
     r"Experiment\s+Settings|Dataset\s+and\s+Metrics))\b",
     re.IGNORECASE,
 )
-# 结论章节标题匹配(带编号形式)
+# Conclusion-section heading match (numbered form)
 CONCLUSION_HEADING_PATTERN = re.compile(
     r"^\s*(?:[0-9]+(?:\.[0-9]+)*|[IVX]+)\.?\s+(?:Conclusion|Conclusions)\b",
     re.IGNORECASE,
 )
-# 结论章节标题回退匹配(无编号形式)
+# Conclusion-section heading fallback match (unnumbered form)
 CONCLUSION_FALLBACK_PATTERN = re.compile(r"^\s*(?:Conclusion|CONCLUSION|Conclusions|CONCLUSIONS)\s*$")
-# 图题行匹配
+# Figure-caption line match
 FIGURE_CAPTION_PATTERN = re.compile(r"^\s*(?:Fig\.|Figure)\s*([0-9]+)\b", re.IGNORECASE)
-# 表题行匹配
+# Table-caption line match
 TABLE_CAPTION_PATTERN = re.compile(r"^\s*(?:Table|Tab\.)\s*([0-9]+|[IVXLCDM]+)\b", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
 class PaperCount:
-    """存储单篇参考论文实验章节的图/表数量信息。"""
+    """Holds the figure/table counts for one reference paper's experiments section."""
 
     pdf: str
     year: str
@@ -66,21 +66,21 @@ class PaperCount:
 
 
 def parse_args() -> argparse.Namespace:
-    """命令行:PDF 语料、已抽取文本目录、输出 CSV 路径全部必填。"""
-    p = argparse.ArgumentParser(description="参考论文实验章节图/表数量普查")
-    p.add_argument("--corpus", type=Path, required=True, help="参考论文 PDF 根目录")
-    p.add_argument("--text-root", dest="text_root", type=Path, required=True, help="已 pdftotext 的文本目录")
-    p.add_argument("--out", type=Path, required=True, help="输出 CSV 路径")
+    """CLI: the PDF corpus, the extracted-text directory, and the output CSV path are all required."""
+    p = argparse.ArgumentParser(description="Survey of figure/table counts in reference-paper experiments sections")
+    p.add_argument("--corpus", type=Path, required=True, help="reference-paper PDF root directory")
+    p.add_argument("--text-root", dest="text_root", type=Path, required=True, help="directory of pdftotext output")
+    p.add_argument("--out", type=Path, required=True, help="output CSV path")
     return p.parse_args()
 
 
 def normalize_line(line: str) -> str:
-    """将 PDF 提取行中的多余空白折叠为单个空格。"""
+    """Collapse the redundant whitespace in a PDF-extracted line into single spaces."""
     return re.sub(r"\s+", " ", line).strip()
 
 
 def parse_year_and_venue(pdf_path: Path) -> tuple[str, str]:
-    """从参考文献文件名中提取年份和会议/期刊标识。"""
+    """Pull the year and the venue identifier out of a reference's filename."""
     parts = pdf_path.stem.split("_")
     year = parts[0] if parts and re.fullmatch(r"\d{4}", parts[0]) else ""
     venue = parts[1] if len(parts) > 1 else ""
@@ -88,10 +88,10 @@ def parse_year_and_venue(pdf_path: Path) -> tuple[str, str]:
 
 
 def find_experiment_slice(lines: list[str]) -> tuple[int, int]:
-    """在 PDF 文本行列表中定位实验章节的起止行号。
+    """Locate the start and end line numbers of the experiments section in a list of PDF text lines.
 
-    先按带编号标题匹配，找不到则回退到无编号形式。
-    返回 (start, end) 行索引；若未找到实验段则返回 (-1, -1)。
+    Tries the numbered heading form first, and falls back to the unnumbered form when that misses.
+    Returns the (start, end) line indices; (-1, -1) when no experiments section is found.
     """
     normalized = [normalize_line(line) for line in lines]
     start = -1
@@ -116,7 +116,7 @@ def find_experiment_slice(lines: list[str]) -> tuple[int, int]:
 
 
 def collect_unique_captions(lines: list[str], pattern: re.Pattern[str]) -> set[str]:
-    """从文本行中收集唯一的图/表编号标识符。"""
+    """Collect the unique figure/table number identifiers from a set of text lines."""
     identifiers: set[str] = set()
     for raw_line in lines:
         line = normalize_line(raw_line)
@@ -127,10 +127,10 @@ def collect_unique_captions(lines: list[str], pattern: re.Pattern[str]) -> set[s
 
 
 def count_experiment_floats(lines: list[str]) -> dict[str, int]:
-    """统计文本行列表中实验章节内的图和表数量(纯函数)。
+    """Count the figures and tables inside the experiments section of a list of text lines (pure function).
 
-    定位实验章节 heading → 在该段内计数唯一的 Fig./Table. 引用。
-    返回 {"figures": n, "tables": m}；若找不到实验段则两项均为 0。
+    Locate the experiments heading → count the unique Fig./Table. references within that span.
+    Returns {"figures": n, "tables": m}; both are 0 when no experiments section is found.
     """
     start, end = find_experiment_slice(lines)
     if start < 0:
@@ -142,12 +142,12 @@ def count_experiment_floats(lines: list[str]) -> dict[str, int]:
 
 
 def pdf_text_path(pdf_path: Path, text_root: Path) -> Path:
-    """返回指定 PDF 对应的文本缓存路径。"""
+    """Return the text-cache path that corresponds to a given PDF."""
     return text_root / f"{pdf_path.stem}.txt"
 
 
 def ensure_pdf_text(pdf_path: Path, text_root: Path) -> Path:
-    """为单个 PDF 创建或复用 pdftotext 缓存。"""
+    """Create or reuse the pdftotext cache for a single PDF."""
     text_root.mkdir(parents=True, exist_ok=True)
     text_path = pdf_text_path(pdf_path, text_root)
     if not text_path.exists():
@@ -156,13 +156,13 @@ def ensure_pdf_text(pdf_path: Path, text_root: Path) -> Path:
 
 
 def list_method_reference_pdfs(corpus: Path) -> list[Path]:
-    """列出 corpus 目录下排除综述/基准类后的期刊参考 PDF。"""
+    """List the journal reference PDFs under the corpus directory, minus the review/benchmark ones."""
     pdfs = sorted(corpus.glob("**/*.pdf"))
     return [pdf for pdf in pdfs if not EXCLUDE_NAME_PATTERN.search(pdf.stem)]
 
 
 def count_one_pdf(pdf_path: Path, corpus: Path, text_root: Path) -> PaperCount | None:
-    """统计单篇参考 PDF 实验章节内的图/表数量，失败返回 None。"""
+    """Count the figures/tables in one reference PDF's experiments section; returns None on failure."""
     text_path = ensure_pdf_text(pdf_path, text_root)
     lines = text_path.read_text(encoding="utf-8", errors="replace").splitlines()
     start, end = find_experiment_slice(lines)
@@ -188,7 +188,7 @@ def count_one_pdf(pdf_path: Path, corpus: Path, text_root: Path) -> PaperCount |
 
 
 def percentile(values: list[float], q: float) -> float:
-    """对数值列表计算线性插值百分位数。"""
+    """Compute a linearly interpolated percentile over a list of numbers."""
     if not values:
         raise ValueError("percentile requires at least one value")
     sorted_values = sorted(values)
@@ -200,7 +200,7 @@ def percentile(values: list[float], q: float) -> float:
 
 
 def summarize(values: list[int]) -> tuple[float, float, float, float]:
-    """返回整数列表的均值、Q1、Q3 和 IQR。"""
+    """Return the mean, Q1, Q3, and IQR of a list of integers."""
     numeric = [float(value) for value in values]
     q1 = percentile(numeric, 0.25)
     q3 = percentile(numeric, 0.75)
@@ -208,7 +208,7 @@ def summarize(values: list[int]) -> tuple[float, float, float, float]:
 
 
 def write_counts(counts: list[PaperCount], out: Path) -> None:
-    """将逐篇计数写入 CSV 文件。"""
+    """Write the per-paper counts to a CSV file."""
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(PaperCount.__dataclass_fields__))
@@ -218,7 +218,7 @@ def write_counts(counts: list[PaperCount], out: Path) -> None:
 
 
 def main() -> None:
-    """执行参考论文图/表计数工作流并打印汇总统计。"""
+    """Run the reference-paper figure/table counting workflow and print the summary statistics."""
     args = parse_args()
 
     counts: list[PaperCount] = []

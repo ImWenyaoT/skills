@@ -70,12 +70,13 @@ latency in milliseconds; `measure_flops` returns GMACs or `None` when `thop` is 
 
 Create a JSON object keyed by image filename. Each value may contain `title`, `anchors` as
 `[x_fraction, y_fraction, label]`, and `fixes` as `[label, severity, description]`. Supported
-severity keys include `必改`, `复核`, `标签`, `题注`, `样式`, and `范围`.
+severity keys are `blocker`, `verify`, `label`, `caption`, `style`, and `scope`; an
+unrecognised key raises rather than painting a grey badge nobody notices.
 
 ```bash
 uv run --with pillow --with matplotlib scripts/annotate_renders.py \
   --config spec.json --renders renders --out annotated
 ```
 
-Resolve every `必改` item and recheck the clean final artifact. Annotated images are QA evidence,
+Resolve every `blocker` item and recheck the clean final artifact. Annotated images are QA evidence,
 not manuscript figures.

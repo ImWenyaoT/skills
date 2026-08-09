@@ -7,10 +7,8 @@
 由 Tian Wenyao 维护的一组可组合 Agent Skills，适用于 Codex、Claude Code 及其他兼容
 [Agent Skills](https://agentskills.io) 的工具。
 
-这些 skills 来自真实工作流，强调可预测的过程、明确的完成标准和渐进披露。仓库采用两层设计：
-
-- **编排 skills** 由用户显式调用，负责选择和组合下层能力。
-- **能力 skills** 由模型按任务触发，提供可复用的执行纪律。
+这些 skills 来自真实工作流，强调可预测的过程、明确的完成标准和渐进披露。每个 skill 都由模型按任务触发，
+边界互不重叠，也可以单独安装、单独分享。
 
 ## 安装
 
@@ -34,46 +32,26 @@ npx skills add ImWenyaoT/skills --all
 
 ```bash
 npx skills add . --list
-npx skills add . --skill answering-reviewers
+npx skills add . --skill publishing-papers
 ```
 
 ## Skills
 
-### Agent 工程
+这些 skill **不是一套流程**,彼此不依赖。按当下手头的问题装其中一个就能用。
 
-| Skill | 用途 |
+| Skill | 什么时候拿它出来 |
 |---|---|
-| [`agent-runtime`](skills/agent-runtime) | 有界 agent loop、工具策略与审批、异步评分、会话/trace 持久化,以及遗留通道的退役闸门。 |
-| [`adversarial-review`](skills/adversarial-review) | 派独立只读 sub-agent 做对抗式终审。 |
-
-### 学术论文
-
-| Skill | 用途 |
-|---|---|
-| [`writing-papers`](skills/writing-papers) | 起草、审阅和润色技术论文。 |
-| [`answering-reviewers`](skills/answering-reviewers) | 把审稿意见当 spec 逐条实现,并渲染修回看板。 |
+| [`training-models`](skills/training-models) | 训练跑不对:loss 不下降、acc 卡住、梯度异常、训练验证不一致。 |
+| [`comparing-runs`](skills/comparing-runs) | 一堆跑完的 run 要变成一张经得起审的表:消融臂可比吗、基线复现、误差棒、每行能不能追回去。 |
+| [`writing-papers`](skills/writing-papers) | 起草、审阅或润色技术论文的正文。 |
 | [`drawing-figures`](skills/drawing-figures) | 规划并制作出版级论文图表。 |
-| [`journal-articles`](skills/journal-articles) | 维护可复现编译的 `elsarticle` / `IEEEtran` 手稿。 |
-| [`journal-submissions`](skills/journal-submissions) | 构建并检查 Elsevier / IEEE 投稿包。 |
-
-### 机器学习与文档
-
-| Skill | 用途 |
-|---|---|
-| [`training-models`](skills/training-models) | 搭建、审查和诊断神经网络训练流程。 |
-| [`markdown-pdf`](skills/markdown-pdf) | 将 Markdown 转为适合打印的 PDF。 |
-
-### Skill 维护
-
-| Skill | 用途 |
-|---|---|
-| [`curating-skills`](skills/curating-skills) | 判定一个候选能力该不该进库:从会话里挖,或审核别人写的 skill。 |
+| [`publishing-papers`](skills/publishing-papers) | 科学做完之后的所有事:期刊模板与本地编译、投稿材料、修回逐条回应。 |
 
 ## 设计原则
 
 - 一个含 `SKILL.md` 的目录就是一个可安装 skill；scripts、references 和 assets 与其共置。
-- 编排 skill 设置 `disable-model-invocation: true`，只组织能力，不复制下层规则。
-- 能力 skill 保留精确的 `description`、自己的完成标准和单一事实来源。
+- 每个 skill 自洽：不引用别的 skill，单独发给别人也能用。
+- 每个 skill 保留精确的 `description`、自己的完成标准和单一事实来源。
 - 只有具备独立触发或跨流程复用价值的纪律才拆成 skill；局部分支放进 `references/`。
 
 ## 仓库结构
@@ -92,17 +70,17 @@ docs/research/             # 设计审计与研究记录
 
 ```bash
 # 与 CI 相同的完整检查（需要 matplotlib 和 Pillow）
-./scripts/ci.sh
+python3 scripts/ci.py
 
-# 核心仓库脚本 branch coverage，最低 70%
-./scripts/coverage.sh
+# 追加 scripts/ 的 branch coverage 门槛（最低 70%，需要 coverage 包）
+python3 scripts/ci.py --coverage
 
 # 官方安装器 discovery
 npx skills@latest add . --list
 ```
 
 GitHub Actions 会在 Python 3.11 与 3.13 上运行仓库测试和每个 skill 的内置测试，在 3.13
-上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 10 个 skills。
+上强制 branch coverage 门槛，并单独验证官方 `skills` CLI 能发现全部 5 个 skills。
 
 已安装的 skills 由 `npx skills` 管理。发布新提交后，运行 `npx skills@latest update -g` 更新全局安装。
 

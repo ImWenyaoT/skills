@@ -1,38 +1,47 @@
-# Publication Artwork Requirements
+# Publication artwork
 
-Read the target venue's current guide first. Record the required file types, physical size,
-minimum resolution, color mode, font handling, and whether figures must be separate files.
-Do not generalize values from one journal.
+One export standard covers almost every venue. Conference and journal figure requirements differ
+very little in practice, so start from the default and only read a venue guide when that venue names
+something the default does not already satisfy.
 
-## Classify before exporting
+## The default
 
-| Artwork class | Examples | Preferred output |
-|---|---|---|
-| Vector drawing | plots, diagrams, schematics | PDF or EPS with fonts embedded or text converted as required |
-| Halftone | photographs, microscopy, continuous-tone images | TIFF, PNG, or JPEG at the guide's minimum DPI |
-| Line drawing | monochrome strokes, text-heavy raster diagrams | vector preferred; otherwise high-resolution TIFF or PNG |
-| Combination | line/text overlays on photographs or heatmaps | vector composition or raster at the guide's combination-art minimum |
+- **Anything that can be vector, is vector.** Plots, diagrams, schematics → PDF, EPS, or SVG with
+  fonts embedded.
+- **Everything else at 600 dpi** at its final physical size. Photographs, microscopy, qualitative
+  panels, heatmaps.
+- **Design at final column width**, text at 8 pt or larger, no meaning carried by colour alone.
 
-Elsevier guides commonly distinguish these classes rather than accepting one DPI for all
-artwork. A frequently encountered baseline is 300 dpi for halftones, 500 dpi for combination
-art, and 1000 dpi for rasterized line drawings, but these are extraction cues, not defaults:
-the target journal's current guide controls.
+That is enough for CVPR, ICCV, NeurIPS, and the ordinary Elsevier or IEEE submission.
+
+## When to go read the guide
+
+Four things vary enough to be worth checking, and only when the venue actually raises them:
+
+- **Separate artwork files.** Some Elsevier journals want each figure uploaded as its own file
+  rather than embedded in the PDF.
+- **A stated DPI above 600**, usually for rasterised line art.
+- **Colour mode** — a print journal that asks for CMYK.
+- **A physical size limit** in millimetres for single- and double-column figures.
+
+Elsevier guides classify artwork rather than giving one DPI: roughly 300 dpi for halftones,
+500 for combination art, 1000 for rasterised line drawings. Those numbers are a reason to keep
+line art vector, not a set of defaults to apply everywhere.
 
 ## Validate the deliverable
 
-1. Export at final physical dimensions; DPI without print size is incomplete.
-2. Confirm pixel dimensions meet `inches x required DPI` in both axes.
-3. Inspect at the size used in the manuscript: labels, legends, symbols, and thin strokes
-   remain readable without disproportionate text.
-4. Cite and number every figure in manuscript order. Use logical filenames and keep each
-   requested artwork item separate.
-5. Supply a caption outside the artwork unless the venue requires otherwise; explain every
-   symbol and abbreviation while keeping text inside the image minimal.
-6. Check accessible color contrast and ensure meaning is not encoded by color alone.
-7. Preserve the data and script behind analytical plots. AI-assisted data visualization must
-   remain reproducible from the underlying data.
-8. Treat primary observed or experimental images as evidence: preserve originals and use
-   only documented, scientifically acceptable processing. Never generate missing evidence.
+1. Export at final physical dimensions; DPI without print size means nothing.
+2. Confirm pixel dimensions meet `inches × dpi` on both axes.
+3. Inspect at the size used in the manuscript: labels, legends, symbols, and thin strokes stay
+   readable, and no text is disproportionate.
+4. Cite and number every figure in manuscript order, with logical filenames.
+5. Keep the caption outside the artwork unless the venue says otherwise; explain every symbol and
+   abbreviation, and keep text inside the image minimal.
+6. Check colour contrast, and confirm meaning survives in greyscale.
+7. Preserve the data and the script behind every analytical plot. A figure has to be reproducible
+   from the data underneath it.
+8. Treat observed or experimental images as evidence: keep the originals, use only documented,
+   scientifically acceptable processing, and never generate missing evidence.
 
-Done means the canonical vector or source artifact is retained, every raster upload meets
-the venue's class-specific pixel requirement, and the final manuscript rendering is legible.
+Done means the canonical vector or source artifact is retained, every raster meets its pixel
+requirement, and the final manuscript rendering is legible at print size.

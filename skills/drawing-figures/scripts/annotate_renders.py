@@ -1,11 +1,12 @@
-"""annotate_renders.py（参数化版）
+"""annotate_renders.py (parameterised)
 
-将修改任务卡标注叠加到渲染图上，生成带红色编号锚点 + 严重度色块修改清单的标注图。
+Overlay a fix-list onto a rendered figure, producing an annotated image with red numbered
+anchors and a severity-coloured list of the fixes.
 
-与原版的区别：写死的 SPECS dict 已外置为 --config JSON，
-通过 load_specs(config_path) 读取。SEVERITY 色映射与 CJK 字体注册保持不变。
+Unlike the original, the hard-coded SPECS dict now lives in a --config JSON read by
+load_specs(config_path). The SEVERITY colour map and the CJK font registration are unchanged.
 
-运行方式:
+Usage:
     uv run python annotate_renders.py --config my_specs.json --renders renders/ --out out/
 """
 
@@ -25,16 +26,17 @@ from matplotlib import gridspec
 from matplotlib.patches import Circle, FancyBboxPatch
 
 
-# --- CJK 字体注册 -------------------------------------------------------
+# --- CJK font registration ----------------------------------------------
 
 def register_cjk_font() -> Optional[str]:
-    """注册系统 CJK .ttc 字体到 matplotlib，并配置 sans-serif 列表。
+    """Register a system CJK .ttc font with matplotlib and set the sans-serif list.
 
-    遍历已知 Noto CJK 字体路径，找到则调用 fontManager.addfont 注册；
-    找不到字体时静默返回 None，不抛出异常。
+    Walk the known Noto CJK font paths and register the first one found through
+    fontManager.addfont. Return None quietly when no font is present — a figure with no
+    CJK text in it does not need one.
 
     Returns:
-        找到并注册的字体路径字符串；若无字体则返回 None。
+        The path of the font that was registered, or None when none was found.
     """
     _ttc_candidates = [
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
@@ -60,71 +62,71 @@ def register_cjk_font() -> Optional[str]:
     return registered
 
 
-# 模块加载时执行一次字体注册
+# Register once, at import time
 register_cjk_font()
 
 
-# --- 配色 ---------------------------------------------------------------
+# --- Colours ------------------------------------------------------------
 
 ANCHOR_FILL = "#B94A48"
 ANCHOR_TXT = "#FFFFFF"
 BG = "#FAFAF8"
 TEXT = "#1F1F1F"
 
-# 严重度色块（与 palette.py 保持同色系）
+# Severity badges, in the same hues as palette.py
 SEVERITY = {
-    "必改":    "#B94A48",  # 阻塞项，不修不能交
-    "复核":    "#C49A3C",  # 人眼复核（颜色/连线落点等）
-    "标签":    "#2A6478",  # 在图上加/改文字标签
-    "题注":    "#4F7A4C",  # caption / LaTeX 端文案
-    "样式":    "#7952B3",  # 线型/颜色/粗细
-    "范围":    "#777777",  # 决定该图替换范围
+    "blocker": "#B94A48",  # must be fixed before the figure ships
+    "verify":  "#C49A3C",  # a human has to look (colour, where a line lands)
+    "label":   "#2A6478",  # add or change text on the figure itself
+    "caption": "#4F7A4C",  # caption or LaTeX-side wording
+    "style":   "#7952B3",  # line style, colour, weight
+    "scope":   "#777777",  # decides how much of this figure gets replaced
 }
 
 
-# --- 外部配置加载 -------------------------------------------------------
+# --- External config ----------------------------------------------------
 
 def load_specs(config_path: str) -> dict:
-    """从外部 JSON 文件读取图注规格（取代原版写死的 SPECS dict）。
+    """Read the annotation specs from an external JSON file.
 
-    JSON 格式示例:
+    Example JSON:
         {
             "fig1.png": {
-                "title": "Fig 1 标题",
+                "title": "Fig 1 title",
                 "anchors": [[0.5, 0.5, "1"], ...],
-                "fixes":   [["1", "必改", "描述"], ...]
+                "fixes":   [["1", "blocker", "description"], ...]
             }
         }
 
-    也支持 brief 测试用的简化格式（anchors 用 4 元素列表
-    [x, y, severity, desc]，没有 title/fixes）。
+    A short form is also accepted, for tests: anchors as four-element lists
+    [x, y, severity, desc], with no title or fixes.
 
     Args:
-        config_path: JSON 配置文件的路径字符串。
+        config_path: path to the JSON config file.
 
     Returns:
-        以图名为键的规格字典。
+        The spec dict, keyed by figure name.
 
     Raises:
-        FileNotFoundError: 文件不存在时。
-        json.JSONDecodeError: JSON 解析失败时。
+        FileNotFoundError: when the file is absent.
+        json.JSONDecodeError: when the JSON does not parse.
     """
     path = Path(config_path)
     with path.open("r", encoding="utf-8") as fh:
         return json.load(fh)
 
 
-# --- 绘制辅助函数 -------------------------------------------------------
+# --- Drawing helpers ----------------------------------------------------
 
 def _draw_anchor(ax, x: float, y: float, label: str, r: float) -> None:
-    """在图像坐标轴上绘制红底白字的编号圆圈锚点。
+    """Draw a numbered anchor — white on red — on the image axes.
 
     Args:
-        ax: matplotlib Axes 对象（图像区域）。
-        x: 锚点中心的像素 x 坐标。
-        y: 锚点中心的像素 y 坐标。
-        label: 圆圈内显示的文字（通常为数字字符串）。
-        r: 圆圈半径（像素）。
+        ax: the matplotlib Axes holding the image.
+        x: anchor centre, in pixels.
+        y: anchor centre, in pixels.
+        label: the text inside the circle, usually a number.
+        r: circle radius, in pixels.
     """
     ax.add_patch(Circle(
         (x, y), r,
@@ -138,16 +140,16 @@ def _draw_anchor(ax, x: float, y: float, label: str, r: float) -> None:
 
 
 def _draw_legend_row(ax, y: float, label: str, severity: str, desc: str) -> None:
-    """在 legend 区域绘制一行修改记录：编号圈 + 严重度色块 + 描述文字。
+    """Draw one fix row in the legend area: number, severity badge, description.
 
     Args:
-        ax: matplotlib Axes 对象（legend 区域）。
-        y: 在 transAxes 坐标系中的纵向位置（0~1）。
-        label: 编号字符串，与图上锚点对应。
-        severity: 严重度键，必须在 SEVERITY 中有对应颜色。
-        desc: 修改描述文字。
+        ax: the matplotlib Axes holding the legend.
+        y: vertical position in transAxes coordinates, 0 to 1.
+        label: the number, matching the anchor on the image.
+        severity: a SEVERITY key; an unknown one is an error, not a grey badge.
+        desc: what has to change.
     """
-    # 编号圈
+    # Numbered circle
     ax.add_patch(Circle(
         (0.022, y), 0.014,
         facecolor=ANCHOR_FILL, edgecolor="white", linewidth=1.2,
@@ -159,12 +161,12 @@ def _draw_legend_row(ax, y: float, label: str, severity: str, desc: str) -> None
         fontsize=9, fontweight="bold",
         transform=ax.transAxes,
     )
-    # 严重度色块
+    # Severity badge
     badge_x, badge_w = 0.050, 0.060
     ax.add_patch(FancyBboxPatch(
         (badge_x, y - 0.022), badge_w, 0.044,
         boxstyle="round,pad=0.005",
-        facecolor=SEVERITY.get(severity, "#999999"), edgecolor="none",
+        facecolor=SEVERITY[severity], edgecolor="none",
         transform=ax.transAxes,
     ))
     ax.text(
@@ -173,7 +175,7 @@ def _draw_legend_row(ax, y: float, label: str, severity: str, desc: str) -> None
         fontsize=9, fontweight="bold",
         transform=ax.transAxes,
     )
-    # 描述文字
+    # Description text
     ax.text(
         badge_x + badge_w + 0.014, y, desc,
         ha="left", va="center", color=TEXT, fontsize=9.5,
@@ -181,27 +183,28 @@ def _draw_legend_row(ax, y: float, label: str, severity: str, desc: str) -> None
     )
 
 
-# --- 核心标注函数 -------------------------------------------------------
+# --- The annotation itself ----------------------------------------------
 
 def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
-    """将标注信息叠加到图像上并保存为 PNG。
+    """Overlay the annotations onto an image and save it as a PNG.
 
-    spec 支持两种 anchors 格式：
-    - 3 元素 (x_frac, y_frac, label)：仅画锚点圆圈
-    - 4 元素 (x_frac, y_frac, severity, desc)：画锚点并在 legend 区渲染修改行
+    Anchors come in two shapes:
+    - three elements (x_frac, y_frac, label): draw the anchor circle only
+    - four elements (x_frac, y_frac, severity, desc): draw the anchor and render a fix row
+      in the legend area
 
-    spec 字段说明：
-        title   (可选): 顶部标题文字。
-        anchors (必须): 锚点列表，坐标为相对图像尺寸的小数。
-        fixes   (可选): 修改清单 [(label, severity, desc), ...]。
+    Spec fields:
+        title   (optional): the heading across the top.
+        anchors (required): the anchors, in coordinates relative to the image size.
+        fixes   (optional): the fix list, [(label, severity, desc), ...].
 
     Args:
-        img_path: 源图像文件路径。
-        spec: 该图的标注规格字典。
-        out_path: 输出 PNG 文件路径。
+        img_path: the source image.
+        spec: the annotation spec for this figure.
+        out_path: where the PNG goes.
 
     Returns:
-        输出文件的 Path 对象。
+        The Path of the file written.
     """
     img = mpimg.imread(str(img_path))
     h, w = img.shape[:2]
@@ -210,7 +213,7 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
     fixes = spec.get("fixes", [])
     title = spec.get("title", "")
 
-    # 兼容 4 元素 anchors（x, y, severity, desc）→ 自动生成编号锚点 + fixes
+    # Four-element anchors (x, y, severity, desc) generate their own numbers and fixes
     if anchors and len(anchors[0]) == 4:
         auto_fixes = []
         auto_anchors = []
@@ -225,7 +228,7 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
 
     n_fixes = len(fixes)
 
-    # 画布几何
+    # Canvas geometry
     page_w_in = 13.0
     img_h_in = page_w_in * (h / w)
     title_h_in = 0.45 if title else 0.0
@@ -235,7 +238,7 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
 
     fig = plt.figure(figsize=(page_w_in, total_h_in), facecolor=BG)
 
-    # 动态构建 gridspec 行
+    # Build the gridspec rows
     height_ratios = []
     subplot_order = []
     if title:
@@ -256,7 +259,7 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
 
     axes = {name: fig.add_subplot(gs[i]) for i, name in enumerate(subplot_order)}
 
-    # 标题
+    # Title
     if "title" in axes:
         ax_t = axes["title"]
         ax_t.axis("off")
@@ -265,7 +268,7 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
         ax_t.text(0.5, 0.5, title, ha="center", va="center",
                   fontsize=14, fontweight="bold", color=TEXT)
 
-    # 图像 + 锚点
+    # Image and anchors
     ax_i = axes["img"]
     ax_i.imshow(img)
     ax_i.set_xlim(0, w)
@@ -277,7 +280,7 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
         xf, yf, label = anchor[0], anchor[1], anchor[2]
         _draw_anchor(ax_i, xf * w, yf * h, str(label), radius)
 
-    # legend 区
+    # Legend area
     if "legend" in axes and n_fixes:
         ax_l = axes["legend"]
         ax_l.axis("off")
@@ -305,17 +308,17 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
     return out
 
 
-# --- CLI 入口 -----------------------------------------------------------
+# --- CLI ----------------------------------------------------------------
 
 def main() -> None:
-    """命令行入口：从 --config JSON 读取 SPECS，批量生成标注图。"""
-    parser = argparse.ArgumentParser(description="为渲染图生成修改任务卡标注")
+    """Read SPECS from the --config JSON and annotate every figure it names."""
+    parser = argparse.ArgumentParser(description="Annotate rendered figures with a fix list")
     parser.add_argument("--config", required=True,
-                        help="包含 SPECS 的 JSON 配置文件路径")
+                        help="path to the JSON config holding SPECS")
     parser.add_argument("--renders", default=".",
-                        help="源渲染图所在目录（默认当前目录）")
+                        help="directory holding the source renders (default: current directory)")
     parser.add_argument("--out", default="annotated",
-                        help="输出目录（默认 ./annotated）")
+                        help="output directory (default: ./annotated)")
     args = parser.parse_args()
 
     specs = load_specs(args.config)
@@ -327,16 +330,16 @@ def main() -> None:
     for img_name, spec in specs.items():
         img_path = renders_dir / img_name
         if not img_path.exists():
-            print(f"[跳过] {img_name} 在 {renders_dir} 下不存在")
+            print(f"[skip] {img_name} is not present under {renders_dir}")
             continue
         stem = Path(img_name).stem
         out_path = out_dir / f"{stem}_spec.png"
         annotate_image(str(img_path), spec, str(out_path))
         written.append(out_path)
-        print(f"[完成] {out_path}")
+        print(f"[done] {out_path}")
 
     if written:
-        print(f"\n共生成 {len(written)} 张标注图，输出目录：{out_dir}")
+        print(f"\nwrote {len(written)} annotated figures to {out_dir}")
 
 
 if __name__ == "__main__":

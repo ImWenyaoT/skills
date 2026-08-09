@@ -1,95 +1,95 @@
-# 审查维度详解
+# Review dimensions
+
+The four passes a full manuscript review makes. Each one names what to look for and what a finding
+has to carry; classify every finding as P0, P1, or P2 back in the skill.
 
 ## Contents
 
-- [1. 语言与格式审查](#1-语言与格式审查)
-- [2. 逻辑自洽审查](#2-逻辑自洽审查)
-- [3. 图文联动审查](#3-图文联动审查)
-- [4. 实验数据分析](#4-实验数据分析)
-- [5. 图表推荐](#5-图表推荐)
-- [6. 架构图设计](#6-架构图设计)
+- [1. Language and format](#1-language-and-format)
+- [2. Logical self-consistency](#2-logical-self-consistency)
+- [3. Figure-text linkage](#3-figure-text-linkage)
+- [4. Experimental data](#4-experimental-data)
 
-## 1. 语言与格式审查
+## 1. Language and format
 
-检查：sentence fragments；主谓一致；拼写 / OOV；mass noun 误用（researches, equipments）；过长过密句；非正式语；弱或含糊动词；重复词；冗余啰嗦；连词滥用；未定义缩写/initialisms；`etc.` 误用；comma splice 或 run-on；冗余括号、重复缩写、过度加粗、过度解释。
+Check for: sentence fragments; subject-verb agreement; spelling and out-of-vocabulary words; mass
+nouns used as count nouns (`researches`, `equipments`); sentences that run long and dense; informal
+register; weak or vague verbs; repeated words; padding; overused connectives; undefined
+abbreviations and initialisms; misused `etc.`; comma splices and run-ons; redundant parentheses,
+repeated abbreviations, over-bolding, over-explaining.
 
-润色要求：标准学术书面语；避免口语缩写（用 it is 不用 it's）；拒绝华丽辞藻与生僻词；方法/模型/系统名避免所有格（优先 the performance of METHOD）；不要把段落改写成列表，除非原文就是列表或明确要求。
+Polish to: standard academic written English; no contractions (`it is`, not `it's`); no ornate or
+obscure vocabulary; no possessive on a method, model, or system name (prefer `the performance of
+METHOD`); and no paragraph converted into a list unless the source was a list or the author asked.
 
-Widom 的 General Writing 硬规则（逐条可 grep，违例常在修回新增段落里滋生）：
+Widom's general-writing hard rules — each one greppable, and each one prone to creeping back in
+through paragraphs newly written for a revision:
 
-- **裸指代**：句首的 This / That / It 必须带显式先行名词（This desaturation…，不是 This is…）。`grep -nE "^(This|It|That) "` 逐个判。
-- **斜体只用于定义与引文**，不用于强调。`\emph{without any fine-tuning}` 这种强调式斜体删掉；`\emph{Retinex-inspired decomposition}` 这种命名式定义合法。
-- **`etc.` 只在余项完全显然时允许**；"for various reasons" 一律禁止——写出真实理由。
-- **术语与记号只定义一次**（长间隔后的提醒除外），第二次带括号缩写的定义就是违例。
-- 贡献 bullet 的 Section 指针、结论不复读摘要（换定量表述）、引言第 ⑤ 点含 limitations——这三条在 drafting-framework 里，**review 时也要回查**：修回中新写的摘要/结论最容易重新趋同，新增贡献最容易漏指针。
+- **Bare referents.** A sentence-initial `This` / `That` / `It` carries an explicit noun after it
+  (`This desaturation …`, not `This is …`). Walk them with
+  `grep -nE "^(This|It|That) "` and judge each.
+- **Italics mark definitions and quotations, not emphasis.** Delete emphatic italics such as
+  `\emph{without any fine-tuning}`; naming definitions such as
+  `\emph{Retinex-inspired decomposition}` are legitimate.
+- **`etc.` only when the remaining items are entirely obvious**, and never "for various reasons" —
+  give the reasons.
+- **A term or notation is defined once** (a reminder after a long gap aside). A second parenthetical
+  definition of the same abbreviation is a violation.
+- Section pointers on contribution bullets, a conclusion that does not restate the abstract (use a
+  quantitative phrasing instead), and limitations inside introduction point 5 — those three live in
+  the drafting framework, and **a review checks them again**: an abstract and conclusion rewritten
+  for a revision drift back toward each other, and a newly added contribution is the one that loses
+  its pointer.
 
-### 成块引用的 S/T 处置法
+### Disposing of block citations
 
-多键 `\cite{a,b,c}` 在数字式期刊渲染成 [1,2,3],是 Elsevier 编辑明令禁止的形态。逐处二选一:
+A multi-key `\cite{a,b,c}` renders as [1,2,3] in a numeric journal style, which Elsevier editors
+explicitly forbid. Take one of two routes at each site:
 
-- **S 拆分**:句子里有具名方法时,把每个 cite 贴到它自己的方法名后
-  ("RetinexNet \cite{a}, KinD \cite{b}, and URetinex-Net \cite{c} explicitly split ...")。
-  refs 一条不丢,这是首选。
-- **T 精简**:泛述句配一串引文(一句话挂三篇综述、总起句挂下文将逐一具名的方法集、
-  同一集合的第二次回指)——留最相关的一条,或当块内各篇在别处已具名引用时整块删除。
+- **Split.** When the sentence names methods, attach each citation to its own method name
+  (`RetinexNet \cite{a}, KinD \cite{b}, and URetinex-Net \cite{c} explicitly split …`). No
+  reference is lost, so this is the first choice.
+- **Trim.** A general statement carrying a string of citations — three surveys on one sentence, a
+  topic sentence citing the set of methods the next paragraphs name one by one, a second reference
+  back to a set already cited — keeps only the most relevant one, or loses the whole block when
+  each member is already cited by name elsewhere.
 
-判据:每个 `\cite` 应回答"这句话里的**哪个具体主张**由这篇文献支撑"。一个键答一个主张;
-答不出主张的键就是 T 的删除对象。纯把块拆成连排单 cite("X \cite{a} \cite{b}")不合规——
-那只是换了写法的成块。T 处置后失引的 bib 条目一并删除。
+The test: every `\cite` answers "which specific claim in this sentence does this reference
+support?" One key, one claim. A key with no claim behind it is what trimming removes. Splitting the
+block into consecutive single citations (`X \cite{a} \cite{b}`) does not comply — that is the same
+block with different punctuation. Delete any bib entry left uncited afterwards.
 
-预防写法:related work 逐方法具名叙述天然免疫成块;成块几乎总是"偷懒的泛述句"的症状,
-句子写具体了,引用自然就散开了。
+Prevention: a related-work section that narrates method by method is immune by construction. A
+block citation is almost always the symptom of a lazy general sentence; make the sentence specific
+and the citations separate themselves.
 
-## 2. 逻辑自洽审查
+## 2. Logical self-consistency
 
-检查：前后矛盾；核心概念换名；因果跳跃；结论超出证据；引言贡献是否在实验得到验证；方法描述能否解释实验表现；失败案例/限制/边界是否与主张冲突；"看似解释、实为补丁"的句子。
+Check for: statements that contradict each other; a core concept renamed halfway through; causal
+leaps; conclusions reaching past their evidence; contributions claimed in the introduction that no
+experiment verifies; a method description that cannot explain the measured behaviour; failure
+cases, limitations, or boundaries that conflict with the claims; and sentences that look like
+explanations but are patches.
 
-注意：不是从创新性角度攻击文章，而是检查文章作为 story 是否讲得通。
+The pass does not attack the work's novelty. It asks whether the paper holds together as a story.
 
-## 3. 图文联动审查
+## 3. Figure-text linkage
 
-从信息传递角度查图、表、正文：审稿人只看图表能否理解约 80% 核心信息；正文是否只补关键背景/因果/解释而不重复图表；图与表是否互补而非讲同一件事；正文是否准确引用图表；图注/表注能否独立说明关键信息；是否有"正文长篇解释其实可交给图表"的段落；图表顺序是否符合叙事路径；表格是否宜转图、或图是否需表格补充精确数值。
+Read the figures, tables, and prose as one channel of information. A reviewer who reads only the
+figures and tables should get roughly 80% of the core message. The prose adds the necessary
+background, causality, and interpretation rather than repeating what the figure already shows.
+Figures and tables complement each other instead of making the same point twice. Every reference in
+the text points at the right object. Each caption stands on its own for the key information. Look
+for paragraphs of prose that a figure could carry, for a figure order that fights the narrative,
+for a table that would read better as a plot, and for a plot that needs a table beside it for exact
+values.
 
-## 4. 实验数据分析
+## 4. Experimental data
 
-所有结论必须严格基于输入数据：不编造数据、不夸大提升幅度、不捏造不存在的现象。重点：SOTA 对比；参数敏感性；性能-效率权衡；消融中关键模块贡献；数据集/指标/设置是否一致；单次与多次实验是否区分；是否需误差线、置信区间或显著性标记。
+Every conclusion stays strictly inside the supplied data: invent no numbers, overstate no gain,
+report no phenomenon that is not there. The focus: comparison against the state of the art;
+parameter sensitivity; the performance-efficiency trade-off; each module's contribution in the
+ablation; consistency of datasets, metrics, and settings; single runs kept distinct from repeated
+ones; and whether error bars, confidence intervals, or significance marks are needed.
 
-避免报账式描述——不要只说 A 是 0.5、B 是 0.6，而要解释差异对主张意味着什么。
-
-## 5. 图表推荐
-
-优先从以下类型选择（附适用场景）：
-
-- 纵向分组柱状图：标准 SOTA 对比，对比项适中、标签短。
-- 横向条形图：方法名较长或对比项很多。
-- 帕累托前沿图：两个相互制约指标的权衡。
-- 雷达图：多维综合能力。
-- 堆叠柱状图：整体指标的细分构成。
-- 带置信区域折线图：训练过程 / loss / accuracy。
-- 局部放大折线图：收敛后期微小差异。
-- 散点拟合图：离散数据趋势。
-- ROC 曲线：二分类且正负样本较平衡。
-- Precision-Recall 曲线：类别不平衡时优先。
-- 热力图：矩阵数据、混淆矩阵、多任务性能对比。
-- 散点图：两个连续变量关系。
-- 气泡图：散点加第三维（参数量或计算成本）。
-- 小提琴图：分布密度。
-- 箱线图：中位数、离群点、范围。
-- 环形图/扇形图：分类占比（优先环形）。
-- 双 Y 轴图：两个量纲不同的变量。
-- 柱折组合图：样本数量与性能等背景前景结合。
-- 分面网格图：变量过多时拆分小图。
-
-数据差异巨大时：需保留原始直观感 → 断裂坐标轴；跨越数量级 → 对数坐标；关注相对提升 → 归一化。
-
-## 6. 架构图设计
-
-若输入涉及方法架构图，输出：
-
-1. **画面布局**：从左到右或从上到下的模块排布、主干流与支路。
-2. **每个模块**：名称、填充色、描边色、内部关键算子、输入到输出张量形状。
-3. **箭头语义**：前向流、条件注入、no_grad 或路由、梯度或强调流；区分实线、虚线、线宽。
-4. **标注**：张量形状、关键超参、算子符号（⊙、⊕、concat）的位置。
-5. **验收标准**：白底、双栏缩放后仍清晰、无多余装饰、与同篇其他图配色一致。
-
-只画论文真实结构，不臆造模块；一张图聚焦一件事，主架构与模块细节分开。
+Avoid ledger prose. Not "A is 0.5 and B is 0.6" but what the difference means for the claim.

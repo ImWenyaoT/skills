@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""从参考论文语料抽取各章节字数，给出稳健的写作目标区间。
+"""Extract per-section word counts from a corpus of reference papers, giving robust target ranges for writing.
 
-word count 右偏，因此用中位数(median)做锚、IQR(Q1-Q3)做目标区间，
-并附 mean/std/trimmed-mean 供参考，同时报告每个 section 的抽取覆盖率
-(null 率)，避免用低覆盖 section 的统计冒充可靠结论。
+Word counts are right-skewed, so the median is the anchor and the IQR (Q1-Q3) is the target range,
+with mean/std/trimmed-mean attached for reference. Each section's extraction coverage
+(null rate) is reported too, so statistics from a poorly covered section cannot pass themselves
+off as a reliable conclusion.
 
-用法示例:
+Example usage:
     python section_wordcount.py \\
         --corpus /path/to/pdfs \\
         --out /path/to/output \\
@@ -21,10 +22,10 @@ import statistics as st
 import subprocess
 from pathlib import Path
 
-# 默认排除正则：review/survey/benchmark 等非方法论文
+# Default exclusion regex: review/survey/benchmark and other non-method papers
 DEFAULT_EXCLUDE = r"Comprehensive_Review|Survey|UniRTL|Adversarial"
 
-# section 规范桶 -> 标题关键词（按优先级匹配；第一个命中的桶胜出）
+# canonical section bucket -> heading keywords (matched in priority order; the first bucket to hit wins)
 SECTION_KEYWORDS = [
     ("introduction", [r"introduction"]),
     ("related", [r"related\s+work", r"^background"]),
@@ -33,7 +34,7 @@ SECTION_KEYWORDS = [
     ("experiments", [r"experiment", r"experimental", r"result", r"evaluation"]),
     ("conclusion", [r"conclusion", r"concluding"]),
 ]
-# 标记正文结束（参考文献/致谢之后不计入）
+# Marks the end of the body (nothing after references/acknowledgments counts)
 END_KEYWORDS = re.compile(r"^(references|acknowledg|declaration|appendix|"
                           r"data\s+availability|supplementary)", re.I)
 SECTIONS = ["abstract", "introduction", "related", "method",
@@ -41,10 +42,10 @@ SECTIONS = ["abstract", "introduction", "related", "method",
 
 
 def summarize(counts):
-    """对一组字数算稳健分布:中位数锚 + IQR 区间(word count 右偏)。
+    """Compute a robust distribution over a set of word counts: median anchor + IQR range (word counts are right-skewed).
 
-    counts: list[int] 某 section 跨论文的字数。
-    返回 dict(median/q1/q3/mean/std/n);n<2 时 q1/q3 退化为 median。
+    counts: list[int], one section's word counts across papers.
+    Returns dict(median/q1/q3/mean/std/n); when n<2, q1/q3 collapse onto the median.
     """
     n = len(counts)
     if n == 0:
@@ -60,17 +61,17 @@ def summarize(counts):
 
 
 def parse_args():
-    """命令行:语料目录与输出目录必填,排除正则与输出前缀可选。"""
-    p = argparse.ArgumentParser(description="参考论文逐 section 字数预算(中位数+IQR)")
-    p.add_argument("--corpus", type=Path, required=True, help="参考论文 PDF 语料根目录")
-    p.add_argument("--out", type=Path, required=True, help="统计 CSV 输出目录")
-    p.add_argument("--exclude", default=DEFAULT_EXCLUDE, help="文件名排除正则")
-    p.add_argument("--prefix", default="", help="输出文件名前缀(如 myproject_)")
+    """CLI: corpus directory and output directory are required; exclusion regex and output prefix are optional."""
+    p = argparse.ArgumentParser(description="Per-section word budget from reference papers (median+IQR)")
+    p.add_argument("--corpus", type=Path, required=True, help="root directory of the reference-paper PDF corpus")
+    p.add_argument("--out", type=Path, required=True, help="output directory for the statistics CSVs")
+    p.add_argument("--exclude", default=DEFAULT_EXCLUDE, help="filename exclusion regex")
+    p.add_argument("--prefix", default="", help="output filename prefix (e.g. myproject_)")
     return p.parse_args()
 
 
 def extract_text(pdf: Path) -> str:
-    """用 pdftotext -raw 抽全文(保留两栏阅读顺序优于默认模式)。"""
+    """Extract the full text with pdftotext -raw (it preserves two-column reading order better than the default mode)."""
     res = subprocess.run(
         ["pdftotext", "-raw", "-q", str(pdf), "-"],
         capture_output=True, text=True,
@@ -79,7 +80,7 @@ def extract_text(pdf: Path) -> str:
 
 
 def classify_heading(title: str) -> str | None:
-    """把一个 section 标题文字归到规范桶；命中不了返回 None。"""
+    """Map a section heading's text onto a canonical bucket; returns None when nothing hits."""
     t = title.strip().lower()
     for bucket, pats in SECTION_KEYWORDS:
         if any(re.search(p, t) for p in pats):
@@ -88,10 +89,11 @@ def classify_heading(title: str) -> str | None:
 
 
 def find_numbered_headings(lines: list[str]) -> list[tuple[int, int, str]]:
-    """找顶层 numbered section 标题，返回 [(行号, 编号N, 规范桶)]。
+    """Find the top-level numbered section headings, returning [(line number, number N, canonical bucket)].
 
-    只接受形如 'N. Title' / 'N Title' 的短行(<=6 词, <50 字符)，且编号从 1
-    起大致单调递增，以过滤正文里的 'Fig. 1'、列表项、公式编号等噪声。
+    Only short lines of the form 'N. Title' / 'N Title' are accepted (<=6 words, <50 characters), and
+    the numbering must rise roughly monotonically from 1, which filters out body-text noise such as
+    'Fig. 1', list items, and equation numbers.
     """
     cand: list[tuple[int, int, str]] = []
     pat = re.compile(r"^\s*(\d{1,2})\.?\s+([A-Za-z][A-Za-z0-9 \-&/,:]{2,48})\s*$")
@@ -107,7 +109,7 @@ def find_numbered_headings(lines: list[str]) -> list[tuple[int, int, str]]:
         if bucket is None:
             continue
         cand.append((i, num, bucket))
-    # 保留编号单调不降且去重桶首次出现，过滤偶发误匹配
+    # keep only non-decreasing numbers and the first occurrence of each bucket, filtering stray mismatches
     kept: list[tuple[int, int, str]] = []
     last_num = 0
     seen: set[str] = set()
@@ -123,26 +125,26 @@ def find_numbered_headings(lines: list[str]) -> list[tuple[int, int, str]]:
 
 
 def count_words(lines: list[str], a: int, b: int) -> int:
-    """统计 [a, b) 行区间的英文词数（跳过明显的页眉/页脚短数字行）。"""
+    """Count the English words in the line range [a, b) (skipping obvious short numeric header/footer lines)."""
     words = 0
     for ln in lines[a:b]:
         s = ln.strip()
         if not s:
             continue
-        if re.fullmatch(r"[\d ./\-]+", s):  # 纯页码/页眉数字
+        if re.fullmatch(r"[\d ./\-]+", s):  # bare page numbers / header digits
             continue
         words += len(re.findall(r"[A-Za-z][A-Za-z\-']+", ln))
     return words
 
 
 def section_counts(text: str) -> dict[str, int | None]:
-    """对单篇全文，返回各规范 section 的词数（取不到为 None）。"""
+    """For one paper's full text, return the word count of each canonical section (None where it cannot be recovered)."""
     lines = text.splitlines()
     out: dict[str, int | None] = {s: None for s in SECTIONS}
     headings = find_numbered_headings(lines)
     head_line = {b: i for i, n, b in headings}
 
-    # abstract: 'abstract' 行(前 40% 文本内) 到 'keywords'/intro 之间
+    # abstract: from the 'abstract' line (within the first 40% of the text) up to 'keywords'/intro
     n = len(lines)
     abs_start = None
     for i in range(min(n, int(n * 0.4))):
@@ -160,9 +162,9 @@ def section_counts(text: str) -> dict[str, int | None]:
                 break
         out["abstract"] = count_words(lines, abs_start, abs_end)
 
-    # numbered sections: 每个桶从它的标题行到下一个 section 标题/正文结束
+    # numbered sections: each bucket runs from its heading line to the next section heading / end of body
     order = sorted([(i, b) for i, num, b in headings])
-    # 找正文结束: conclusion 之后出现的 references/acknowledgment 等
+    # find the end of the body: references/acknowledgment and friends appearing after the conclusion
     end_idx = n
     concl_line = head_line.get("conclusion")
     for i in range(concl_line if concl_line else 0, n):
@@ -176,7 +178,7 @@ def section_counts(text: str) -> dict[str, int | None]:
 
 
 def robust_stats(vals: list[int]) -> dict[str, float]:
-    """给一组词数算稳健统计：N/mean/std/median/Q1/Q3/IQR/10%截尾均值。"""
+    """Compute robust statistics over a set of word counts: N/mean/std/median/Q1/Q3/IQR/10% trimmed mean."""
     vals = sorted(vals)
     k = len(vals)
     q = st.quantiles(vals, n=4) if k >= 2 else [vals[0], vals[0], vals[0]]
@@ -196,7 +198,7 @@ def robust_stats(vals: list[int]) -> dict[str, float]:
 
 
 def main() -> None:
-    """主流程：读取命令行参数，抽取每篇各章字数 -> 写逐篇 CSV -> 算并写各章统计 CSV。"""
+    """Main flow: read the command-line arguments, extract each paper's per-section word counts -> write the per-paper CSV -> compute and write the per-section statistics CSV."""
     args = parse_args()
     exclude_pat = re.compile(args.exclude, re.I)
 
@@ -207,13 +209,13 @@ def main() -> None:
         counts = section_counts(extract_text(p))
         rows.append({"paper": p.name, **counts})
 
-    # 逐篇 CSV
+    # per-paper CSV
     with (args.out / f"{args.prefix}section_wordcounts.csv").open("w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["paper", *SECTIONS])
         w.writeheader()
         w.writerows(rows)
 
-    # 逐 section 统计 + 覆盖率
+    # per-section statistics + coverage
     total = len(rows)
     summ: list[dict] = []
     for s in SECTIONS:
@@ -229,8 +231,8 @@ def main() -> None:
         w.writeheader()
         w.writerows(summ)
 
-    # 控制台打印
-    print(f"语料: {total} 篇方法论文 (已排除: {args.exclude})\n")
+    # console output
+    print(f"corpus: {total} method papers (excluded: {args.exclude})\n")
     print(f"{'section':<13}{'cover':<8}{'median':>8}{'IQR(Q1-Q3)':>16}"
           f"{'mean':>8}{'std':>7}{'trim_mean':>11}")
     for d in summ:
@@ -239,7 +241,7 @@ def main() -> None:
                   f"{str(d['Q1'])+'-'+str(d['Q3']):>16}{d['mean']:>8}"
                   f"{d['std']:>7}{d['trimmed_mean']:>11}")
         else:
-            print(f"{d['section']:<13}{d['coverage']:<8}  (覆盖不足, 跳过统计)")
+            print(f"{d['section']:<13}{d['coverage']:<8}  (coverage too low, statistics skipped)")
 
 
 if __name__ == "__main__":

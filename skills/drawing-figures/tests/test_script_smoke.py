@@ -1,4 +1,4 @@
-"""面向实用绘图脚本 CLI 的最小稳定 smoke tests。"""
+"""Minimal, stable smoke tests for the figure-script CLIs."""
 
 from __future__ import annotations
 
@@ -17,10 +17,10 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
 
 class FigureScriptSmokeTests(unittest.TestCase):
-    """通过公开 CLI 验证拼图和标注脚本能从小型 fixture 生成 artifact。"""
+    """Drive the stitch and annotate CLIs from small fixtures and check the artifacts."""
 
     def test_stitch_cli_writes_expected_canvas(self) -> None:
-        """拼图 CLI 应归一化面板高度并保留白色间距。"""
+        """The stitch CLI normalises panel heights and keeps the white gap."""
         with tempfile.TemporaryDirectory() as tmp:
             work = Path(tmp)
             first = work / "first.png"
@@ -51,7 +51,7 @@ class FigureScriptSmokeTests(unittest.TestCase):
                 self.assertEqual(stitched.getpixel((13, 5)), (255, 255, 255))
 
     def test_annotate_cli_writes_qa_artifact(self) -> None:
-        """标注 CLI 应按 JSON fixture 为存在的渲染图生成非空 PNG。"""
+        """The annotate CLI writes a non-empty PNG for each render the JSON fixture names."""
         with tempfile.TemporaryDirectory() as tmp:
             work = Path(tmp)
             renders = work / "renders"

@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Check that every skill's trigger boundary is declared and non-overlapping.
 
-Two offline checks, no model and no network:
+Three offline checks, no model and no network:
   1. Contract  — every skill has >=2 positive and >=2 forbidden cases in
                  evals/trigger_cases.json, and every label names a real skill.
-  2. Smoke     — a bag-of-words overlap between each prompt and the metadata a
-                 router sees before loading SKILL.md (name + the part of the
-                 description before "Do not"). It catches descriptions that
-                 obviously collide; it is NOT a model, and a passing smoke does
-                 not mean a real router would route the same way.
+  2. Anti-scope — every declared boundary ("Do not use for ...", "Does not apply
+                 to ...") is exercised by a forbidden case that overlaps it.
+  3. Smoke     — a bag-of-words overlap between each prompt and the attracting
+                 half of the metadata a router sees before loading SKILL.md.
+                 It catches descriptions that obviously collide; it is NOT a
+                 model, and a passing smoke does not mean a real router would
+                 route the same way.
 
 This used to also score `--predictions` from a model-in-the-loop router with
 precision/recall/F1, a confusion matrix, and pass@k / pass^k. That half was
@@ -32,6 +34,21 @@ SKILLS_ROOT = ROOT / "skills"
 EVALS = ROOT / "evals" / "trigger_cases.json"
 SKIP = {"scripts", ".git", ".github", "evals"}
 NONE_LABEL = "<none>"  # explicit abstain class so "fire nothing" is first-class
+# "Does not apply to ..." is as common as "Do not use for ..." in this library, and
+# matching only the latter silently scored three skills' anti-scope as attraction.
+# The marker must start a sentence: a description listing symptoms says "the loss
+# does not decrease", and matching that mid-clause cuts the trigger vocabulary off
+# at the knees and files it under the boundary.
+ANTISCOPE_MARKER = re.compile(
+    r"(?:^|(?<=[.;!。；！])\s*)(Do(?:es)? not\b|Don't\b|不要|不应|不负责|不处理)",
+    re.IGNORECASE,
+)
+# Word overlap cannot separate two skills that score within a few percent of each
+# other, so a verdict there reads noise. Measured on this library's 73 correctly
+# routed cases, the runner-up stays under 0.75 of the winner in 95% of them; only
+# above 0.80 does the ranking stop meaning anything. Report a miss only when the
+# expected skill falls outside that tie band.
+TIE_RATIO = 0.80
 STOPWORDS = {
     "about",
     "after",
@@ -44,12 +61,14 @@ STOPWORDS = {
     "build",
     "code",
     "during",
+    "for",
     "from",
     "help",
     "into",
     "need",
     "needs",
     "not",
+    "that",
     "the",
     "this",
     "turn",
@@ -148,27 +167,55 @@ def load_cases(path: Path = EVALS) -> list[Case]:
 
 
 def tokenize(text: str) -> set[str]:
-    """Tokenize English words, skill-name fragments, and short CJK n-grams."""
+    """Tokenize English words, skill-name fragments, and short CJK n-grams.
+
+    CJK bigrams are taken inside each run of CJK characters. Flattening the whole
+    text first would join characters across a comma or an English word and invent
+    grams no reader ever wrote: "写摘要, 写引言" would yield "要写".
+    """
     lowered = text.lower().replace("-", " ")
     words = {
         token
         for token in re.findall(r"[a-z0-9][a-z0-9_]{2,}", lowered)
         if token not in STOPWORDS
     }
-    cjk_chars = re.findall(r"[一-鿿]", text)
-    cjk_grams = {"".join(cjk_chars[i : i + 2]) for i in range(max(0, len(cjk_chars) - 1))}
+    cjk_grams: set[str] = set()
+    for run in re.findall(r"[一-鿿]+", text):
+        cjk_grams.update(run[index : index + 2] for index in range(len(run) - 1))
     return words | cjk_grams
+
+
+def split_description(description: str) -> tuple[str, str]:
+    """Split a description into the half that attracts and the anti-scope clause.
+
+    A bag of words cannot represent negation, so the anti-scope clause must stay
+    out of the attracting half — its words would pull the skill toward the very
+    prompts it declares out of scope. It is scored separately instead, by
+    `validate_antiscope`.
+    """
+    match = ANTISCOPE_MARKER.search(description)
+    if not match:
+        return description, ""
+    cut = match.start(1)
+    return description[:cut], description[cut:]
 
 
 def metadata_tokens(skill: Skill) -> set[str]:
     """Return the pre-load tokens a router can infer from name and description."""
-    positive_description = re.split(
-        r"\bDo not\b|\bDon't\b|不要|不应|不负责",
-        skill.description,
-        maxsplit=1,
-        flags=re.IGNORECASE,
-    )[0]
+    positive_description, _ = split_description(skill.description)
     return tokenize(f"{skill.name.replace('-', ' ')} {positive_description}")
+
+
+def antiscope_tokens(skill: Skill) -> set[str]:
+    """Return the tokens that appear only in the skill's anti-scope clause.
+
+    A word on both sides carries no sign — it cannot tell a router anything about
+    the boundary — so only the exclusive words count as the declared boundary.
+    """
+    positive, negative = split_description(skill.description)
+    if not negative:
+        return set()
+    return tokenize(negative) - tokenize(f"{skill.name.replace('-', ' ')} {positive}")
 
 
 def similarity(prompt: str, skill: Skill) -> float:
@@ -239,16 +286,48 @@ def smoke_test_metadata(cases: list[Case], skills: dict[str, Skill]) -> list[str
         if expected and top_name not in expected:
             expected_scores = {name: similarity(case.prompt, skills[name]) for name in expected}
             best_expected, best_score = max(expected_scores.items(), key=lambda item: item[1])
-            failures.append(
-                f"{case.id}: metadata top={top_name}({top_score:.3f}) "
-                f"but expected {best_expected}({best_score:.3f})"
-            )
+            if best_score < TIE_RATIO * top_score:
+                failures.append(
+                    f"{case.id}: metadata top={top_name}({top_score:.3f}) "
+                    f"but expected {best_expected}({best_score:.3f})"
+                )
 
-        if top_name in forbidden and top_score >= 0.10:
-            failures.append(f"{case.id}: forbidden skill {top_name} ranks first ({top_score:.3f})")
+        # When no skill should fire, which one happens to rank first is meaningless —
+        # only whether anything scores high enough to fire. Judging an abstain case by
+        # both rules sentences it twice, under two different thresholds.
+        if expected and top_name in forbidden and top_score >= 0.10:
+            best_expected = max(similarity(case.prompt, skills[name]) for name in expected)
+            if best_expected < TIE_RATIO * top_score:
+                failures.append(f"{case.id}: forbidden skill {top_name} ranks first ({top_score:.3f})")
 
         if not expected and top_score >= 0.25:
             failures.append(f"{case.id}: no expected skill but metadata top={top_name}({top_score:.3f})")
+    return failures
+
+
+def validate_antiscope(cases: list[Case], skills: dict[str, Skill]) -> list[str]:
+    """Check that every declared anti-scope clause is exercised by a forbidden case.
+
+    The clause is what a real router reads to decide *not* to fire a skill, so it
+    is the half that most needs testing — and the half a bag-of-words smoke cannot
+    score directly. Tie it to the goldens instead: a boundary nothing tests is a
+    boundary that can name a skill deleted two refactors ago and never be caught.
+    """
+    failures: list[str] = []
+    for name in sorted(skills):
+        boundary = antiscope_tokens(skills[name])
+        if not boundary:
+            failures.append(f"{name}: description declares no anti-scope clause")
+            continue
+        covered = any(
+            name in case.forbidden_skills and tokenize(case.prompt) & boundary
+            for case in cases
+        )
+        if not covered:
+            failures.append(
+                f"{name}: anti-scope declares a boundary no forbidden case exercises "
+                f"({sorted(boundary)[:6]}…)"
+            )
     return failures
 
 
@@ -295,6 +374,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     print_summary(cases, skills)
 
     failures = validate_case_contract(cases, skills)
+    failures.extend(validate_antiscope(cases, skills))
     if not args.skip_smoke:
         failures.extend(smoke_test_metadata(cases, skills))
 

@@ -1,13 +1,55 @@
----
-name: answering-reviewers
-description: Answers reviewer comments on a major/minor revision — treats each comment as a spec to implement, not a claim to debate, and holds the work to that spec's scope. Use when the user has a revision decision, reviewer comments, an editor's summary, a point-by-point response to reviewers, 修回, 返稿, 逐条回应, 审稿意见, or asks how to handle a specific reviewer point. Also use when the user is deciding which requested experiments to run, is about to argue that a reviewer is wrong, is considering extra experiments nobody asked for, or asks where the revision stands (进展, 现在怎么说, what now). Does not draft or polish the manuscript prose itself, and does not assemble the Editorial Manager upload packet.
----
+# Answering a revision decision
 
-# Answering Reviewers
+A revision decision means the editor already decided the paper can be saved. The reviewers have
+told you what they will not accept. Your job is to remove each objection — **the ask is the spec**.
 
-A revision decision means the editor already decided the paper can be saved. The reviewers have told you what they will not accept. Your job is to remove each objection — **the ask is the spec**.
+The failure this file prevents: an author who is technically right and rejected anyway.
 
-The failure this skill prevents: an author who is technically right and rejected anyway.
+## Contents
+
+- [Working order](#working-order)
+- [The page](#the-page)
+- [The ask is the spec](#the-ask-is-the-spec)
+- [Doing beats arguing](#doing-beats-arguing)
+- [Not doing it is the exception](#not-doing-it-is-the-exception)
+- [The spec bounds the work in both directions](#the-spec-bounds-the-work-in-both-directions)
+- [When the honest answer costs you something](#when-the-honest-answer-costs-you-something)
+- [Land each change in every manuscript location it governs](#land-each-change-in-every-manuscript-location-it-governs)
+- [The response letter](#the-response-letter)
+- [Consistency is a second reviewer](#consistency-is-a-second-reviewer)
+- [Rendering the letter](#rendering-the-letter)
+
+## Working order
+
+Verify → run → write. Land the numbers first; the letter is what you write once there is something to report.
+
+When the schedule is tight, cut scope within each comment (fewer seeds, shorter schedule, fewer datasets) rather than dropping comments. An addressed comment at reduced scope scores; an unaddressed comment does not.
+
+## The page
+
+The revision lives on one page, not in chat. Build it the moment the decision letter arrives, in
+whatever form it came — a PDF, a `.docx`, screenshots of the submission system, or text pasted
+into the conversation. It starts as a translation of the reviewers' words and grows, comment by
+comment, into the draft of the response letter.
+
+Re-render it whenever the user asks where things stand, whenever results land and change a
+status, and before any scope decision. They need the whole board, not the slice you happen to be
+holding.
+
+Three properties carry the work. **Verbatim originals beside the translation**, because
+paraphrase is how scope quietly drifts. **An evidence slot that stays visibly empty** until a real
+number fills it — intentions do not count, which is the rule the letter runs on too. And **the
+force of the reviewer's wording marked in the English**, because translation flattens it: "provide
+**concrete** evidence" is a reviewer who has already judged your evidence thin, and the Chinese
+for it reads like a neutral request.
+
+Offer two or three routes per open comment rather than one instruction, and let the page record
+which one the author picks. They know which GPU is free and how much of the deadline is real.
+
+See [html-report.md](html-report.md) for the format, and
+[`assets/revision-page-example.html`](assets/revision-page-example.html) for the smallest page the
+generator accepts — it carries only the anchors, so it is the fastest way to check that a real
+page still parses.
 
 ## The ask is the spec
 
@@ -62,73 +104,13 @@ The exception is narrow: an unasked experiment earns its place only when it is t
 
 The same bound applies when the reviewer named a concern but prescribed no remedy: the editor's wording is the ceiling, not the floor. If the editor says the issue "must be discussed honestly," a candid quantitative discussion and a limitation may already satisfy the spec — do not invent an expensive experiment unless evidence is what makes that discussion credible. Where the reviewer *did* prescribe concrete actions (a citation, a named ablation, a dependency disclosure), implement them directly.
 
-## Concede early and openly
+## When the honest answer costs you something
 
-Name the components you adopted, cite them, and state plainly what is yours: *"Built on the adopted X [cite]; unlike prior work, we …"*
-
-This is counterintuitive and it works. Volunteering an adopted component is what moved one submission from major to minor revision. The reviewer is already suspicious; a concession you volunteer costs one sentence, while the same fact discovered by the reviewer costs your credibility on everything else.
-
-The corollary: **keep adopted components out of the contribution list.** A contribution that leads with someone else's idea invites exactly the "these two works look similar" comment.
-
-When that comment does arrive, answer it by differentiating **claim sets**, not architectures. Rewrite the contribution list until every claimed contribution is distinct from both the nearest cited method and your own prior work. The objection is usually one of three shapes — *collision* (two works claim the same thing), *hierarchy* (a minor claim is billed as a major one), or *emphasis* (the adopted part leads) — and none of the three is a demand to abandon the adopted component. State the adopted parts as foundations, then locate the novelty where it actually lives: in the mechanism, the allocation, the interaction, the objective, or the evidence. If a separate comment challenges a foundation itself, answer it there rather than letting it bend the novelty response.
-
-## Wrong premises
-
-Reviewers make factual errors. Handle it in this order — the order is the whole technique:
-
-1. **Concede the literal claim** if it is literally true. Do not spend a word defending it.
-2. **Locate the premise** behind the claim, which is usually where the error lives ("I guess the authors want X" is a premise wearing a disguise).
-3. **Correct it with evidence, briefly** — ideally from a source the reviewer already trusts (the original paper of the method they are citing at you, their own cited work's tables).
-4. **Then do what they asked anyway.** The correction earns nothing on its own; the experiment does. Running the comparison they wanted is what converts "the author argued with me" into "the author addressed it."
-
-A correction without an experiment reads as a dodge, no matter how right it is.
-
-## Verify provenance before constructing a defense
-
-A number matching a published one is not evidence that it was copied from the paper. Before you
-explain a suspicious baseline, go looking: run directories, archived machines, logs, checkpoints,
-scripts, old drafts, a co-author's records. Keep three states apart — reproduced locally with
-artifacts, reported from an external source, and provenance not yet recovered. "Not yet
-recovered" is an evidence slot to work on, not a licence to write a tidy origin story.
-
-When someone remembers a real run on another machine, hold that as a hypothesis and leave the
-response unwritten until the artifact or the protocol turns up. A letter can explain an
-unfavourable real result; it cannot recast it as a citation or a protocol mix-up that never
-happened.
-
-This governs your *investigation*, not your prose. What you may say is a separate rule — see
-[The response letter](#the-response-letter) — and neither one licenses guessing.
-
-## When the experiment proves the reviewer right
-
-The comparison they demanded sometimes returns the answer they predicted and you feared. Your
-method is not the best choice; the component they doubted contributes nothing measurable. This is
-the moment the revision is won or lost, and the instinct that loses it is to go looking for the
-cut of the data where you still win.
-
-Report the result. A number you suppress is a number the next reviewer finds, and by then it costs
-the paper rather than one comment.
-
-Then separate two questions that the reviewer's phrasing fused into one. *"Prove that X is the
-best choice"* presumes X is your contribution. Frequently it is not — it is the substrate your
-contribution runs on, and the comparison you just ran across substrates is evidence that your real
-contribution holds across all of them. Name what you actually claim, show the comparison supports
-that claim, and state plainly why the paper keeps the substrate it uses: comparability with the
-prior work under review, cost, or scope. Volunteering the better alternative as a direction
-strengthens the paper, because a limitation you name yourself is one the reviewer no longer has to.
-
-Two details make the concession land instead of read as defeat:
-
-- **Say that their judgement was confirmed.** They wrote the comment because they suspected
-  something; the experiment agreeing with them is the strongest evidence you took it seriously.
-- **Point out any handicap the losing arm carried in its favour.** If your method had a trainable
-  parameter the baselines lacked and still lost, say so — it forecloses "you did not tune the
-  comparison properly," which is otherwise the next round's comment.
-
-The boundary: hunting for a favourable framing is legitimate, and hunting for a favourable number
-is not. Reframing chooses which honest claim to foreground. Rerunning until the result flatters
-you, or reporting the one split where you win, is the fabrication that ends careers. If a new
-angle needs a new experiment, commit to reporting whatever it returns before you launch it.
+Four comments cannot be answered by running what was asked, because answering them means conceding
+something first: your novelty overlaps a component you adopted, the reviewer's premise is factually
+wrong, a baseline's provenance cannot be recovered, or the experiment returns the answer they
+predicted and you feared. Read [conceding.md](conceding.md) when a comment is one of
+those four — each has a technique that gives the point away without giving away the paper.
 
 ## Land each change in every manuscript location it governs
 
@@ -163,38 +145,6 @@ Tone is a solved problem: plain, factual, no hedging, no gratitude inflation, no
 A reviewer who catches one inconsistency starts auditing everything. Before submitting, check that the same number means the same thing everywhere: one metric protocol per column (raw and corrected scores are different columns, never the same one), one value per baseline across all tables and drafts, one name per method, one key per citation.
 
 Baselines deserve a specific pass. A baseline you reproduced below its published number is read as suppression, whatever the cause. Either reproduce it with official weights, or state the protocol difference in the caption — before a reviewer states it for you.
-
-## Working order
-
-Verify → run → write. Land the numbers first; the letter is what you write once there is something to report.
-
-When the schedule is tight, cut scope within each comment (fewer seeds, shorter schedule, fewer datasets) rather than dropping comments. An addressed comment at reduced scope scores; an unaddressed comment does not.
-
-## The page
-
-The revision lives on one page, not in chat. Build it the moment the decision letter arrives, in
-whatever form it came — a PDF, a `.docx`, screenshots of the submission system, or text pasted
-into the conversation. It starts as a translation of the reviewers' words and grows, comment by
-comment, into the draft of the response letter.
-
-Re-render it whenever the user asks where things stand, whenever results land and change a
-status, and before any scope decision. They need the whole board, not the slice you happen to be
-holding.
-
-Three properties carry the work. **Verbatim originals beside the translation**, because
-paraphrase is how scope quietly drifts. **An evidence slot that stays visibly empty** until a real
-number fills it — intentions do not count, which is the rule the letter runs on too. And **the
-force of the reviewer's wording marked in the English**, because translation flattens it: "provide
-**concrete** evidence" is a reviewer who has already judged your evidence thin, and the Chinese
-for it reads like a neutral request.
-
-Offer two or three routes per open comment rather than one instruction, and let the page record
-which one the author picks. They know which GPU is free and how much of the deadline is real.
-
-See [references/html-report.md](references/html-report.md) for the format, and
-[`assets/revision-page-example.html`](assets/revision-page-example.html) for the smallest page the
-generator accepts — it carries only the anchors, so it is the fastest way to check that a real
-page still parses.
 
 ## Rendering the letter
 

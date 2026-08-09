@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""从本地 PDF 论文中抽取 figure/table caption 候选，输出 Markdown 审计文件。"""
+"""Extract figure/table caption candidates from local PDF papers and write a Markdown audit file."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from pathlib import Path
 
 @dataclass
 class Caption:
-    """存储一条抽取到的 figure 或 table caption 候选。"""
+    """Holds one extracted figure or table caption candidate."""
 
     kind: str
     number: str
@@ -20,15 +20,15 @@ class Caption:
 
 
 def parse_args() -> argparse.Namespace:
-    """命令行:本地 PDF 目录与输出 md 必填。"""
-    p = argparse.ArgumentParser(description="从本地 PDF 抽 figure/table caption 候选")
-    p.add_argument("--pdf-dir", dest="pdf_dir", type=Path, required=True, help="PDF 根目录")
-    p.add_argument("--out", type=Path, required=True, help="输出 md 路径")
+    """CLI: local PDF directory and output md are both required."""
+    p = argparse.ArgumentParser(description="Extract figure/table caption candidates from local PDFs")
+    p.add_argument("--pdf-dir", dest="pdf_dir", type=Path, required=True, help="PDF root directory")
+    p.add_argument("--out", type=Path, required=True, help="output md path")
     return p.parse_args()
 
 
 def pdf_to_lines(pdf_path: Path) -> list[str]:
-    """调用 pdftotext，返回原始行列表（已去首尾空白）。"""
+    """Call pdftotext and return the raw lines (already stripped of leading/trailing whitespace)."""
     result = subprocess.run(
         ["pdftotext", "-raw", str(pdf_path), "-"],
         check=True,
@@ -41,7 +41,7 @@ def pdf_to_lines(pdf_path: Path) -> list[str]:
 
 
 def normalize_text(text: str) -> str:
-    """归一化空白及常见 PDF 抽取乱码（连字符等）。"""
+    """Normalize whitespace and the usual PDF-extraction garble (ligatures, hyphenation, and friends)."""
     text = re.sub(r"\s+", " ", text)
     text = text.replace("ﬁ", "fi").replace("ﬂ", "fl")
     text = text.replace("state-of-the-art", "state of the art")
@@ -50,7 +50,7 @@ def normalize_text(text: str) -> str:
 
 
 def looks_like_caption_start(line: str) -> re.Match[str] | None:
-    """检测行是否为 Figure/Table caption 起始，忽略正文引用。"""
+    """Detect whether a line starts a Figure/Table caption, ignoring in-text references."""
     fig_match = re.match(r"^(Fig\.|Figure)\s+([0-9]+|[IVX]+)[\.:]\s*(.*)$", line, flags=re.I)
     if fig_match:
         return fig_match
@@ -64,7 +64,7 @@ def looks_like_caption_start(line: str) -> re.Match[str] | None:
 
 
 def collect_caption(lines: list[str], start_index: int, match: re.Match[str]) -> Caption:
-    """从起始行及后续续行收集完整 caption 文本。"""
+    """Collect the full caption text from its opening line and the continuation lines that follow."""
     kind_token, number, rest = match.groups()
     kind = "Figure" if kind_token in {"Fig.", "Figure"} else "Table"
     parts = [rest] if rest else []
@@ -95,7 +95,7 @@ def collect_caption(lines: list[str], start_index: int, match: re.Match[str]) ->
 
 
 def parse_captions(lines: list[str]) -> list[Caption]:
-    """从文本行列表中解析所有 caption 候选，返回 Caption 列表（纯函数，无 IO）。"""
+    """Parse every caption candidate out of a list of text lines, returning a list of Caption (pure function, no IO)."""
     results: list[Caption] = []
     for idx, line in enumerate(lines):
         match = looks_like_caption_start(line)
@@ -107,7 +107,7 @@ def parse_captions(lines: list[str]) -> list[Caption]:
 
 
 def extract_captions(pdf_path: Path) -> tuple[list[Caption], list[Caption]]:
-    """从单个 PDF 抽取去重后的 figure/table caption 列表。"""
+    """Extract the deduplicated figure/table caption lists from a single PDF."""
     lines = pdf_to_lines(pdf_path)
     figures: dict[str, Caption] = {}
     tables: dict[str, Caption] = {}
@@ -124,22 +124,22 @@ def extract_captions(pdf_path: Path) -> tuple[list[Caption], list[Caption]]:
 
 
 def paper_label(pdf_path: Path) -> str:
-    """从 PDF 文件名生成简短论文标签。"""
+    """Build a short paper label from the PDF filename."""
     return pdf_path.stem.replace("_", " ")
 
 
 def render_markdown(rows: list[tuple[Path, list[Caption], list[Caption]]]) -> str:
-    """将抽取结果渲染为中文 Markdown 审计文件字符串。"""
+    """Render the extraction results into the Markdown audit-file string."""
     lines = [
-        "# 论文图表审计",
+        "# Paper figure/table audit",
         "",
-        "本文档从指定 PDF 目录批量抽取 Figure/Table caption，用于快速观察论文通常画哪些图、放哪些表。",
+        "This document batch-extracts Figure/Table captions from the given PDF directory, so you can see at a glance which figures papers usually draw and which tables they usually include.",
         "",
-        "说明：caption 保留论文原文英文，方便后续回到 PDF 核对；自动抽取结果可能包含换行、断词或少量正文误匹配，正式引用前需要人工复核。",
+        "Note: captions keep the paper's original English, so you can check them back against the PDF; the automatic extraction may contain line breaks, split words, or the odd body-text false match, so review them by hand before citing anything.",
         "",
-        f"PDF 总数：{len(rows)}",
+        f"Total PDFs: {len(rows)}",
         "",
-        "| 论文 | 图数量 | 表数量 |",
+        "| Paper | Figures | Tables |",
         "| --- | ---: | ---: |",
     ]
     for pdf_path, figures, tables in rows:
@@ -149,25 +149,25 @@ def render_markdown(rows: list[tuple[Path, list[Caption], list[Caption]]]) -> st
     for pdf_path, figures, tables in rows:
         lines.append(f"## {paper_label(pdf_path)}")
         lines.append("")
-        lines.append("图：")
+        lines.append("Figures:")
         if figures:
             for cap in figures:
                 lines.append(f"- Fig. {cap.number}: {cap.text}")
         else:
-            lines.append("- 未抽取到图 caption")
+            lines.append("- no figure caption extracted")
         lines.append("")
-        lines.append("表：")
+        lines.append("Tables:")
         if tables:
             for cap in tables:
                 lines.append(f"- Table {cap.number}: {cap.text}")
         else:
-            lines.append("- 未抽取到表 caption")
+            lines.append("- no table caption extracted")
         lines.append("")
     return "\n".join(lines)
 
 
 def main() -> None:
-    """主入口：扫描 PDF 目录，抽取 caption 并写出 Markdown 文件。"""
+    """Main entry point: scan the PDF directory, extract captions, and write out the Markdown file."""
     args = parse_args()
     pdf_dir: Path = args.pdf_dir
     out_path: Path = args.out

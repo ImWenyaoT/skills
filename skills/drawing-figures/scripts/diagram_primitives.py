@@ -1,13 +1,14 @@
-"""diagram_primitives.py —— 架构图绘制公共原语。
+"""diagram_primitives.py — the shared primitives for architecture diagrams.
 
-架构图脚本的公共核心:
-  - SEMANTIC:  语义颜色字典(填充/描边各 10 个条目)
-  - draw_box:  带标签的圆角矩形(FancyBboxPatch)
-  - connect:   语义箭头(fwd/cond/nograd/grad)
-  - save_diagram: 同时落盘 PDF+PNG(600 DPI,复用 figkit.plot_helpers.save_fig)
+What every diagram script builds on:
+  - SEMANTIC:      the semantic colour dict (ten fill and stroke pairs)
+  - draw_box:      a labelled rounded rectangle (FancyBboxPatch)
+  - connect:       a semantic arrow (fwd, cond, nograd, grad)
+  - save_diagram:  writes PDF and PNG at 600 DPI, reusing figkit.plot_helpers
 
-每篇论文写一个薄壳脚本导入本模块即可,不必重复实现上述原语;
-坐标、标签、连线拓扑等布局细节留在各自的脚本里。
+A paper writes a thin script that imports this module rather than reimplementing
+the primitives. Layout — coordinates, labels, wiring topology — stays in that
+script.
 """
 
 from __future__ import annotations
@@ -19,49 +20,49 @@ from figkit.palette_base import ARROW_FWD, ARROW_COND, ARROW_NOGRAD, ARROW_GRAD
 from figkit.plot_helpers import save_fig
 
 
-# ── 语义颜色字典 ─────────────────────────────────────────────────────────────
-# 语义色板：填充色浅、描边色深，同色相配对，
-# 每个键名语义化以覆盖架构图最常见的模块类型。
+# ── Semantic colour dict ─────────────────────────────────────────────────────
+# Light fill against a darker stroke of the same hue. The key names cover the
+# module types an architecture diagram needs most often.
 SEMANTIC: dict[str, str] = {
-    # 主干/骨干块 (GCM, DSR, PatchEmbed, Unpatchify …)
+    # Trunk and backbone blocks (GCM, DSR, PatchEmbed, Unpatchify …)
     "TEAL_FILL":    "#D4E8EB",
     "TEAL_STROKE":  "#2A6478",
 
-    # 条件/软权重块 (AdaLN, CondEmbed, Proj …)
+    # Conditioning and soft-weight blocks (AdaLN, CondEmbed, Proj …)
     "AMBER":        "#E8D5B0",
     "AMBER_STROKE": "#C49A3C",
 
-    # 非可微/离散操作 (argmax, sort/unsort, routing …)
+    # Non-differentiable or discrete operations (argmax, sort/unsort, routing …)
     "GRAY":         "#DADADA",
     "GRAY_STROKE":  "#777777",
 
-    # 精化/后处理头 (BAR head, fusion, output smoothing …)
+    # Refinement and post-processing heads (BAR head, fusion, smoothing …)
     "GREEN":        "#CBE0C8",
     "GREEN_STROKE": "#4F7A4C",
 
-    # 展开块内部 (MSA, MLP inside G-Block …)
+    # The inside of an expanded block (MSA, MLP within a G-Block …)
     "SLATE":        "#8DAFC0",
     "SLATE_STROKE": "#486878",
 
-    # 冻结/外部模块 (DA-CLIP encoder, guidance provider …)
+    # Frozen or external modules (DA-CLIP encoder, guidance provider …)
     "FROZEN":        "#E0D8CE",
     "FROZEN_STROKE": "#A09080",
 
-    # 桥接/结构胶水 (linear 768→144, upsample, skip …)
+    # Bridges and structural glue (linear 768->144, upsample, skip …)
     "BRIDGE":        "#E8E4D8",
     "BRIDGE_STROKE": "#8A7A5C",
 
-    # 输入/输出张量框
+    # Input and output tensor boxes
     "IO_FILL":   "#FFFFFF",
     "IO_STROKE": "#333333",
 }
 
-# 箭头类型 → (颜色, 是否虚线) 映射表
+# Arrow kind -> (colour, dashed)
 _ARROW_STYLES: dict[str, tuple[str, bool]] = {
-    "fwd":    (ARROW_FWD,    False),   # 标准前向数据流
-    "cond":   (ARROW_COND,   False),   # 条件注入
-    "nograd": (ARROW_NOGRAD, True),    # no_grad / 离散路由, 虚线
-    "grad":   (ARROW_GRAD,   False),   # 反向梯度 / 强调
+    "fwd":    (ARROW_FWD,    False),   # standard forward data flow
+    "cond":   (ARROW_COND,   False),   # conditioning injection
+    "nograd": (ARROW_NOGRAD, True),    # no_grad or discrete routing, dashed
+    "grad":   (ARROW_GRAD,   False),   # backward gradient or emphasis
 }
 
 
@@ -75,21 +76,21 @@ def draw_box(
     stroke: str,
     fontsize: float = 9.5,
 ) -> FancyBboxPatch:
-    """在 ax 上绘制圆角矩形模块并居中写标签,返回 patch 对象。
+    """Draw a rounded-rectangle module on ax with a centred label.
 
-    参数
+    Parameters
     ----
     ax:       matplotlib Axes
-    xy:       左下角坐标 (x, y)
-    w, h:     宽度、高度(数据坐标单位)
-    label:    模块名称文字
-    fill:     填充颜色(hex string)
-    stroke:   边框颜色(hex string)
-    fontsize: 标签字号,默认 9.5
+    xy:       lower-left corner (x, y)
+    w, h:     width and height, in data coordinates
+    label:    the module name
+    fill:     fill colour (hex string)
+    stroke:   border colour (hex string)
+    fontsize: label size, 9.5 by default
 
-    返回
+    Returns
     ----
-    FancyBboxPatch 对象(已添加到 ax)
+    The FancyBboxPatch, already added to ax.
     """
     x, y = xy
     box = FancyBboxPatch(
@@ -119,25 +120,25 @@ def connect(
     dst_xy: tuple[float, float],
     kind: str = "fwd",
 ) -> None:
-    """在两点之间绘制语义化箭头,按 kind 决定颜色与线型。
+    """Draw a semantic arrow between two points; kind picks colour and style.
 
-    参数
+    Parameters
     ----
     ax:      matplotlib Axes
-    src_xy:  箭头起点 (x, y)
-    dst_xy:  箭头终点 (x, y)
-    kind:    箭头类型,可选 "fwd" / "cond" / "nograd" / "grad"
-             - fwd:    标准前向数据流(深青蓝,实线)
-             - cond:   条件注入(琥珀,实线)
-             - nograd: no_grad / 离散路由(灰,虚线)
-             - grad:   反向梯度 / 强调(红,实线)
+    src_xy:  arrow tail (x, y)
+    dst_xy:  arrow head (x, y)
+    kind:    one of "fwd", "cond", "nograd", "grad"
+             - fwd:    standard forward data flow (deep teal, solid)
+             - cond:   conditioning injection (amber, solid)
+             - nograd: no_grad or discrete routing (grey, dashed)
+             - grad:   backward gradient or emphasis (red, solid)
 
-    返回
+    Returns
     ----
-    None(注解已添加到 ax)
+    None. The annotation is already added to ax.
     """
     if kind not in _ARROW_STYLES:
-        raise ValueError(f"connect: kind 必须是 {list(_ARROW_STYLES.keys())}，得到 {kind!r}")
+        raise ValueError(f"connect: kind must be one of {list(_ARROW_STYLES.keys())}, got {kind!r}")
 
     color, dashed = _ARROW_STYLES[kind]
     ls = "--" if dashed else "-"
@@ -157,20 +158,20 @@ def connect(
 
 
 def save_diagram(fig, out_stem: str) -> None:
-    """将架构图同时保存为 PDF 与 PNG(均 600 DPI),复用 figkit.save_fig。
+    """Save the diagram as both PDF and PNG at 600 DPI, reusing figkit.save_fig.
 
-    参数
+    Parameters
     ----
     fig:      matplotlib Figure
-    out_stem: 输出文件路径(不含后缀),如 "/path/to/diag"
-              → 生成 /path/to/diag.pdf 与 /path/to/diag.png
+    out_stem: output path without a suffix, e.g. "/path/to/diag", which writes
+              /path/to/diag.pdf and /path/to/diag.png
 
-    注意:调用后 fig 会被 plt.close(),不可再用。
+    Note: fig is closed by plt.close() on return and cannot be reused.
     """
-    # 先保存 PDF(矢量);save_fig 会 close fig,故 PNG 必须先另存
-    # 方案:先手动保存 PNG,再调 save_fig 保存 PDF(其内部 close)
+    # save_fig closes the figure, so the PNG has to be written first and the
+    # vector PDF second, through save_fig.
     from figkit.palette_base import BG
     fig.patch.set_facecolor(BG)
     fig.savefig(out_stem + ".png", dpi=600, bbox_inches="tight", facecolor=BG)
-    # save_fig 会 close fig
+    # save_fig closes fig
     save_fig(fig, out_stem + ".pdf", dpi=600)
