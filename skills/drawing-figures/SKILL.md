@@ -7,24 +7,29 @@ compatibility: Requires Python 3 with matplotlib and Pillow.
 
 # drawing-figures
 
-Produce publication figures through two independently usable phases. This skill owns figure
-budgeting and figure artifacts; it does not own manuscript prose review, caption-only rewriting,
-or submission packaging.
+Produce publication figures. This skill owns figure budgeting and figure artifacts; it does not own
+manuscript prose review, caption-only rewriting, or submission packaging.
 
-## Route the work
+## Two kinds of figure, made two different ways
 
-1. **Phase A — Budget**: use when a reference corpus is available and the paper still needs
-   evidence-based targets for section length, figure/table count, palette, or caption patterns.
-   Follow [references/budget-workflow.md](references/budget-workflow.md).
-2. **Phase B — Draw**: analytical plots, qualitative panels, efficiency figures, and render-QA
-   annotations are produced by the bundled scripts — follow
-   [references/figure-script-reference.md](references/figure-script-reference.md).
-   **Architecture diagrams are a different loop**: the agent writes the structure as mermaid,
-   derives an image-generation prompt from it, checks each returned image against it, and then
-   corrects the file a human traced by hand. Follow
-   [references/architecture-diagrams.md](references/architecture-diagrams.md).
-3. Run both phases when planning and producing a new paper's figure set. Skip Phase A when the
-   venue requirements and figure plan are already settled.
+Route on what the figure is made of, because the two paths share almost nothing:
+
+| | **Result figures** — most of them | **The architecture figure** — usually one |
+|---|---|---|
+| Made from | Experiment artifacts: checkpoints, logs, metrics | The structure of your model, which lives in the code |
+| Produced by | Python that runs, deterministically, from the data | An image model, then traced by hand into a vector file |
+| Regenerating it | Rerun the caller script | Revise the mermaid, reroll the prompt, retrace |
+| Follow | [references/figure-script-reference.md](references/figure-script-reference.md) | [references/architecture-diagrams.md](references/architecture-diagrams.md) |
+
+A result figure has data behind it, so its correctness question is "do these pixels come from the
+run they claim to". The architecture figure has no data at all, so its question is "does this
+topology match the model" — and the answer is a mermaid file the agent writes once and every later
+conversation reads instead of the model code.
+
+**Budget first, when there is a corpus to budget against.** Evidence-based targets for section
+length, figure and table counts, palette, and caption patterns come from
+[references/budget-workflow.md](references/budget-workflow.md). Skip it when the venue
+requirements and the figure plan are already settled.
 
 Export by the default in [references/publication-artwork.md](references/publication-artwork.md) —
 vector wherever the figure can be vector, 600 dpi otherwise, designed at final column width. That
@@ -70,27 +75,36 @@ files, a stated DPI above 600, CMYK, or a physical size limit in millimetres.
 
 ## Completion criteria
 
-Phase A is complete only when its budget records section word counts, figure/table counts,
-palette, and caption patterns, or explicitly records which corpus artifact was unavailable.
+A budget is complete only when it records section word counts, figure/table counts, palette, and
+caption patterns, or explicitly records which corpus artifact was unavailable.
 
-For **every final figure**, report this evidence contract:
+Three of the four evidence items are the same for every figure. Only the first differs, because
+only the first is about where the figure's content came from — and the two kinds of figure answer
+that question with different artifacts.
 
-1. **Artifact path** — the canonical output and retained source/data/caller path. For an
-   architecture diagram the retained source is the mermaid, not a script: it is what the
-   generated image was checked against and what the traced file was corrected against, and a
-   traced file whose mermaid was never revised is a figure nobody can check.
-   For comparison figures, trace the "Ours" panel to the checkpoint or run that produced
-   its pixels — read the generator script's data paths, not the panel label. A label
-   is a claim, not evidence: panels inherited from a related project, an earlier model,
-   or an unversioned asset directory can carry your method's name over another model's
-   output, and the tables and figures then report different models without any visible
-   error. If a panel's pixels cannot be traced to your own run, regenerate it; if its
-   numbers must match a table, generate both from the same checkpoint.
-2. **Format evidence** — vector status for PDF/EPS/SVG, or raster format, physical dimensions,
-   pixel dimensions, and effective DPI against the venue artwork class.
-3. **Design-system check** — font family/size and palette/contrast/dual-encoding result.
-4. **Paper linkage** — figure number, manuscript section or paragraph that cites it, and caption
-   path/text status; confirm the caption's stated finding matches the figure and manuscript text.
+**1a. Provenance of a result figure.** Name the canonical output and the retained data and caller
+paths. For a comparison figure, trace the "Ours" panel to the checkpoint or run that produced its
+pixels — read the generator script's data paths, not the panel label. A label is a claim, not
+evidence: panels inherited from a related project, an earlier model, or an unversioned asset
+directory can carry your method's name over another model's output, and the tables and figures
+then report different models with nothing visibly wrong. If a panel's pixels cannot be traced to
+your own run, regenerate it; if its numbers must match a table, generate both from the same
+checkpoint.
+
+**1b. Provenance of the architecture figure.** There is no data to trace, so the retained source
+is the mermaid, and the claim it has to support is that the topology matches the code. Name the
+mermaid path, say when it was last checked against the model, and confirm the traced file still
+matches it. A traced file whose mermaid was never revised is a figure nobody can check — and,
+because the mermaid is what later conversations read instead of the model code, a stale one is
+worse than none.
+
+**2. Format evidence** — vector status for PDF/EPS/SVG, or raster format, physical dimensions,
+pixel dimensions, and effective DPI against the venue artwork class.
+
+**3. Design-system check** — font family/size and palette/contrast/dual-encoding result.
+
+**4. Paper linkage** — figure number, manuscript section or paragraph that cites it, and caption
+path/text status; confirm the caption's stated finding matches the figure and manuscript text.
 
 Done means every item above is concrete and checked, the manuscript rendering is legible at final
 size, each symbol/abbreviation is explained, and no unresolved render-QA blocker remains.

@@ -3,16 +3,6 @@
 Write thin per-paper callers around these reusable scripts. Keep paper-specific coordinates,
 labels, data, and model construction outside the shared modules.
 
-## Architecture diagrams
-
-Import `SEMANTIC`, `draw_box`, `connect`, and `save_diagram` from
-`scripts/diagram_primitives.py`. `connect(..., kind=)` accepts `fwd`, `cond`, `nograd`, or `grad`.
-`save_diagram(fig, "figures/framework")` writes a vector PDF and a 600 dpi PNG fallback.
-
-```bash
-uv run --with matplotlib python your_paper/draw_arch.py
-```
-
 ## Analytical plots
 
 Use `with_modules` from `figkit.palette_base` for paper-specific semantic colours and

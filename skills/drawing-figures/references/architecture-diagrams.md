@@ -1,8 +1,17 @@
 # Architecture diagrams
 
-An architecture figure is not drawn by a script here. It goes through an image model, then through
-a human tracing the result, and the agent's work sits on both sides of that handoff. This file is
-that loop.
+A paper has two kinds of figure. Every other one is made from experiment artifacts by Python that
+runs; **this one has no data behind it at all** — its content is the structure of your model, which
+lives in the code. It goes through an image model and then through a human tracing the result, and
+the agent's work sits on both sides of that handoff.
+
+**Write the mermaid first, and keep it.** Not mainly as a spec for the image model — as the
+architecture in a form an agent can load in one read. Without it, every new conversation and every
+switched agent starts by reading the model code again to recover what connects to what, which is
+slow, and which quietly produces a slightly different understanding each time. The mermaid is that
+lookup, cached, in a file you can diff. Everything downstream — the prompt, the review of each
+returned image, the pass over the traced file — is cheap only because it starts from a structure
+nobody had to re-derive.
 
 ## Contents
 
@@ -27,8 +36,11 @@ The mermaid is the single source of truth across all five. The generated image i
 it, the traced file is a second, and both are checked against the same text. That is what makes
 "the dataflow is correct" a thing you can verify rather than squint at.
 
-Keep the mermaid in the paper's workspace beside the figure, and update it whenever the structure
-changes. A traced file whose mermaid was never revised is a figure nobody can check.
+It outlives the figure, too. Keep it in the paper's workspace and revise it whenever the
+architecture changes: the next agent to work on this paper reads the mermaid instead of the model
+code, and a mermaid that no longer matches the code is worse than none — it is a confident wrong
+answer that costs nothing to believe. A traced file whose mermaid was never revised is a figure
+nobody can check.
 
 ## 1. Write the diagram as mermaid
 
