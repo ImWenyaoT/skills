@@ -67,6 +67,31 @@ class ValidateSkillsTests(unittest.TestCase):
         self.assertEqual(len(warnings), 1)
 
 
+class MarketplaceManifestTests(unittest.TestCase):
+    """.claude-plugin/marketplace.json is Claude Code's format, separate from plugin.json."""
+
+    def setUp(self) -> None:
+        self.root = Path(__file__).resolve().parents[1]
+        self.manifest = json.loads(
+            (self.root / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8")
+        )
+
+    def test_every_listed_skill_path_exists(self) -> None:
+        for plugin in self.manifest["plugins"]:
+            for rel in plugin["skills"]:
+                self.assertTrue((self.root / rel / "SKILL.md").is_file(), rel)
+
+    def test_every_skill_in_the_repo_is_listed(self) -> None:
+        """A skill nobody can install from the marketplace may as well not exist."""
+        listed = {
+            Path(rel).name
+            for plugin in self.manifest["plugins"]
+            for rel in plugin["skills"]
+        }
+        on_disk = {p.parent.name for p in self.root.glob("skills/*/SKILL.md")}
+        self.assertEqual(listed, on_disk)
+
+
 class PluginManifestTests(unittest.TestCase):
     def test_plugin_manifest_matches_the_closed_schema(self) -> None:
         """plugin.json makes the repo installable as an Agent Plugins package."""

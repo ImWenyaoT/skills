@@ -60,7 +60,10 @@ npx skills add . --skill publishing-papers
 skills/<name>/SKILL.md     # 可安装 skills
 evals/trigger_cases.json   # 触发边界 golden cases
 scripts/                   # 仓库级校验工具
-docs/research/             # 设计审计与研究记录
+docs/skill-quality.md     # 验收判据
+docs/spec-conformance.md  # 规范对齐情况
+.claude-plugin/           # Claude Code marketplace 清单
+plugin.json               # Agent Plugins 包清单
 ```
 
 `skills/` 是 [`npx skills`](https://github.com/vercel-labs/skills) 官方支持的集合目录。CLI 会

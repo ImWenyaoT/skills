@@ -1,19 +1,26 @@
 # Skill Quality Rubric
 
-Source ticket: [Synthesize the skill quality rubric](https://github.com/ImWenyaoT/skills/issues/7)
+The acceptance standard for every skill in this repository. `AGENTS.md` says how to
+build one; this says when it is good enough. Read it before a broad edit, and use it
+to decide whether a change is finished.
 
-## Purpose
+The goal is not prettier prose. It is predictable agent behaviour: the right skill
+triggers, the loaded instructions drive the same process every run, and a change is
+protected by evals rather than by hope.
 
-Use this rubric to audit this repo's skills before making broad edits. The goal is not prettier prose. The goal is predictable agent behavior: the right skill triggers, the loaded instructions drive the same process each run, and changes are protected by trigger and outcome evals.
+Eight criteria follow. Nothing here depends on how many skills the library has — it
+was written when there were nineteen and it survived the cut to five unchanged.
 
 ## Sources
 
-- Local reference: `writing-great-skills`
-- Repo policy: `AGENTS.md`
+- Agent Skills specification: <https://agentskills.io/specification>
+- Best practices for skill creators: <https://agentskills.io/skill-creation/best-practices>
+- Optimizing skill descriptions: <https://agentskills.io/skill-creation/optimizing-descriptions>
+- Evaluating skill output quality: <https://agentskills.io/skill-creation/evaluating-skills>
 - Anthropic: [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
 - Anthropic: [Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
-- OpenAI: [Agent Skills - Codex](https://developers.openai.com/codex/skills)
-- OpenAI: [Testing Agent Skills Systematically with Evals](https://developers.openai.com/blog/eval-skills)
+- OpenAI Codex: [Build skills](https://learn.chatgpt.com/docs/build-skills)
+- Repository policy: `AGENTS.md`
 
 ## Rubric
 

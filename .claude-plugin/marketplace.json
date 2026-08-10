@@ -1,0 +1,48 @@
+{
+  "name": "imwenyaot-skills",
+  "owner": {
+    "name": "Tian Wenyao",
+    "url": "https://github.com/ImWenyaoT"
+  },
+  "metadata": {
+    "description": "Skills for research and paper work: getting trustworthy numbers, and turning them into a published paper.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "training-models",
+      "description": "Staged setup and silent-failure diagnosis for neural network training: the loss will not fall, accuracy stalls, gradients blow up, train and eval disagree.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/training-models"]
+    },
+    {
+      "name": "comparing-runs",
+      "description": "Turn several finished runs into one table that survives review: comparable ablation arms, baseline reproduction, seeds and error bars, a row you can trace back to its commit.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/comparing-runs"]
+    },
+    {
+      "name": "writing-papers",
+      "description": "Draft, review, and polish the prose of a technical paper around one evidence-backed contribution.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/writing-papers"]
+    },
+    {
+      "name": "drawing-figures",
+      "description": "Plan and produce publication-grade figures: budgets derived from a reference corpus, charts, diagrams, qualitative panels, and print-ready exports.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/drawing-figures"]
+    },
+    {
+      "name": "publishing-papers",
+      "description": "Everything after the science is settled: the journal's manuscript source and local build, the upload packet, and the point-by-point response to reviewers.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/publishing-papers"]
+    }
+  ]
+}

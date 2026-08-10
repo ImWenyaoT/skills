@@ -64,7 +64,10 @@ matches the problem in front of you.
 skills/<name>/SKILL.md     # Installable skills
 evals/trigger_cases.json   # Trigger-boundary golden cases
 scripts/                   # Repository validation tools
-docs/research/             # Design audits and research notes
+docs/skill-quality.md     # The acceptance rubric
+docs/spec-conformance.md  # What the spec requires and what CI enforces
+.claude-plugin/           # Claude Code marketplace manifest
+plugin.json               # Agent Plugins package manifest
 ```
 
 `skills/` is an official collection directory supported by

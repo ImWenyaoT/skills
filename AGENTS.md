@@ -60,6 +60,29 @@
 
 参考:[Anthropic — Set appropriate degrees of freedom](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)、[OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills)。
 
+## 三层检查,各管一件事
+
+三处地方都在"验",但验的不是同一种东西,别混:
+
+| 验什么 | 在哪 | 形态 | 发不发出去 |
+|---|---|---|---|
+| **仓库工具本身对不对**——校验器真的会拒绝坏名字吗,判分器真的扣着 validation 不说吗 | `tests/` | 代码 | 不发 |
+| **描述会不会把对的 skill 叫出来**——跨 skill 的边界 | `evals/trigger_cases.json` | 数据(golden) | 不发 |
+| **随 skill 发出去的脚本能不能跑** | `skills/<name>/tests/` | 代码 | **跟着 skill 装到别人机器上** |
+
+**测试跟着代码走,不跟着 skill 走。** 纯散文的 skill(`writing-papers`、`comparing-runs`)
+没有 `tests/` 是正确的,不是缺失。反过来,**打包进 `scripts/` 的东西应该是"测过的脚本"**
+——官方 best-practices 的原话就是 write a tested script once。目前 `drawing-figures`
+12 个 py 对 1 个测试文件、`training-models` 的 `sanity_check.py` 400 行 0 测试(它要 torch,
+这是理由,但要写下来而不是默认),这两处是已知欠账。
+
+**没有第四层。** skill 用起来产出好不好——官方 `evaluating-skills` 描述的那套
+(`evals/evals.json` + assertion + 带/不带 skill 对照)本库**一条都没有**,原因见
+[`docs/spec-conformance.md`](docs/spec-conformance.md)。要补是一个决定,不是补漏。
+
+验收判据在 [`docs/skill-quality.md`](docs/skill-quality.md);规范对齐情况在
+[`docs/spec-conformance.md`](docs/spec-conformance.md)。
+
 ## 触发测试(本库的验证闭环)
 
 本库只做**离线**的一层:**该触发的声明了吗、不该触发的划清了吗**。
