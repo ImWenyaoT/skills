@@ -1,0 +1,101 @@
+%% HGD-Net — a worked example, read out of the model code rather than drawn by hand.
+%%
+%% This is what the mermaid step produces on a real published architecture: every
+%% node is a module identifier that exists in the source, with the shape it carries.
+%% Writing it once is what lets a later conversation answer "what feeds the
+%% bottleneck" without opening the model again.
+%%
+%% Read from src/hgd_net/models/: hybrid.py (construction and forward), jit.py,
+%% daclip.py, and components/{pab,blocks,embeddings,layers,rrb,attention_zoo,
+%% transforms}.py. Checked against the code on 2026-08-10.
+%%
+%% Edge vocabulary, as in architecture-template.mmd:
+%%   -->            forward data flow
+%%   -. cond .->    conditioning injected from the side
+%%   -. no_grad .-> detached; no gradient
+%%   ==>            a path the figure deliberately emphasises (here, the two bridges)
+
+flowchart LR
+%% ==================== FROZEN GUIDANCE (single DA-CLIP pass, torch.no_grad) ====================
+X[/"x — RGB input<br/>B×3×H×W"/]
+DACLIP["daclip — DACLIP frozen<br/>img_feat, degra_feat · B×512 each"]
+CATC["torch.cat img_feat+degra_feat+i_global<br/>B×1025"]
+D2J["daclip_to_jit — nn.Linear<br/>1025→768 · B×768"]
+CEMB["hv_branch.cond_embedder<br/>Linear-SiLU-Linear · B×768"]
+D2C["daclip_to_cidnet — Linear+Unflatten<br/>512→2304 · B×144×4×4"]
+GINT["F.interpolate bilinear<br/>B×144×H/8×W/8"]
+X -. no_grad .-> DACLIP
+DACLIP -. no_grad .-> CATC & D2C
+CATC --> D2J --> CEMB
+D2C --> GINT
+
+%% ==================== HVI DECOUPLING ====================
+TRANS["trans.HVIT — HviTransform<br/>B×3×H×W → h,v | i"]
+X --> TRANS
+
+%% ==================== STREAM A — CHROMATIC (hv_branch = JiT, ViT-B/16) ====================
+XEMB["hv_branch.x_embedder — PatchEmbed<br/>B×N×768, N=(H/16)(W/16)"]
+BLK["hv_branch.blocks — JiTBlock ×12 adaLN-Zero<br/>B×N×768"]
+FIN["hv_branch.final_layer + unpatchify<br/>B×N×512 → jit_out B×2×H×W"]
+TRANS -->|"cat h,v · B×2×H×W"| XEMB --> BLK --> FIN
+CEMB -. cond .-> BLK & FIN
+
+%% ==================== STREAM B — INTENSITY (i_encoder / i_decoder) ====================
+ENC0["i_encoder.enc0 — Conv2d 1→36<br/>x0 B×36×H×W"]
+ATT0["i_encoder.att0 — SRC (no_grad argmax route)<br/>B×36×H×W"]
+ENC1["enc1 — NormDownsample<br/>x1 B×36×H/2×W/2"]
+PAB1["pab1 — PAB<br/>B×36×H/2×W/2"]
+ENC2["enc2 — NormDownsample<br/>x2 B×72×H/4×W/4"]
+PAB2["pab2 — PAB<br/>B×72×H/4×W/4"]
+ENC3["enc3 — NormDownsample<br/>x3 B×144×H/8×W/8"]
+PAB3["pab3 — PAB<br/>B×144×H/8×W/8"]
+PAB4["pab4 — PAB<br/>B×144×H/8×W/8"]
+ATT4["i_encoder.att4 — MSAABlock<br/>x4 B×144×H/8×W/8"]
+ADDB(["i_feats[-1] + jit_proj<br/>B×144×H/8×W/8"])
+DEC3["i_decoder.dec3 — NormUpsample<br/>B×72×H/4×W/4"]
+PAB5["pab5 — PAB<br/>B×72×H/4×W/4"]
+DEC2["dec2 — NormUpsample<br/>B×36×H/2×W/2"]
+PAB6["pab6 — PAB<br/>B×36×H/2×W/2"]
+DEC1["dec1 — NormUpsample<br/>B×36×H×W"]
+ATTF["i_decoder.att_final — EGABlock<br/>B×36×H×W"]
+DEC0["dec0 — Conv2d 36→1<br/>i_pre_rrb B×1×H×W"]
+TRANS -->|"i · B×1×H×W"| ENC0 --> ATT0 --> ENC1 --> PAB1 --> ENC2 --> PAB2 --> ENC3 --> PAB3 --> PAB4 --> ATT4 --> ADDB --> DEC3 --> PAB5 --> DEC2 --> PAB6 --> DEC1 --> ATTF --> DEC0
+ATT0 -->|"+x0 skip"| DEC1
+PAB1 -->|"+x1 skip"| DEC2
+PAB2 -->|"+x2 skip"| DEC3
+GINT -. cond .-> PAB1 & PAB2 & PAB3 & PAB4 & PAB5 & PAB6
+TRANS -. cond .-> CATC
+
+%% ==================== BRIDGE — HV → I (single pass, no gate) and I → HV refine ====================
+J2I["jit_to_i — nn.Linear<br/>768→144 · B×N×144"]
+RSHP["transpose+reshape<br/>B×144×H/16×W/16"]
+BUP["F.interpolate bilinear ×2<br/>B×144×H/8×W/8"]
+BLK ==> J2I ==> RSHP ==> BUP ==> ADDB
+
+%% ==================== HEAD, FUSION, OUTPUT ====================
+RIN["rrb_in_proj — Conv2d 1→36<br/>B×36×H×W"]
+BAR["rrb — BAR mask-gated dual path<br/>B×36×H×W"]
+ROUT["rrb_out_proj — Conv2d 36→1<br/>i_refined B×1×H×W"]
+IOUT(["i_out = i_refined + i_input<br/>B×1×H×W"])
+HVREF["hv_refine — Conv-GELU-Conv 1→16→2<br/>B×2×H×W"]
+FUSE(["cat h_out,v_out,i_out + clamp<br/>hvi_out_final B×3×H×W"])
+PHVIT["trans.PHVIT — inverse HVI<br/>B×3×H×W"]
+OUT[/"EnhanceOutput.rgb<br/>B×3×H×W"/]
+DEC0 --> RIN --> BAR --> ROUT --> IOUT
+IOUT ==> HVREF ==> FUSE
+FIN --> FUSE
+IOUT --> FUSE
+FUSE --> PHVIT --> OUT
+
+classDef io fill:#FFFFFF,stroke:#333333,color:#333333
+classDef trunk fill:#D4E8EB,stroke:#2A6478,color:#2A6478
+classDef cond fill:#E8D5B0,stroke:#C49A3C,color:#7A5C1E
+classDef nondiff fill:#DADADA,stroke:#777777,color:#444444
+classDef head fill:#CBE0C8,stroke:#4F7A4C,color:#2F4A2D
+classDef frozen fill:#E0D8CE,stroke:#A09080,color:#5A5045
+class X,OUT io
+class TRANS,XEMB,BLK,FIN,ENC0,ENC1,PAB1,ENC2,PAB2,ENC3,PAB3,PAB4,ATT4,ADDB,DEC3,PAB5,DEC2,PAB6,DEC1,ATTF,DEC0,J2I,RSHP,BUP trunk
+class CATC,D2J,CEMB,D2C,GINT cond
+class ATT0 nondiff
+class RIN,BAR,ROUT,IOUT,HVREF,FUSE,PHVIT head
+class DACLIP frozen

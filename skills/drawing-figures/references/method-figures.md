@@ -49,6 +49,17 @@ Which is also why a stale one is worse than none: it is a confident wrong answer
 to believe. Revise it whenever the architecture changes, and record when it was last checked
 against the code.
 
+**Writing it also audits the figure you already have.** Reading the forward pass and writing down
+what it actually does is the only cheap way to find out that the published figure says something
+else. On a real accepted paper this step turned up a conditioning path drawn as one shared vector
+broadcast to two consumers where the code has two independent projections fed different inputs, an
+operator sitting at the end of the decoder that the figure omits entirely, missing skip
+connections, and a block drawn as a lane operator that the code wraps in projections and a global
+residual. Some of those are legitimate simplification. Some are the figure claiming a topology the
+model does not have, and a reviewer who reads the code finds them.
+[`assets/example-hgd-net.mmd`](assets/example-hgd-net.mmd) is that mermaid, for reference on what
+the output looks like at real complexity.
+
 Rules that make it a spec rather than a sketch:
 
 - **Every node carries its tensor shape.** The shape is what a reader checks and what a traced file
