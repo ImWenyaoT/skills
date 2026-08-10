@@ -14,17 +14,17 @@ manuscript prose review, caption-only rewriting, or submission packaging.
 
 Route on what the figure is made of, because the two paths share almost nothing:
 
-| | **Result figures** — most of them | **The architecture figure** — usually one |
+| | **Result figures** — most of them | **Method figures** — the architecture, and one per contributed block |
 |---|---|---|
 | Made from | Experiment artifacts: checkpoints, logs, metrics | The structure of your model, which lives in the code |
 | Produced by | Python that runs, deterministically, from the data | An image model, then traced by hand into a vector file |
-| Regenerating it | Rerun the caller script | Revise the mermaid, reroll the prompt, retrace |
-| Follow | [references/figure-script-reference.md](references/figure-script-reference.md) | [references/architecture-diagrams.md](references/architecture-diagrams.md) |
+| Regenerating it | Rerun the caller script | Revise the prompt, reroll, retrace |
+| Follow | [references/figure-script-reference.md](references/figure-script-reference.md) | [references/method-figures.md](references/method-figures.md) |
 
 A result figure has data behind it, so its correctness question is "do these pixels come from the
-run they claim to". The architecture figure has no data at all, so its question is "does this
-topology match the model" — and the answer is a mermaid file the agent writes once and every later
-conversation reads instead of the model code.
+run they claim to". A method figure has no data at all, so its question is "does this topology
+match the model" — answered by a mermaid the agent writes once and every later conversation reads
+instead of the model code, and by a prompt per figure that accumulates across rounds.
 
 **Budget first, when there is a corpus to budget against.** Evidence-based targets for section
 length, figure and table counts, palette, and caption patterns come from
@@ -64,9 +64,9 @@ files, a stated DPI above 600, CMYK, or a physical size limit in millimetres.
 
 - [Budget workflow](references/budget-workflow.md): commands, dependencies, outputs, and Phase A
   completion criteria.
-- [Architecture diagrams](references/architecture-diagrams.md): mermaid as the source of truth,
-  the prompt derived from it, what to check on a returned image and in what order, and the pass
-  over a traced draw.io or PowerPoint file.
+- [Method figures](references/method-figures.md): the mermaid that keeps the model loadable in one
+  read, the nine-section prompt, what to check on a returned image and in what order, the render
+  ledger, and the pass over a traced draw.io or PowerPoint file.
 - [Chart selection](references/chart-selection.md): which chart form fits which data shape, and
   what to do when values span orders of magnitude.
 - [Figure script reference](references/figure-script-reference.md): diagram, plot, stitch,
@@ -91,7 +91,7 @@ then report different models with nothing visibly wrong. If a panel's pixels can
 your own run, regenerate it; if its numbers must match a table, generate both from the same
 checkpoint.
 
-**1b. Provenance of the architecture figure.** There is no data to trace, so the retained source
+**1b. Provenance of a method figure.** There is no data to trace, so the retained source
 is the mermaid, and the claim it has to support is that the topology matches the code. Name the
 mermaid path, say when it was last checked against the model, and confirm the traced file still
 matches it. A traced file whose mermaid was never revised is a figure nobody can check — and,
