@@ -19,19 +19,22 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-extend-exclude = ["skills/training-models/sample_codes"]
+
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.ruff.lint.per-file-ignores]
-# The pitfall files exist to show wrong code beside right code.
-"skills/*/sample_codes/**" = ["ALL"]
+# These two exist to show wrong code beside right code; linting the wrong half
+# would be linting the point.
+"skills/training-models/scripts/*_pitfalls_before_after.py" = ["ALL"]
 
 [tool.ty.environment]
 python-version = "3.11"
 
 [tool.ty.src]
-# Skill scripts import torch, matplotlib, and PIL. The first is never installed
-# here, so type-checking them would report the environment rather than the code.
-exclude = ["skills/training-models/sample_codes"]
+# Everything under training-models imports torch, which is the skill's declared
+# runtime and deliberately not a dependency of this repository. Type-checking it
+# here would report the environment rather than the code; the tests guard the
+# import and skip, and tests/verify_on_colab.ipynb runs them where torch lives.
+exclude = ["skills/training-models"]

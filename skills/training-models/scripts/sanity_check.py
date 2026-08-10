@@ -32,7 +32,12 @@ MODE_DEPENDENT_LAYERS = (
 )
 
 
-def overfit_single_batch(model, xb, yb, criterion, *, steps=300, lr=1e-2):
+# Per-sample cross-entropy scatter of a correctly scaled initialisation, used to size
+# gate 1's tolerance for small batches. The skill sends 2 to 8 examples through it.
+TYPICAL_SPREAD = 1.0
+
+
+def overfit_single_batch(model, xb, yb, criterion, *, steps=300, lr=1e-2, opens_below=0.05):
     """Stage 2 gate 5: train on one batch many times, and report the loss.
 
     Args:
@@ -42,8 +47,11 @@ def overfit_single_batch(model, xb, yb, criterion, *, steps=300, lr=1e-2):
         criterion: The loss function. It must match the output contract of the model.
         steps: The number of optimizer steps.
         lr: The learning rate.
+        opens_below: The loss under which the gate counts as open.
     Returns:
-        A tuple (first_loss, last_loss) that shows how far the loss fell.
+        A dict with the first and last loss and the verdict, in the same shape every
+        other check in this file returns. A bare tuple left the caller to decide
+        whether the gate had opened, which is the decision this file exists to make.
     Note:
         A loss near zero opens the gate. The forward path, the backward path, and the
         optimizer are then correct, so look at the data, the regularization, or the
@@ -62,7 +70,19 @@ def overfit_single_batch(model, xb, yb, criterion, *, steps=300, lr=1e-2):
         last_loss = loss.item()
         if first_loss is None:
             first_loss = last_loss
-    return first_loss, last_loss
+    opened = last_loss is not None and last_loss < opens_below
+    return {
+        "initial_loss": first_loss,
+        "final_loss": last_loss,
+        "opens_below": opens_below,
+        "verdict": "pass" if opened else "fail",
+        "note": (
+            "The batch overfits, so the forward path, the backward path, and the "
+            "optimizer are correct."
+            if opened
+            else "The loss stayed high. The defect is in the pipeline, not in generalization."
+        ),
+    }
 
 
 def check_train_eval_toggle(model, xb):
@@ -87,11 +107,7 @@ def check_train_eval_toggle(model, xb):
     """
     probe = copy.deepcopy(model)
     layer_names = sorted(
-        {
-            type(m).__name__
-            for m in probe.modules()
-            if isinstance(m, MODE_DEPENDENT_LAYERS)
-        }
+        {type(m).__name__ for m in probe.modules() if isinstance(m, MODE_DEPENDENT_LAYERS)}
     )
 
     probe.train()
@@ -170,7 +186,9 @@ def check_zero_grad_in_loop(loop_source):
 
     if found_zero_grad:
         verdict = "pass"
-        note = "The source calls zero_grad(). Confirm the order: zero_grad, forward, backward, step."
+        note = (
+            "The source calls zero_grad(). Confirm the order: zero_grad, forward, backward, step."
+        )
     elif found_backward:
         verdict = "fail"
         note = (
@@ -179,7 +197,9 @@ def check_zero_grad_in_loop(loop_source):
         )
     else:
         verdict = "not_applicable"
-        note = "The source calls neither zero_grad() nor backward(). This text is not a training loop."
+        note = (
+            "The source calls neither zero_grad() nor backward(). This text is not a training loop."
+        )
 
     return {
         "found_zero_grad": found_zero_grad,
@@ -243,15 +263,29 @@ def verify_loss_at_init(model, xb, yb, criterion, *, expected=None):
     with torch.no_grad():
         out = model(xb)
         loss = criterion(out, yb).item()
+        # The measured mean scatters around the prior by roughly the standard error,
+        # and the skill sends a batch of 2 to 8 examples through this gate on its way
+        # to gate 5. A fixed band therefore fails healthy models on exactly the batch
+        # size the skill asks for — and this gate is first in the diagnostic order, so
+        # a false shut gate sends you hunting a defect that is not there.
+        n = int(yb.shape[0])
     note = "No prior arrived. The function reports the measured value alone."
     if expected is None and isinstance(criterion, nn.CrossEntropyLoss):
         n_classes = out.shape[-1]
         expected = math.log(n_classes)
         note = f"CrossEntropy at init must sit near log({n_classes}) = {expected:.4f}"
-    close = expected is not None and abs(loss - expected) <= 0.5
+    # The tolerance scales with the sampling noise of the mean, not with the spread
+    # this batch happens to show: a broken model has a huge spread, and letting it
+    # widen its own band is how a gate stops being a gate. TYPICAL_SPREAD is the
+    # per-sample scatter of a correctly scaled init; two of its standard errors is
+    # the band, floored at the original 0.5 for large batches.
+    tolerance = max(0.5, 2.0 * TYPICAL_SPREAD / math.sqrt(max(n, 1)))
+    close = expected is not None and abs(loss - expected) <= tolerance
     return {
         "loss_at_init": loss,
         "expected": expected,
+        "batch_size": n,
+        "tolerance": tolerance,
         "close_to_prior": bool(close),
         "verdict": "pass" if close else ("fail" if expected is not None else "not_run"),
         "note": note,
@@ -277,10 +311,10 @@ def input_independent_baseline(model, xb, yb, criterion, *, steps=100, lr=1e-2):
     """
     real = copy.deepcopy(model)
     zeroed = copy.deepcopy(model)
-    _, real_last = overfit_single_batch(real, xb, yb, criterion, steps=steps, lr=lr)
-    _, zero_last = overfit_single_batch(
+    real_last = overfit_single_batch(real, xb, yb, criterion, steps=steps, lr=lr)["final_loss"]
+    zero_last = overfit_single_batch(
         zeroed, torch.zeros_like(xb), yb, criterion, steps=steps, lr=lr
-    )
+    )["final_loss"]
     uses_input = zero_last > real_last * 1.2
     return {
         "real_input_last_loss": real_last,
@@ -334,12 +368,21 @@ def run_sanity_checks(model, xb, yb, criterion, *, loop_source=None):
 
     print(rule)
     print("[Stage 2 gate 5] one batch overfits")
-    first, last = overfit_single_batch(model, xb, yb, criterion)
+    gate5 = overfit_single_batch(model, xb, yb, criterion)
+    first, last = gate5["initial_loss"], gate5["final_loss"]
     print(f"first_loss={first:.4f}  last_loss={last:.4f}")
-    if last < first * 0.1:
-        verdict = "PASS: the gate is open. Look at the data, the regularization, or the generalization."
+    # The verdict comes from the check, not from a second rule stated here: this
+    # block used to open the gate at last < first/10 while the function opened it
+    # below an absolute loss, so the report and the check could disagree.
+    if gate5["verdict"] == "pass":
+        verdict = (
+            "PASS: the gate is open. Look at the data, the regularization, or the generalization."
+        )
     else:
-        verdict = "FAIL: the gate is shut. Check the mode, zero_grad, the logits contract, and the labels."
+        verdict = (
+            "FAIL: the gate is shut. Check the mode, zero_grad, the logits contract, "
+            "and the labels."
+        )
     print(verdict)
     print(rule)
 
@@ -396,5 +439,10 @@ if __name__ == "__main__":
 
     # Demo 4: checklist entry 3 on a loop that forgets zero_grad().
     print("\n>>> checklist 3 on a loop without zero_grad():")
-    broken_loop = "for xb, yb in loader:\n    loss = criterion(model(xb), yb)\n    loss.backward()\n    opt.step()\n"
+    broken_loop = (
+        "for xb, yb in loader:\n"
+        "    loss = criterion(model(xb), yb)\n"
+        "    loss.backward()\n"
+        "    opt.step()\n"
+    )
     print(" ", check_zero_grad_in_loop(broken_loop))

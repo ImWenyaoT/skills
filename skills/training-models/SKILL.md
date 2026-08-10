@@ -111,13 +111,13 @@ time, so a run that still descends slowly is usually a run to leave alone.
 
 ## Runnable checks
 
-- [`sanity_check.py`](sample_codes/getting-started/sanity_check.py) — Stage 2 gates 1, 4, and 5,
+- [`sanity_check.py`](scripts/sanity_check.py) — Stage 2 gates 1, 4, and 5,
   plus the mode, `zero_grad`, and logits contracts. A check that cannot decide reports
   `not_applicable` rather than a pass.
-- [`correct_training_loop.py`](sample_codes/getting-started/correct_training_loop.py) — a train
+- [`correct_training_loop.py`](scripts/correct_training_loop.py) — a train
   and validation loop to copy.
-- [`six_pitfalls_before_after.py`](sample_codes/common-patterns/six_pitfalls_before_after.py) and
-  [`extra_pitfalls_before_after.py`](sample_codes/common-patterns/extra_pitfalls_before_after.py)
+- [`six_pitfalls_before_after.py`](scripts/six_pitfalls_before_after.py) and
+  [`extra_pitfalls_before_after.py`](scripts/extra_pitfalls_before_after.py)
   — broken and repaired pairs for the failure modes in the checklist.
 
 ## Completion

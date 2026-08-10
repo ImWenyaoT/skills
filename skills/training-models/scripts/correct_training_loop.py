@@ -151,8 +151,7 @@ def main(device: str = DEFAULT_DEVICE, epochs: int = 5, seed: int = 0):
         tr_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
         val_loss, val_acc = evaluate(model, val_loader, criterion, device)
         print(
-            f"epoch {epoch}: train_loss={tr_loss:.4f} "
-            f"val_loss={val_loss:.4f} val_acc={val_acc:.3f}"
+            f"epoch {epoch}: train_loss={tr_loss:.4f} val_loss={val_loss:.4f} val_acc={val_acc:.3f}"
         )
 
 

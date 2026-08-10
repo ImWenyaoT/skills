@@ -72,9 +72,18 @@
 
 **测试跟着代码走,不跟着 skill 走。** 纯散文的 skill(`writing-papers`、`comparing-runs`)
 没有 `tests/` 是正确的,不是缺失。反过来,**打包进 `scripts/` 的东西应该是"测过的脚本"**
-——官方 best-practices 的原话就是 write a tested script once。目前 `drawing-figures`
-12 个 py 对 1 个测试文件、`training-models` 的 `sanity_check.py` 400 行 0 测试(它要 torch,
-这是理由,但要写下来而不是默认),这两处是已知欠账。
+——官方 best-practices 的原话就是 write a tested script once。
+
+**依赖装不上不是不测的理由。** `training-models` 的检查要 torch,而 torch 不该成为本仓库的
+依赖;做法是测试用 `skipUnless` 守住 import,在没有 torch 的地方整体跳过,同目录再放一个
+notebook 把**同一份测试**跑在 Colab 上。测试是唯一的事实来源,notebook 只是另一个跑它的地方。
+
+**每道门都要两个方向测。** 只会报 pass 的门不是门。写这批测试时,反向断言当场抓到三个真缺陷:
+gate 5 返回裸元组而同文件其它检查都返回带 verdict 的 dict;`run_sanity_checks` 用
+`last < first*0.1` 又判了一遍 gate 5,和函数里的绝对阈值是两套定义;gate 1 固定 ±0.5 的容差
+在 skill 自己要求的「2 到 8 个样本」上会对**健康模型误报**,而它是诊断顺序里的第一道门。
+
+剩余欠账:`drawing-figures` 12 个 py 对 1 个测试文件。
 
 **没有第四层。** skill 用起来产出好不好——官方 `evaluating-skills` 描述的那套
 (`evals/evals.json` + assertion + 带/不带 skill 对照)本库**一条都没有**,原因见

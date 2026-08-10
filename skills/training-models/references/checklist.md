@@ -448,7 +448,7 @@ with the decay off.
 **Repair**
 
 - Use the `warmup_cosine` factor in
-  [`extra_pitfalls_before_after.py`](../sample_codes/common-patterns/extra_pitfalls_before_after.py)
+  [`extra_pitfalls_before_after.py`](scripts/extra_pitfalls_before_after.py)
   as the `lr_lambda` of `torch.optim.lr_scheduler.LambdaLR`. It rises linearly to the target over
   the warmup steps, and then follows a cosine down to zero.
 - Call `scheduler.step()` after each `optimizer.step()`.
@@ -619,7 +619,7 @@ No Stage 2 gate covers this entry. It belongs to Stage 4, where you regularize.
 **Repair**
 
 - Call `split_param_groups` from
-  [`extra_pitfalls_before_after.py`](../sample_codes/common-patterns/extra_pitfalls_before_after.py).
+  [`extra_pitfalls_before_after.py`](scripts/extra_pitfalls_before_after.py).
   It returns two parameter groups. The weight matrices keep the decay. The bias and the 1-D norm
   parameters get `weight_decay=0`.
 
