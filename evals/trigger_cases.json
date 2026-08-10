@@ -744,6 +744,54 @@
         "comparing-runs"
       ],
       "notes": "Replaces the case retired from validation. Variants are named, but the work is legibility of a rendered figure."
+    },
+    {
+      "id": "drawing-figures-positive-arch-prompt",
+      "split": "train",
+      "prompt": "帮我给这个模型的架构图写一版生图提示词,我拿去 Gemini 出图,重点是 dataflow 的先后位置不能错。",
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
+      "notes": "Image-generation prompt for an architecture figure — the agent's actual deliverable in this workflow."
+    },
+    {
+      "id": "drawing-figures-positive-arch-review-render",
+      "split": "validation",
+      "prompt": "这是模型生的第三版架构图,你看看哪里和我们说的数据流对不上,提示词要怎么改。",
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
+      "notes": "Reviewing a returned image against the declared dataflow and revising the prompt."
+    },
+    {
+      "id": "drawing-figures-positive-drawio-touchup",
+      "split": "train",
+      "prompt": "我照生成的图临摹了一版 draw.io,箭头和模块都摆好了,你按原来的规格看看还差什么再告诉我改。",
+      "expected_skills": [
+        "drawing-figures"
+      ],
+      "forbidden_skills": [
+        "writing-papers"
+      ],
+      "notes": "The correction pass after the human has traced the image; the tracing itself is not the agent's step."
+    },
+    {
+      "id": "drawing-figures-negative-generate-the-image-itself",
+      "split": "validation",
+      "prompt": "Summarise what this architecture figure shows in one caption sentence for the manuscript.",
+      "expected_skills": [
+        "writing-papers"
+      ],
+      "forbidden_skills": [
+        "drawing-figures"
+      ],
+      "notes": "Near miss: an architecture figure is named, but writing its caption prose is drafting."
     }
   ]
 }

@@ -1,0 +1,48 @@
+%% Architecture diagram spec. This file is the source of truth for the figure:
+%% the image model renders it, the human traces that rendering, and both are
+%% checked back against this. Keep it beside the figure and revise it whenever
+%% the architecture changes.
+%%
+%% Edge vocabulary — the same four kinds the palette and the drawing scripts use:
+%%   -->              fwd     standard forward data flow
+%%   -. cond .->      cond    conditioning injected from the side
+%%   -. no_grad .->   nograd  detached, discrete, or routed; no gradient
+%%   ==>              grad    backward gradient, or the path the figure emphasises
+%%
+%% Replace every name below with the real module names from the paper. A figure
+%% that ships with "Module A" in it is a figure whose paper has a naming gap.
+
+flowchart LR
+    %% --- trunk, in the order the data moves ---
+    IN["Input<br/>B×3×H×W"]
+    EMB["PatchEmbed<br/>B×N×C"]
+    CORE["YourCoreModule<br/>B×N×C"]
+    HEAD["Head<br/>B×K"]
+    OUT["Output<br/>B×K"]
+
+    IN --> EMB --> CORE --> HEAD --> OUT
+
+    %% --- branches: say where each leaves and where it rejoins ---
+    COND["ConditionEncoder<br/>B×D"]
+    COND -. cond .-> CORE
+
+    ROUTE["ArgmaxRouting<br/>B×N"]
+    CORE -. no_grad .-> ROUTE
+    ROUTE -. no_grad .-> HEAD
+
+    %% --- an emphasised path, only if the figure is making a point about it ---
+    %% HEAD ==> CORE
+
+    %% --- semantic roles, matching scripts/figkit/palette_base.py ---
+    classDef io      fill:#FFFFFF,stroke:#333333,stroke-width:1.5px;
+    classDef trunk   fill:#D4E8EB,stroke:#2A6478,stroke-width:1.5px;
+    classDef cond    fill:#E8D5B0,stroke:#C49A3C,stroke-width:1.5px;
+    classDef discrete fill:#DADADA,stroke:#777777,stroke-width:1.5px;
+    classDef head    fill:#CBE0C8,stroke:#4F7A4C,stroke-width:1.5px;
+    classDef frozen  fill:#E0D8CE,stroke:#A09080,stroke-width:1.5px;
+
+    class IN,OUT io;
+    class EMB,CORE trunk;
+    class COND cond;
+    class ROUTE discrete;
+    class HEAD head;

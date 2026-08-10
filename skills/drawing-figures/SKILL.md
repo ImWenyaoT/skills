@@ -1,6 +1,6 @@
 ---
 name: drawing-figures
-description: 'Publication figure budgeting and production for academic papers, including 论文绘图/画图/架构图/结果图: reference-derived budgets, Elsevier/CVPR/ICCV/NeurIPS figures, diagrams, plots, result stitches, and publication-ready exports. Covers charts of every form — grouped bars, scatter, Pareto fronts, heatmaps — colour-blind-safe encoding, 600 dpi exports, and baseline-comparison panels. Do not use for language review, caption-only edits, or submission packaging.'
+description: 'Publication figure budgeting and production for academic papers, including 论文绘图/画图/架构图/结果图: reference-derived budgets, Elsevier/CVPR/ICCV/NeurIPS figures, diagrams, plots, result stitches, and publication-ready exports. Covers charts of every form — grouped bars, scatter, Pareto fronts, heatmaps — colour-blind-safe encoding, 600 dpi exports, and baseline-comparison panels. For an architecture figure it writes the structure as mermaid, derives the 生图提示词 an image model needs, checks each returned image against it, and corrects the draw.io or PowerPoint file traced from the accepted one. Do not use for language review, caption-only edits, or submission packaging.'
 license: MIT
 compatibility: Requires Python 3 with matplotlib and Pillow.
 ---
@@ -16,9 +16,13 @@ or submission packaging.
 1. **Phase A — Budget**: use when a reference corpus is available and the paper still needs
    evidence-based targets for section length, figure/table count, palette, or caption patterns.
    Follow [references/budget-workflow.md](references/budget-workflow.md).
-2. **Phase B — Draw**: use when producing or revising architecture diagrams, analytical plots,
-   qualitative panels, efficiency figures, or render-QA annotations. Follow
+2. **Phase B — Draw**: analytical plots, qualitative panels, efficiency figures, and render-QA
+   annotations are produced by the bundled scripts — follow
    [references/figure-script-reference.md](references/figure-script-reference.md).
+   **Architecture diagrams are a different loop**: the agent writes the structure as mermaid,
+   derives an image-generation prompt from it, checks each returned image against it, and then
+   corrects the file a human traced by hand. Follow
+   [references/architecture-diagrams.md](references/architecture-diagrams.md).
 3. Run both phases when planning and producing a new paper's figure set. Skip Phase A when the
    venue requirements and figure plan are already settled.
 
@@ -55,9 +59,11 @@ files, a stated DPI above 600, CMYK, or a physical size limit in millimetres.
 
 - [Budget workflow](references/budget-workflow.md): commands, dependencies, outputs, and Phase A
   completion criteria.
-- [Chart selection](references/chart-selection.md): which chart form fits which data shape, what to
-  do when values span orders of magnitude, and the five things an architecture diagram must specify
-  before it is drawn.
+- [Architecture diagrams](references/architecture-diagrams.md): mermaid as the source of truth,
+  the prompt derived from it, what to check on a returned image and in what order, and the pass
+  over a traced draw.io or PowerPoint file.
+- [Chart selection](references/chart-selection.md): which chart form fits which data shape, and
+  what to do when values span orders of magnitude.
 - [Figure script reference](references/figure-script-reference.md): diagram, plot, stitch,
   measurement, and annotation APIs with runnable examples.
 - [Publication artwork](references/publication-artwork.md): artwork classification and export QA.
@@ -69,7 +75,10 @@ palette, and caption patterns, or explicitly records which corpus artifact was u
 
 For **every final figure**, report this evidence contract:
 
-1. **Artifact path** — the canonical output and retained source/data/caller path.
+1. **Artifact path** — the canonical output and retained source/data/caller path. For an
+   architecture diagram the retained source is the mermaid, not a script: it is what the
+   generated image was checked against and what the traced file was corrected against, and a
+   traced file whose mermaid was never revised is a figure nobody can check.
    For comparison figures, trace the "Ours" panel to the checkpoint or run that produced
    its pixels — read the generator script's data paths, not the panel label. A label
    is a claim, not evidence: panels inherited from a related project, an earlier model,

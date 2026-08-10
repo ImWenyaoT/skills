@@ -1,0 +1,84 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="architecture" id="architecture">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1"
+                  arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="500"
+                  math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!--
+          Trace the accepted generated image onto this file. The styles below already
+          carry the palette and the arrow semantics, so start from these shapes rather
+          than from draw.io's defaults: copy one, move it, retype the label.
+
+          Every label here is a placeholder. Take the real names and the tensor shapes
+          from the mermaid, never from the generated image — an image model's text is
+          plausible-looking nonsense, and it is the one thing tracing must not carry over.
+
+          Semantic fills, matching scripts/figkit/palette_base.py:
+            io       #FFFFFF / #333333   input and output tensors
+            trunk    #D4E8EB / #2A6478   backbone blocks
+            cond     #E8D5B0 / #C49A3C   conditioning and soft weights
+            discrete #DADADA / #777777   non-differentiable or routed
+            head     #CBE0C8 / #4F7A4C   refinement and output heads
+            frozen   #E0D8CE / #A09080   frozen or external modules
+
+          Arrow semantics:
+            fwd     solid,  #3A5A6A
+            cond    dashed, #C49A3C
+            nograd  dashed, #888888
+            grad    solid,  #B94A48, thicker
+        -->
+
+        <mxCell id="io-in" value="Input&#10;B×3×H×W"
+          style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=11;"
+          vertex="1" parent="1"><mxGeometry x="40" y="200" width="120" height="60" as="geometry" /></mxCell>
+
+        <mxCell id="trunk-embed" value="PatchEmbed&#10;B×N×C"
+          style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#D4E8EB;strokeColor=#2A6478;strokeWidth=1.5;fontFamily=Arial;fontSize=11;"
+          vertex="1" parent="1"><mxGeometry x="220" y="200" width="140" height="60" as="geometry" /></mxCell>
+
+        <mxCell id="trunk-core" value="YourCoreModule&#10;B×N×C"
+          style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#D4E8EB;strokeColor=#2A6478;strokeWidth=1.5;fontFamily=Arial;fontSize=11;"
+          vertex="1" parent="1"><mxGeometry x="420" y="200" width="160" height="60" as="geometry" /></mxCell>
+
+        <mxCell id="head" value="Head&#10;B×K"
+          style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#CBE0C8;strokeColor=#4F7A4C;strokeWidth=1.5;fontFamily=Arial;fontSize=11;"
+          vertex="1" parent="1"><mxGeometry x="640" y="200" width="120" height="60" as="geometry" /></mxCell>
+
+        <mxCell id="io-out" value="Output&#10;B×K"
+          style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=11;"
+          vertex="1" parent="1"><mxGeometry x="820" y="200" width="120" height="60" as="geometry" /></mxCell>
+
+        <mxCell id="cond" value="ConditionEncoder&#10;B×D"
+          style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#E8D5B0;strokeColor=#C49A3C;strokeWidth=1.5;fontFamily=Arial;fontSize=11;"
+          vertex="1" parent="1"><mxGeometry x="420" y="70" width="160" height="60" as="geometry" /></mxCell>
+
+        <mxCell id="discrete" value="ArgmaxRouting&#10;B×N"
+          style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#DADADA;strokeColor=#777777;strokeWidth=1.5;fontFamily=Arial;fontSize=11;"
+          vertex="1" parent="1"><mxGeometry x="530" y="340" width="150" height="60" as="geometry" /></mxCell>
+
+        <mxCell id="e-fwd-1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3A5A6A;strokeWidth=1.5;endArrow=blockThin;endFill=1;"
+          edge="1" parent="1" source="io-in" target="trunk-embed"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-fwd-2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3A5A6A;strokeWidth=1.5;endArrow=blockThin;endFill=1;"
+          edge="1" parent="1" source="trunk-embed" target="trunk-core"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-fwd-3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3A5A6A;strokeWidth=1.5;endArrow=blockThin;endFill=1;"
+          edge="1" parent="1" source="trunk-core" target="head"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-fwd-4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3A5A6A;strokeWidth=1.5;endArrow=blockThin;endFill=1;"
+          edge="1" parent="1" source="head" target="io-out"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e-cond" value="cond"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#C49A3C;strokeWidth=1.5;endArrow=blockThin;endFill=1;fontFamily=Arial;fontSize=9;"
+          edge="1" parent="1" source="cond" target="trunk-core"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e-nograd-1" value="no_grad"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#888888;strokeWidth=1.5;endArrow=blockThin;endFill=1;fontFamily=Arial;fontSize=9;"
+          edge="1" parent="1" source="trunk-core" target="discrete"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e-nograd-2" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#888888;strokeWidth=1.5;endArrow=blockThin;endFill=1;"
+          edge="1" parent="1" source="discrete" target="head"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
