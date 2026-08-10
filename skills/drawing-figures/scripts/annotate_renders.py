@@ -15,9 +15,9 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Optional
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -25,10 +25,10 @@ from matplotlib import font_manager as _fm
 from matplotlib import gridspec
 from matplotlib.patches import Circle, FancyBboxPatch
 
-
 # --- CJK font registration ----------------------------------------------
 
-def register_cjk_font() -> Optional[str]:
+
+def register_cjk_font() -> str | None:
     """Register a system CJK .ttc font with matplotlib and set the sans-serif list.
 
     Walk the known Noto CJK font paths and register the first one found through
@@ -42,7 +42,7 @@ def register_cjk_font() -> Optional[str]:
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
     ]
-    registered: Optional[str] = None
+    registered: str | None = None
     for ttc in _ttc_candidates:
         if Path(ttc).exists():
             try:
@@ -76,15 +76,16 @@ TEXT = "#1F1F1F"
 # Severity badges, in the same hues as palette.py
 SEVERITY = {
     "blocker": "#B94A48",  # must be fixed before the figure ships
-    "verify":  "#C49A3C",  # a human has to look (colour, where a line lands)
-    "label":   "#2A6478",  # add or change text on the figure itself
+    "verify": "#C49A3C",  # a human has to look (colour, where a line lands)
+    "label": "#2A6478",  # add or change text on the figure itself
     "caption": "#4F7A4C",  # caption or LaTeX-side wording
-    "style":   "#7952B3",  # line style, colour, weight
-    "scope":   "#777777",  # decides how much of this figure gets replaced
+    "style": "#7952B3",  # line style, colour, weight
+    "scope": "#777777",  # decides how much of this figure gets replaced
 }
 
 
 # --- External config ----------------------------------------------------
+
 
 def load_specs(config_path: str) -> dict:
     """Read the annotation specs from an external JSON file.
@@ -118,6 +119,7 @@ def load_specs(config_path: str) -> dict:
 
 # --- Drawing helpers ----------------------------------------------------
 
+
 def _draw_anchor(ax, x: float, y: float, label: str, r: float) -> None:
     """Draw a numbered anchor — white on red — on the image axes.
 
@@ -128,14 +130,26 @@ def _draw_anchor(ax, x: float, y: float, label: str, r: float) -> None:
         label: the text inside the circle, usually a number.
         r: circle radius, in pixels.
     """
-    ax.add_patch(Circle(
-        (x, y), r,
-        facecolor=ANCHOR_FILL, edgecolor="white", linewidth=2.0, zorder=20,
-    ))
+    ax.add_patch(
+        Circle(
+            (x, y),
+            r,
+            facecolor=ANCHOR_FILL,
+            edgecolor="white",
+            linewidth=2.0,
+            zorder=20,
+        )
+    )
     ax.text(
-        x, y, label,
-        ha="center", va="center",
-        color=ANCHOR_TXT, fontsize=11, fontweight="bold", zorder=21,
+        x,
+        y,
+        label,
+        ha="center",
+        va="center",
+        color=ANCHOR_TXT,
+        fontsize=11,
+        fontweight="bold",
+        zorder=21,
     )
 
 
@@ -150,40 +164,66 @@ def _draw_legend_row(ax, y: float, label: str, severity: str, desc: str) -> None
         desc: what has to change.
     """
     # Numbered circle
-    ax.add_patch(Circle(
-        (0.022, y), 0.014,
-        facecolor=ANCHOR_FILL, edgecolor="white", linewidth=1.2,
-        transform=ax.transAxes,
-    ))
+    ax.add_patch(
+        Circle(
+            (0.022, y),
+            0.014,
+            facecolor=ANCHOR_FILL,
+            edgecolor="white",
+            linewidth=1.2,
+            transform=ax.transAxes,
+        )
+    )
     ax.text(
-        0.022, y, label,
-        ha="center", va="center", color="white",
-        fontsize=9, fontweight="bold",
+        0.022,
+        y,
+        label,
+        ha="center",
+        va="center",
+        color="white",
+        fontsize=9,
+        fontweight="bold",
         transform=ax.transAxes,
     )
     # Severity badge
     badge_x, badge_w = 0.050, 0.060
-    ax.add_patch(FancyBboxPatch(
-        (badge_x, y - 0.022), badge_w, 0.044,
-        boxstyle="round,pad=0.005",
-        facecolor=SEVERITY[severity], edgecolor="none",
-        transform=ax.transAxes,
-    ))
+    ax.add_patch(
+        FancyBboxPatch(
+            (badge_x, y - 0.022),
+            badge_w,
+            0.044,
+            boxstyle="round,pad=0.005",
+            facecolor=SEVERITY[severity],
+            edgecolor="none",
+            transform=ax.transAxes,
+        )
+    )
     ax.text(
-        badge_x + badge_w / 2, y, severity,
-        ha="center", va="center", color="white",
-        fontsize=9, fontweight="bold",
+        badge_x + badge_w / 2,
+        y,
+        severity,
+        ha="center",
+        va="center",
+        color="white",
+        fontsize=9,
+        fontweight="bold",
         transform=ax.transAxes,
     )
     # Description text
     ax.text(
-        badge_x + badge_w + 0.014, y, desc,
-        ha="left", va="center", color=TEXT, fontsize=9.5,
+        badge_x + badge_w + 0.014,
+        y,
+        desc,
+        ha="left",
+        va="center",
+        color=TEXT,
+        fontsize=9.5,
         transform=ax.transAxes,
     )
 
 
 # --- The annotation itself ----------------------------------------------
+
 
 def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
     """Overlay the annotations onto an image and save it as a PNG.
@@ -251,10 +291,15 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
         subplot_order.append("legend")
 
     gs = gridspec.GridSpec(
-        len(height_ratios), 1, figure=fig,
+        len(height_ratios),
+        1,
+        figure=fig,
         height_ratios=height_ratios,
         hspace=0.03,
-        left=0.02, right=0.98, top=0.99, bottom=0.01,
+        left=0.02,
+        right=0.98,
+        top=0.99,
+        bottom=0.01,
     )
 
     axes = {name: fig.add_subplot(gs[i]) for i, name in enumerate(subplot_order)}
@@ -265,8 +310,9 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
         ax_t.axis("off")
         ax_t.set_xlim(0, 1)
         ax_t.set_ylim(0, 1)
-        ax_t.text(0.5, 0.5, title, ha="center", va="center",
-                  fontsize=14, fontweight="bold", color=TEXT)
+        ax_t.text(
+            0.5, 0.5, title, ha="center", va="center", fontsize=14, fontweight="bold", color=TEXT
+        )
 
     # Image and anchors
     ax_i = axes["img"]
@@ -287,12 +333,18 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
         ax_l.set_xlim(0, 1)
         ax_l.set_ylim(0, 1)
 
-        ax_l.add_patch(FancyBboxPatch(
-            (0.005, 0.02), 0.99, 0.96,
-            boxstyle="round,pad=0.005",
-            facecolor="white", edgecolor="#CCCCCC", linewidth=0.8,
-            transform=ax_l.transAxes,
-        ))
+        ax_l.add_patch(
+            FancyBboxPatch(
+                (0.005, 0.02),
+                0.99,
+                0.96,
+                boxstyle="round,pad=0.005",
+                facecolor="white",
+                edgecolor="#CCCCCC",
+                linewidth=0.8,
+                transform=ax_l.transAxes,
+            )
+        )
 
         top_pad, bot_pad = 0.08, 0.08
         row_span = 1.0 - top_pad - bot_pad
@@ -310,15 +362,19 @@ def annotate_image(img_path: str, spec: dict, out_path: str) -> Path:
 
 # --- CLI ----------------------------------------------------------------
 
+
 def main() -> None:
     """Read SPECS from the --config JSON and annotate every figure it names."""
     parser = argparse.ArgumentParser(description="Annotate rendered figures with a fix list")
-    parser.add_argument("--config", required=True,
-                        help="path to the JSON config holding SPECS")
-    parser.add_argument("--renders", default=".",
-                        help="directory holding the source renders (default: current directory)")
-    parser.add_argument("--out", default="annotated",
-                        help="output directory (default: ./annotated)")
+    parser.add_argument("--config", required=True, help="path to the JSON config holding SPECS")
+    parser.add_argument(
+        "--renders",
+        default=".",
+        help="directory holding the source renders (default: current directory)",
+    )
+    parser.add_argument(
+        "--out", default="annotated", help="output directory (default: ./annotated)"
+    )
     args = parser.parse_args()
 
     specs = load_specs(args.config)

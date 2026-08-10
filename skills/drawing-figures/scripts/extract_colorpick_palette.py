@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Pull "every colour that ever appears" out of the reference-image pixels, as a general palette.
+"""Pull "every colour that ever appears" out of the reference-image pixels, as a general \
+palette.
 
 Scope: every colour present in the reference images under the given directory (including the
 in-between colours inside a gradient) counts as pickable; a gradient only supplies a "range you
@@ -19,30 +20,44 @@ import numpy as np
 from PIL import Image
 
 # Default hyper-parameters —— overridable from the command line
-QUANT_PER_IMG = 32      # quantized colours per image (generous, to cover gradients)
-MIN_SHARE = 0.004       # share threshold within one image (filters noise pixels)
-MERGE_DIST = 22         # Euclidean distance at which near-duplicate colours merge across images
+QUANT_PER_IMG = 32  # quantized colours per image (generous, to cover gradients)
+MIN_SHARE = 0.004  # share threshold within one image (filters noise pixels)
+MERGE_DIST = 22  # Euclidean distance at which near-duplicate colours merge across images
 
 
 def parse_args():
-    """CLI: source directory and output md are required; quantized colour count / merge distance are tunable."""
+    """CLI: source directory and output md are required; quantized colour count / merge \
+distance are tunable."""
     import argparse
+
     p = argparse.ArgumentParser(description="Extract a palette from reference-image pixels")
     p.add_argument("--src", type=Path, required=True, help="color_pick source image directory")
     p.add_argument("--out", type=Path, required=True, help="output palette md path")
-    p.add_argument("--n-colors", dest="n_colors", type=int, default=32, help="quantized colours per image")
-    p.add_argument("--merge-dist", dest="merge_dist", type=float, default=22.0, help="Euclidean distance for merging near-duplicate colours")
+    p.add_argument(
+        "--n-colors", dest="n_colors", type=int, default=32, help="quantized colours per image"
+    )
+    p.add_argument(
+        "--merge-dist",
+        dest="merge_dist",
+        type=float,
+        default=22.0,
+        help="Euclidean distance for merging near-duplicate colours",
+    )
     return p.parse_args()
 
 
-def image_colors(path: Path, n_colors: int = QUANT_PER_IMG,
-                 min_share: float = MIN_SHARE) -> list[tuple[tuple[int, int, int], float]]:
-    """Quantize a single image adaptively, returning [(rgb, share)] with low-share noise already dropped."""
+def image_colors(
+    path: Path, n_colors: int = QUANT_PER_IMG, min_share: float = MIN_SHARE
+) -> list[tuple[tuple[int, int, int], float]]:
+    """Quantize a single image adaptively, returning [(rgb, share)] with low-share noise \
+already dropped."""
     im = Image.open(path).convert("RGB")
     im.thumbnail((400, 400))  # downsample for speed
     q = im.quantize(colors=n_colors, method=Image.Quantize.MEDIANCUT)
     pal = q.getpalette()
-    counts = Counter(q.getdata())
+    if pal is None:
+        raise ValueError(f"{path}: quantized image has no palette, cannot read colours")
+    counts: Counter[int] = Counter(q.getdata())  # ty: ignore[no-matching-overload]
     total = sum(counts.values())
     out = []
     for idx, cnt in counts.items():
@@ -55,7 +70,8 @@ def image_colors(path: Path, n_colors: int = QUANT_PER_IMG,
 
 
 def merge_colors(colors: list[tuple], dist: float) -> list[tuple]:
-    """Cluster a colour list by Euclidean distance, returning the representative colours (no weights).
+    """Cluster a colour list by Euclidean distance, returning the representative colours \
+(no weights).
 
     Args:
         colors: colour list in the form [(r, g, b), ...].
@@ -85,9 +101,11 @@ def merge_colors(colors: list[tuple], dist: float) -> list[tuple]:
     return [tuple(int(v) for v in np.round(r[0] / r[1]).astype(int)) for r in reps]
 
 
-def merge(colors: list[tuple[tuple[int, int, int], float]],
-          merge_dist: float = MERGE_DIST) -> list[tuple[tuple[int, int, int], float]]:
-    """Cluster the colours from every image (weights included) by Euclidean distance; each representative is the weighted mean of its cluster, and weights accumulate."""
+def merge(
+    colors: list[tuple[tuple[int, int, int], float]], merge_dist: float = MERGE_DIST
+) -> list[tuple[tuple[int, int, int], float]]:
+    """Cluster the colours from every image (weights included) by Euclidean distance; each \
+representative is the weighted mean of its cluster, and weights accumulate."""
     reps: list[list] = []  # [sum_rgb*w, w]
     for rgb, w in sorted(colors, key=lambda c: -c[1]):
         arr = np.array(rgb, dtype=float)
@@ -139,7 +157,8 @@ def hexof(rgb: tuple[int, int, int]) -> str:
 
 
 def main() -> None:
-    """Main flow: quantize image by image -> pool and merge -> group into families -> write the markdown palette + print to console."""
+    """Main flow: quantize image by image -> pool and merge -> group into families -> write \
+the markdown palette + print to console."""
     args = parse_args()
     src: Path = args.src
     out: Path = args.out
@@ -152,16 +171,31 @@ def main() -> None:
         allc.extend(image_colors(p, n_colors=n_colors))
     merged = merge(allc, merge_dist=merge_dist)
 
-    fam_order = ["blue", "cyan", "green/teal", "yellow/amber", "coral/orange",
-                 "red", "violet/periwinkle", "magenta/pink", "neutral/gray",
-                 "white/near-white", "black/ink"]
+    fam_order = [
+        "blue",
+        "cyan",
+        "green/teal",
+        "yellow/amber",
+        "coral/orange",
+        "red",
+        "violet/periwinkle",
+        "magenta/pink",
+        "neutral/gray",
+        "white/near-white",
+        "black/ink",
+    ]
     by_fam: dict[str, list] = {f: [] for f in fam_order}
     for rgb, w in merged:
         by_fam.setdefault(family(rgb), []).append((rgb, w))
 
-    lines = ["# color_pick palette (extracted from pixels)", "",
-             f"Adaptive quantization to {n_colors} colours per image, merged across images (dist<{merge_dist}), shares<{MIN_SHARE} filtered out.",
-             "A gradient = a range you may pick from; below are the discrete representative colours.", ""]
+    lines = [
+        "# color_pick palette (extracted from pixels)",
+        "",
+        f"Adaptive quantization to {n_colors} colours per image, merged across images "
+        f"(dist<{merge_dist}), shares<{MIN_SHARE} filtered out.",
+        "A gradient = a range you may pick from; below are the discrete representative colours.",
+        "",
+    ]
     print(f"{'family':<20}{'hex':<10}{'weight%':>8}")
     for f in fam_order:
         items = sorted(by_fam.get(f, []), key=lambda c: -c[1])
@@ -169,8 +203,8 @@ def main() -> None:
             continue
         lines.append(f"## {f}")
         for rgb, w in items:
-            lines.append(f"- {hexof(rgb)}  (w={w*100:.1f}%)")
-            print(f"{f:<20}{hexof(rgb):<10}{w*100:>7.1f}")
+            lines.append(f"- {hexof(rgb)}  (w={w * 100:.1f}%)")
+            print(f"{f:<20}{hexof(rgb):<10}{w * 100:>7.1f}")
         lines.append("")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines), encoding="utf-8")

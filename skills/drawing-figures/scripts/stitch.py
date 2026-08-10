@@ -12,14 +12,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
-from typing import Optional
 
 from PIL import Image, ImageDraw, ImageFont
+from PIL.ImageFont import FreeTypeFont
 
 
 def stitch_row(
     images: list,
-    labels: Optional[list] = None,
+    labels: list | None = None,
     gap: int = 8,
     bg: tuple = (255, 255, 255),
     label_h: int = 0,
@@ -53,7 +53,7 @@ def stitch_row(
         if img.height != target_h:
             scale = target_h / img.height
             new_w = max(1, round(img.width * scale))
-            img = img.resize((new_w, target_h), Image.LANCZOS)
+            img = img.resize((new_w, target_h), Image.Resampling.LANCZOS)
         normalized.append(img)
 
     # Compute the canvas size
@@ -89,7 +89,9 @@ def stitch_row(
     return canvas
 
 
-def _load_font(label_h: int) -> ImageFont.ImageFont:
+# truetype() returns FreeTypeFont and load_default() may return either, so the
+# annotation is the union rather than the base class alone.
+def _load_font(label_h: int) -> ImageFont.ImageFont | FreeTypeFont:
     """Derive a suitable font size from the label strip's height and return a PIL font object.
 
     Prefers a TrueType font from the common system paths, and uses PIL's built-in default font when
@@ -104,7 +106,7 @@ def _load_font(label_h: int) -> ImageFont.ImageFont:
     for path in candidate_paths:
         try:
             return ImageFont.truetype(path, font_size)
-        except (IOError, OSError):
+        except OSError:
             continue
     return ImageFont.load_default()
 
@@ -118,11 +120,18 @@ def main() -> None:
     """
     parser = argparse.ArgumentParser(description="Horizontal equal-height image stitcher")
     parser.add_argument("--images", nargs="+", required=True, help="list of input image paths")
-    parser.add_argument("--labels", nargs="+", default=None, help="top label for each column (as long as --images)")
+    parser.add_argument(
+        "--labels", nargs="+", default=None, help="top label for each column (as long as --images)"
+    )
     parser.add_argument("--out", required=True, help="output image path")
     parser.add_argument("--gap", type=int, default=8, help="pixels between columns, default 8")
-    parser.add_argument("--label-h", type=int, default=0, dest="label_h",
-                        help="height of the top label strip in pixels, 0 for no labels, default 0")
+    parser.add_argument(
+        "--label-h",
+        type=int,
+        default=0,
+        dest="label_h",
+        help="height of the top label strip in pixels, 0 for no labels, default 0",
+    )
     args = parser.parse_args()
 
     imgs = [Image.open(p).convert("RGB") for p in args.images]

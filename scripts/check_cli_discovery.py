@@ -8,6 +8,7 @@ regression — it is the repository doing its job.
 Needs Node and network access, so it runs in its own CI job rather than as part
 of scripts/ci.py.
 """
+
 from __future__ import annotations
 
 import re
@@ -31,7 +32,9 @@ def main() -> int:
 
     completed = subprocess.run(
         ["npx", "--yes", "skills@latest", "add", ".", "--list"],
-        cwd=ROOT, capture_output=True, text=True,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
     )
     output = completed.stdout + completed.stderr
     print(output)

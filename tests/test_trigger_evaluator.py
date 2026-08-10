@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "evaluate_skill_triggers.py"
 SPEC = importlib.util.spec_from_file_location("trigger_evaluator", MODULE_PATH)
 assert SPEC and SPEC.loader
@@ -66,11 +65,15 @@ class TriggerEvaluatorTests(unittest.TestCase):
             any("declares no anti-scope" in f for f in evaluator.validate_antiscope([case], skills))
         )
 
-        skills = {"alpha-skill": self.skill("alpha-skill", "Alpha routing. Do not use for invoices.")}
+        skills = {
+            "alpha-skill": self.skill("alpha-skill", "Alpha routing. Do not use for invoices.")
+        }
         untested = self.case("one", "alpha routing please", (), ("alpha-skill",))
         self.assertTrue(
-            any("no forbidden case exercises" in f
-                for f in evaluator.validate_antiscope([untested], skills))
+            any(
+                "no forbidden case exercises" in f
+                for f in evaluator.validate_antiscope([untested], skills)
+            )
         )
         tested = self.case("two", "fix my invoices", (), ("alpha-skill",))
         self.assertEqual(evaluator.validate_antiscope([untested, tested], skills), [])
@@ -115,7 +118,9 @@ class TriggerEvaluatorTests(unittest.TestCase):
 
     def test_validation_failures_are_counted_not_named(self) -> None:
         """Naming them is how the held-out half turns into more training data."""
-        import contextlib, io
+        import contextlib
+        import io
+
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             evaluator.main([])
@@ -130,11 +135,6 @@ class TriggerEvaluatorTests(unittest.TestCase):
         self.assertTrue(any("duplicate case id" in failure for failure in failures))
         self.assertTrue(any("unknown skills" in failure for failure in failures))
         self.assertTrue(any("both expected and forbidden" in failure for failure in failures))
-
-
-
-
-
 
     def test_load_cases_reads_optional_fields(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -183,7 +183,9 @@ class TriggerEvaluatorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "cases.json"
             path.write_text(
-                json.dumps({"cases": [{"id": "one", "prompt": "x", "expected_skills": ["writing-papers"]}]}),
+                json.dumps(
+                    {"cases": [{"id": "one", "prompt": "x", "expected_skills": ["writing-papers"]}]}
+                ),
                 encoding="utf-8",
             )
             code = evaluator.main(["--cases", str(path), "--skip-smoke"])

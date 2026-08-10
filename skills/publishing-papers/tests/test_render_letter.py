@@ -11,10 +11,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "render_letter.py"
 
+# The bundled scripts are runnable files, not an installed package, so the
+# test adds their directory rather than importing through a package name.
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from render_letter import escape_latex, main  # noqa: E402
-
+from render_letter import escape_latex, main  # noqa: E402  # ty: ignore[unresolved-import]
 
 # The shipped example page is the fixture, so the two cannot drift: a change
 # that breaks the documented sample breaks the suite.
@@ -25,8 +26,10 @@ PAGE = EXAMPLE_PAGE.read_text(encoding="utf-8")
 class EscapeLatexTests(unittest.TestCase):
     def test_escapes_every_special_character(self) -> None:
         """Each LaTeX special must survive as literal text."""
-        self.assertEqual(escape_latex("95% & $x$ #1 a_b {c} ~ ^"),
-                         r"95\% \& \$x\$ \#1 a\_b \{c\} \textasciitilde{} \textasciicircum{}")
+        self.assertEqual(
+            escape_latex("95% & $x$ #1 a_b {c} ~ ^"),
+            r"95\% \& \$x\$ \#1 a\_b \{c\} \textasciitilde{} \textasciicircum{}",
+        )
 
     def test_backslash_does_not_double_escape(self) -> None:
         """A backslash becomes a command that later replacements leave alone."""
@@ -168,7 +171,7 @@ class VoidElementTests(unittest.TestCase):
             '<div class="verbatim">Second ask.</div>'
             "</article>"
         )
-        from render_letter import RevisionPageParser
+        from render_letter import RevisionPageParser  # ty: ignore[unresolved-import]
 
         parser = RevisionPageParser()
         parser.feed(page)

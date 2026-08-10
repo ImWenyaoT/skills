@@ -13,15 +13,16 @@ project-specific model loading is the caller's job (a thin wrapper script).
 
 import argparse
 import time
-from typing import Optional, Tuple
 
-import torch
-import torch.nn as nn
-
+# torch and thop are the skill's declared optional runtime, not repository
+# dependencies; installing them to type-check a measurement helper is not worth it.
+import torch  # ty: ignore[unresolved-import]
+import torch.nn as nn  # ty: ignore[unresolved-import]
 
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def count_params(model: nn.Module) -> dict:
     """
@@ -44,7 +45,7 @@ def count_params(model: nn.Module) -> dict:
 
 def measure_runtime(
     model: nn.Module,
-    input_shape: Tuple[int, ...],
+    input_shape: tuple[int, ...],
     device: str = "cpu",
     iters: int = 50,
     warmup: int = 5,
@@ -98,8 +99,8 @@ def measure_runtime(
 
 def measure_flops(
     model: nn.Module,
-    input_shape: Tuple[int, ...],
-) -> Optional[float]:
+    input_shape: tuple[int, ...],
+) -> float | None:
     """
     Compute the model's compute cost with the thop library, returning GMACs (thop returns MAC
     counts, FLOPs≈2×MAC); returns None when thop is unavailable.
@@ -116,7 +117,7 @@ def measure_flops(
         or profiling fails.
     """
     try:
-        from thop import profile  # type: ignore[import]
+        from thop import profile  # ty: ignore[unresolved-import]
     except ImportError:
         return None
 
@@ -133,6 +134,7 @@ def measure_flops(
 # ---------------------------------------------------------------------------
 # CLI entry point: not bound to any project's config/model loader
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     """
@@ -186,7 +188,10 @@ def main() -> None:
     print("  import measure_model as mm")
     print("  params  = mm.count_params(model)")
     print("  runtime = mm.measure_runtime(model, tuple(input_shape), device=device)")
-    print("  gmacs   = mm.measure_flops(model, tuple(input_shape))  # GMACs (thop returns MAC counts, FLOPs≈2×MAC)")
+    print(
+        "  gmacs   = mm.measure_flops(model, tuple(input_shape))  "
+        "# GMACs (thop returns MAC counts, FLOPs≈2×MAC)"
+    )
 
 
 if __name__ == "__main__":

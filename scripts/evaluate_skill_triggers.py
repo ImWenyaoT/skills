@@ -24,6 +24,7 @@ precision/recall/F1, a confusion matrix, and pass@k / pass^k. That half was
 deleted: it required an external API call that was never approved, so in the
 repository's whole history it never produced a single measurement.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -32,9 +33,9 @@ import math
 import re
 import sys
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = ROOT / "skills"
@@ -190,9 +191,7 @@ def tokenize(text: str) -> set[str]:
     """
     lowered = text.lower().replace("-", " ")
     words = {
-        token
-        for token in re.findall(r"[a-z0-9][a-z0-9_]{2,}", lowered)
-        if token not in STOPWORDS
+        token for token in re.findall(r"[a-z0-9][a-z0-9_]{2,}", lowered) if token not in STOPWORDS
     }
     cjk_grams: set[str] = set()
     for run in re.findall(r"[一-鿿]+", text):
@@ -316,10 +315,14 @@ def smoke_test_metadata(cases: list[Case], skills: dict[str, Skill]) -> list[str
         if expected and top_name in forbidden and top_score >= 0.10:
             best_expected = max(similarity(case.prompt, skills[name]) for name in expected)
             if best_expected < TIE_RATIO * top_score:
-                failures.append(f"{case.id}: forbidden skill {top_name} ranks first ({top_score:.3f})")
+                failures.append(
+                    f"{case.id}: forbidden skill {top_name} ranks first ({top_score:.3f})"
+                )
 
         if not expected and top_score >= 0.25:
-            failures.append(f"{case.id}: no expected skill but metadata top={top_name}({top_score:.3f})")
+            failures.append(
+                f"{case.id}: no expected skill but metadata top={top_name}({top_score:.3f})"
+            )
     return failures
 
 
@@ -338,8 +341,7 @@ def validate_antiscope(cases: list[Case], skills: dict[str, Skill]) -> list[str]
             failures.append(f"{name}: description declares no anti-scope clause")
             continue
         covered = any(
-            name in case.forbidden_skills and tokenize(case.prompt) & boundary
-            for case in cases
+            name in case.forbidden_skills and tokenize(case.prompt) & boundary for case in cases
         )
         if not covered:
             failures.append(
@@ -347,14 +349,6 @@ def validate_antiscope(cases: list[Case], skills: dict[str, Skill]) -> list[str]
                 f"({sorted(boundary)[:6]}…)"
             )
     return failures
-
-
-
-
-
-
-
-
 
 
 def print_summary(cases: list[Case], skills: dict[str, Skill]) -> None:
@@ -373,17 +367,17 @@ def print_summary(cases: list[Case], skills: dict[str, Skill]) -> None:
     )
     for skill_name in sorted(skills):
         train = f"{counts[(skill_name, 'train', 'pos')]}+/{counts[(skill_name, 'train', 'forb')]}-"
-        val = f"{counts[(skill_name, 'validation', 'pos')]}+/{counts[(skill_name, 'validation', 'forb')]}-"
+        val = (
+            f"{counts[(skill_name, 'validation', 'pos')]}+/"
+            f"{counts[(skill_name, 'validation', 'forb')]}-"
+        )
         print(f"- {skill_name}: train {train}   validation {val}")
-
 
 
 def main(argv: Iterable[str] | None = None) -> int:
     """Validate the trigger contract and run the metadata smoke test."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--cases", type=Path, default=EVALS, help="Path to trigger cases JSON"
-    )
+    parser.add_argument("--cases", type=Path, default=EVALS, help="Path to trigger cases JSON")
     parser.add_argument(
         "--skip-smoke",
         action="store_true",
@@ -393,7 +387,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         "--show-validation",
         action="store_true",
         help="Name the failing validation cases. Reading them is how a description "
-             "gets fitted to the held-out half; use only to audit the split itself.",
+        "gets fitted to the held-out half; use only to audit the split itself.",
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
@@ -426,8 +420,10 @@ def main(argv: Iterable[str] | None = None) -> int:
         passed = len(held_out) - len(held_out_failures)
         rate = passed / len(held_out)
         held_out_short = rate < VALIDATION_FLOOR
-        print(f"\nValidation: {passed}/{len(held_out)} passed ({rate:.0%}, "
-              f"floor {VALIDATION_FLOOR:.0%}).")
+        print(
+            f"\nValidation: {passed}/{len(held_out)} passed ({rate:.0%}, "
+            f"floor {VALIDATION_FLOOR:.0%})."
+        )
     if held_out_failures:
         if args.show_validation:
             for failure in held_out_failures:

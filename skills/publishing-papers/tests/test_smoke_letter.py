@@ -13,9 +13,11 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# The bundled scripts are runnable files, not an installed package, so the
+# test adds their directory rather than importing through a package name.
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import smoke_letter  # noqa: E402
+import smoke_letter  # noqa: E402  # ty: ignore[unresolved-import]
 
 
 class DoctorTests(unittest.TestCase):
@@ -28,8 +30,12 @@ class DoctorTests(unittest.TestCase):
 
     def test_missing_package_names_the_package(self) -> None:
         """A partial TeX install must point at the package, not at a LaTeX error."""
-        with mock.patch.object(smoke_letter.shutil, "which", side_effect=lambda name: f"/bin/{name}"), \
-             mock.patch.object(smoke_letter, "_style_found", return_value=False):
+        with (
+            mock.patch.object(
+                smoke_letter.shutil, "which", side_effect=lambda name: f"/bin/{name}"
+            ),
+            mock.patch.object(smoke_letter, "_style_found", return_value=False),
+        ):
             strategy, problems = smoke_letter.doctor()
         self.assertIsNone(strategy)
         self.assertIn("tcolorbox.sty", "".join(problems))

@@ -10,7 +10,7 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
-
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "check_packet.py"
@@ -29,17 +29,20 @@ def write_minimal_docx(path: Path, paragraphs: list[str]) -> None:
         archive.writestr(
             "[Content_Types].xml",
             '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
-            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml" />'
+            '<Default Extension="rels" '
+            'ContentType="application/vnd.openxmlformats-package.relationships+xml" />'
             '<Default Extension="xml" ContentType="application/xml" />'
             '<Override PartName="/word/document.xml" '
-            'ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" />'
+            'ContentType="'
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" />'
             "</Types>",
         )
         archive.writestr(
             "_rels/.rels",
             '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
             '<Relationship Id="rId1" '
-            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" '
+            'Type="'
+            'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" '
             'Target="word/document.xml" />'
             "</Relationships>",
         )
@@ -88,7 +91,7 @@ def write_ieee_manuscript(path: Path, abstract_words: int) -> None:
     )
 
 
-def elsevier_manifest() -> dict[str, object]:
+def elsevier_manifest() -> dict[str, Any]:
     """Return a complete PDF-only Elsevier manifest for focused test overrides."""
     return {
         "publisher": "elsevier",
@@ -109,7 +112,7 @@ def elsevier_manifest() -> dict[str, object]:
     }
 
 
-def ieee_manifest() -> dict[str, object]:
+def ieee_manifest() -> dict[str, Any]:
     """Return a complete initial IEEE manifest for focused test overrides."""
     return {
         "publisher": "ieee",
@@ -137,7 +140,9 @@ class PacketCheckTestCase(unittest.TestCase):
         self.addCleanup(self._tmp.cleanup)
         self.base = Path(self._tmp.name)
 
-    def run_check(self, manifest: object, env: dict | None = None) -> subprocess.CompletedProcess[str]:
+    def run_check(
+        self, manifest: object, env: dict | None = None
+    ) -> subprocess.CompletedProcess[str]:
         """Invoke the public packet-check CLI."""
         manifest_path = self.base / "packet.json"
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")

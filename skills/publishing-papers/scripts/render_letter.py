@@ -62,8 +62,22 @@ FIELD_CLASSES = frozenset(
 # counters. A card that holds one <input> would otherwise never close, and
 # every later card would be swallowed into it silently.
 VOID_ELEMENTS = frozenset(
-    {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
-     "meta", "param", "source", "track", "wbr"}
+    {
+        "area",
+        "base",
+        "br",
+        "col",
+        "embed",
+        "hr",
+        "img",
+        "input",
+        "link",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr",
+    }
 )
 
 

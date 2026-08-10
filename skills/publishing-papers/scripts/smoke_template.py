@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Compile one publisher's bundled template fixture or report the missing runtime step."""
+
 from __future__ import annotations
 
 import argparse
@@ -9,11 +10,10 @@ import sys
 import tempfile
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 # Each publisher's asset directory and the class/bst files kpsewhich must find.
-PUBLISHERS = {
+PUBLISHERS: dict[str, dict[str, str | tuple[str, ...]]] = {
     "elsevier": {
         "label": "Elsevier",
         "package": "elsarticle",
@@ -112,7 +112,9 @@ def main() -> int:
     parser.add_argument("--template", type=Path, default=None)
     args = parser.parse_args()
     profile = PUBLISHERS[args.publisher]
-    template = args.template or ROOT / "assets" / profile["assets"]
+    assets = profile["assets"]
+    assert isinstance(assets, str)
+    template = args.template or ROOT / "assets" / assets
     if not (template / "main.tex").is_file():
         print(f"Template missing main.tex: {template}")
         return 1

@@ -7,9 +7,15 @@ not the workflow, not AGENTS.md — should list the checks again; they call this
   python3 scripts/ci.py              # every check
   python3 scripts/ci.py --coverage   # also enforce branch coverage on scripts/
 
-Coverage is separate because it needs the `coverage` package, which the local
-machine may not have; CI runs it on one interpreter only.
+Everything the checks need — ruff, ty, coverage, matplotlib, Pillow — is the
+`dev` dependency group in pyproject.toml, supplied per run by uv. Nothing has to
+be installed globally, and the versions are pinned in one place so a laptop and
+CI lint identically.
+
+Coverage is opt-in because it is the slow one and CI runs it on a single
+interpreter.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -20,23 +26,28 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 COVERAGE_FLOOR = 70
-REQUIREMENTS = "requirements-ci.txt"
+DEV_GROUP = "dev"
 
 
 def interpreter() -> list[str]:
-    """The command that runs Python with this repository's test dependencies.
+    """The command that runs Python with this repository's dev dependencies.
 
-    Several checks need matplotlib, Pillow, or coverage, and a machine that has
-    none of them should not have to install them globally to run the suite. When
-    uv is on PATH it supplies them per-run from requirements-ci.txt; otherwise
-    fall back to this interpreter and let the import error say what is missing.
+    Several checks need matplotlib, Pillow, coverage, ruff, or ty, and a machine
+    that has none of them should not have to install them globally to run the
+    suite. When uv is on PATH it supplies the `dev` group from pyproject.toml;
+    otherwise fall back to this interpreter and let the import error name what is
+    missing.
     """
     if shutil.which("uv"):
         # --python pins uv to the interpreter already running, so a CI matrix over
         # several Python versions still tests each one.
-        return ["uv", "run", "--python", sys.executable,
-                "--with-requirements", REQUIREMENTS, "--quiet", "python"]
+        return ["uv", "run", "--python", sys.executable, "--group", DEV_GROUP, "--quiet", "python"]
     return [sys.executable]
+
+
+def tool(name: str, *args: str) -> list[str]:
+    """Invoke a dev-group console tool such as ruff or ty."""
+    return [*interpreter()[:-1], name, *args] if shutil.which("uv") else [name, *args]
 
 
 def run(name: str, argv: list[str]) -> bool:
@@ -50,12 +61,15 @@ def run(name: str, argv: list[str]) -> bool:
 
 
 def python_files() -> list[str]:
-    """Every Python file in the repository, excluding caches and the git dir."""
-    skip = {".git", "__pycache__", ".mypy_cache", ".pytest_cache", ".ruff_cache"}
+    """Every Python file this repository owns.
+
+    Anything under a dot-directory belongs to a tool, not to us: .venv alone holds
+    over a thousand installed files, and compiling those is not a check of anything.
+    """
     return [
         str(path.relative_to(ROOT))
         for path in sorted(ROOT.rglob("*.py"))
-        if not skip & set(path.parts)
+        if not any(part.startswith(".") for part in path.parts) and "__pycache__" not in path.parts
     ]
 
 
@@ -72,19 +86,36 @@ def test_suites() -> list[Path]:
 
 def checks(with_coverage: bool) -> list[tuple[str, list[str]]]:
     """Build the ordered list of (name, argv) checks to run."""
-    py = [sys.executable]           # stdlib-only checks need nothing extra
-    dep = interpreter()             # checks that need the test dependencies
+    py = [sys.executable]  # stdlib-only checks need nothing extra
+    dep = interpreter()  # checks that need the test dependencies
     planned: list[tuple[str, list[str]]] = [
         ("Skill frontmatter and structure", [*py, "scripts/validate_skills.py"]),
         ("Trigger contract, anti-scope, smoke", [*py, "scripts/evaluate_skill_triggers.py"]),
     ]
     for suite in test_suites():
-        planned.append((
-            f"Tests: {suite.relative_to(ROOT)}",
-            [*dep, "-W", "error::ResourceWarning", "-m", "unittest", "discover",
-             "-s", str(suite.relative_to(ROOT)), "-p", "test_*.py"],
-        ))
+        planned.append(
+            (
+                f"Tests: {suite.relative_to(ROOT)}",
+                [
+                    *dep,
+                    "-W",
+                    "error::ResourceWarning",
+                    "-m",
+                    "unittest",
+                    "discover",
+                    "-s",
+                    str(suite.relative_to(ROOT)),
+                    "-p",
+                    "test_*.py",
+                ],
+            )
+        )
     planned += [
+        ("Lint", tool("ruff", "check", ".")),
+        # --check, never a rewrite: a check that edits the tree turns a red build
+        # green without telling anyone it did.
+        ("Format", tool("ruff", "format", "--check", ".")),
+        ("Types", tool("ty", "check", ".")),
         ("Every Python file compiles", [*py, "-m", "py_compile", *python_files()]),
         # CLAUDE.md is a symlink to AGENTS.md. On a checkout that cannot make
         # symlinks it degrades into a plain file, and the two silently diverge.
@@ -94,12 +125,33 @@ def checks(with_coverage: bool) -> list[tuple[str, list[str]]]:
     if with_coverage:
         planned += [
             ("Branch coverage: erase", [*dep, "-m", "coverage", "erase"]),
-            ("Branch coverage: run", [*dep, "-m", "coverage", "run", "--branch",
-                                      "--source=scripts", "-m", "unittest",
-                                      "discover", "-s", "tests"]),
-            ("Branch coverage: report", [*dep, "-m", "coverage", "report",
-                                         "--show-missing",
-                                         f"--fail-under={COVERAGE_FLOOR}"]),
+            (
+                "Branch coverage: run",
+                [
+                    *dep,
+                    "-m",
+                    "coverage",
+                    "run",
+                    "--branch",
+                    "--source=scripts",
+                    "-m",
+                    "unittest",
+                    "discover",
+                    "-s",
+                    "tests",
+                ],
+            ),
+            (
+                "Branch coverage: report",
+                [
+                    *dep,
+                    "-m",
+                    "coverage",
+                    "report",
+                    "--show-missing",
+                    f"--fail-under={COVERAGE_FLOOR}",
+                ],
+            ),
         ]
     return planned
 

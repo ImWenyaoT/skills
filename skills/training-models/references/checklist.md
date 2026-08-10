@@ -79,7 +79,7 @@ for step in range(500):
     loss.backward()
     optimizer.step()
     if step % 50 == 0:
-        print(step, loss.item())   # expect a steady approach to zero
+        print(step, loss.item())  # expect a steady approach to zero
 ```
 
 ---
@@ -157,11 +157,11 @@ This entry sits behind Stage 2 gate 5: one batch of 2 to 8 examples overfits to 
 
 ```python
 for xb, yb in train_loader:
-    optimizer.zero_grad()          # 1. clear the gradients (or zero_grad(set_to_none=True))
-    out = model(xb)                # 2. forward
+    optimizer.zero_grad()  # 1. clear the gradients (or zero_grad(set_to_none=True))
+    out = model(xb)  # 2. forward
     loss = criterion(out, yb)
-    loss.backward()                # 3. backward, which adds into .grad
-    optimizer.step()               # 4. update
+    loss.backward()  # 3. backward, which adds into .grad
+    optimizer.step()  # 4. update
 ```
 
 - **Exception: gradient accumulation.** With deliberate accumulation, call `step()` and
@@ -210,12 +210,12 @@ the loss at init away from `log(n)`.
 
 ```python
 # Correct: the model returns logits, and the loss applies the softmax.
-logits = model(xb)                 # no softmax here
+logits = model(xb)  # no softmax here
 loss = nn.CrossEntropyLoss()(logits, yb)
 
 # Probabilities at inference, only when you need them
 probs = logits.softmax(dim=-1)
-pred  = logits.argmax(dim=-1)      # argmax works directly on the logits
+pred = logits.argmax(dim=-1)  # argmax works directly on the logits
 ```
 
 ---
@@ -247,8 +247,8 @@ No Stage 2 gate covers this entry. The run still trains.
 ```python
 # Turn the bias off in the layer before BatchNorm.
 nn.Sequential(
-    nn.Conv2d(3, 64, 3, padding=1, bias=False),   # <- bias=False
-    nn.BatchNorm2d(64),                           # beta supplies the offset
+    nn.Conv2d(3, 64, 3, padding=1, bias=False),  # <- bias=False
+    nn.BatchNorm2d(64),  # beta supplies the offset
     nn.ReLU(inplace=True),
 )
 ```
@@ -292,16 +292,16 @@ This entry sits behind Stage 2 gate 6: the tensors are correct at the last seam.
 **Repair**
 
 ```python
-x = torch.randn(2, 3, 4, 5)        # (N, C, H, W)
+x = torch.randn(2, 3, 4, 5)  # (N, C, H, W)
 
 # Axis order: NCHW -> NHWC needs permute, which keeps the meaning.
-x_nhwc = x.permute(0, 2, 3, 1)     # shape (2, 4, 5, 3)
+x_nhwc = x.permute(0, 2, 3, 1)  # shape (2, 4, 5, 3)
 
 # The result is not contiguous. Call contiguous before view, or use reshape.
-flat = x_nhwc.contiguous().view(2, -1)   # or x_nhwc.reshape(2, -1)
+flat = x_nhwc.contiguous().view(2, -1)  # or x_nhwc.reshape(2, -1)
 
 # Flatten a feature map: merge C, H, and W with view or reshape, not with permute.
-feat = x.reshape(2, -1)            # (2, 60), row-major
+feat = x.reshape(2, -1)  # (2, 60), row-major
 ```
 
 Rule of thumb:
@@ -370,7 +370,7 @@ No Stage 2 gate covers this entry. It belongs to Stage 3, where you overfit the 
 
 ```python
 train_loader = DataLoader(train_ds, batch_size=64, shuffle=True)
-val_loader   = DataLoader(val_ds,   batch_size=64, shuffle=False)
+val_loader = DataLoader(val_ds, batch_size=64, shuffle=False)
 ```
 
 - Time series and grouped data need care. Shuffle inside a legal group. A global shuffle leaks
@@ -407,7 +407,7 @@ multiplies the loss at init by the batch size.
 **Repair**
 
 ```python
-criterion = nn.CrossEntropyLoss()          # reduction='mean' by default
+criterion = nn.CrossEntropyLoss()  # reduction='mean' by default
 
 # Variable-length sequences: average over the valid tokens and mask the padding.
 loss = (per_token_loss * mask).sum() / mask.sum()
@@ -489,7 +489,7 @@ the input.
 **Repair**
 
 ```python
-mu = train_x.mean(0, keepdim=True)      # fit on the training set alone
+mu = train_x.mean(0, keepdim=True)  # fit on the training set alone
 sd = train_x.std(0, keepdim=True) + 1e-8
 # Save mu and sd. Reuse them for train, validation, test, and production.
 norm = lambda x: (x - mu) / sd
@@ -520,6 +520,7 @@ def seed_everything(seed=42):
     import os, random
     import numpy as np
     import torch
+
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -557,8 +558,9 @@ running_loss = 0.0
 for xb, yb in train_loader:
     ...
     loss = criterion(out, yb)
-    loss.backward(); optimizer.step()
-    running_loss += loss.item() * xb.size(0)   # a scalar, weighted by the sample count (entry 8)
+    loss.backward()
+    optimizer.step()
+    running_loss += loss.item() * xb.size(0)  # a scalar, weighted by the sample count (entry 8)
 epoch_loss = running_loss / len(train_loader.dataset)
 ```
 
@@ -589,8 +591,8 @@ moves the loss at init away from `log(n)`.
 
 ```python
 # Multi-class: the target is a long class index of shape (N,).
-yb = yb.long()                       # do not build a one-hot target
-loss = nn.CrossEntropyLoss()(logits, yb)     # the logits have shape (N, C)
+yb = yb.long()  # do not build a one-hot target
+loss = nn.CrossEntropyLoss()(logits, yb)  # the logits have shape (N, C)
 
 # Multi-label or binary: the target is a float 0 or 1 of shape (N, C).
 loss = nn.BCEWithLogitsLoss()(logits, yb.float())

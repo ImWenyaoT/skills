@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Validate a local journal submission packet from a JSON manifest."""
+
 from __future__ import annotations
 
 import argparse
@@ -15,7 +16,6 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
-
 
 PUBLISHERS = ("elsevier", "ieee")
 SUBMISSION_STAGES = ("initial", "revision")
@@ -474,11 +474,7 @@ def check_side_materials(manifest: PacketManifest) -> list[str]:
             continue
         paragraphs, docx_errors = read_docx_paragraphs(path)
         errors.extend(docx_errors)
-        if (
-            paragraphs
-            and manifest.publisher == "elsevier"
-            and "highlight" in path.stem.lower()
-        ):
+        if paragraphs and manifest.publisher == "elsevier" and "highlight" in path.stem.lower():
             errors.extend(check_highlight_limits(paragraphs, manifest.limits))
     return errors
 
@@ -489,10 +485,14 @@ def count_pdf_pages(path: Path) -> tuple[int | None, list[str], bool]:
         return None, [f"PDF does not exist: {path}"], False
     pdfinfo = shutil.which("pdfinfo")
     if not pdfinfo:
-        return None, [
-            "page-count check is blocked: install poppler-utils (pdfinfo), then rerun "
-            "the packet check"
-        ], True
+        return (
+            None,
+            [
+                "page-count check is blocked: install poppler-utils (pdfinfo), then rerun "
+                "the packet check"
+            ],
+            True,
+        )
     result = subprocess.run([pdfinfo, str(path)], capture_output=True, text=True, check=False)
     match = re.search(r"^Pages:\s+(\d+)$", result.stdout, re.MULTILINE)
     if result.returncode != 0 or not match:
@@ -579,7 +579,9 @@ def check_source_zip(path: Path, entrypoint: str) -> tuple[list[str], bool]:
                 return ["standalone source zip compile did not produce a LaTeX log"], False
             log = log_path.read_text(encoding="utf-8", errors="replace")
             if "undefined references" in log.lower() or "undefined citations" in log.lower():
-                return ["standalone source zip compile has undefined references or citations"], False
+                return [
+                    "standalone source zip compile has undefined references or citations"
+                ], False
     return [], False
 
 

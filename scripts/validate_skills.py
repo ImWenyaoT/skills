@@ -10,6 +10,7 @@
   - references/ 下 >100 行的文件应以 "## Contents" 目录开头(警告)
 仅用标准库;有任何 error 时以非零码退出。
 """
+
 from __future__ import annotations
 
 import os
@@ -62,9 +63,7 @@ def main() -> int:
             if line.startswith("description: "):
                 value = line.removeprefix("description: ").strip()
                 if ": " in value and not value.startswith(("'", '"')):
-                    errors.append(
-                        f"{name}:{line_no}: description 含冒号时必须加 YAML 引号"
-                    )
+                    errors.append(f"{name}:{line_no}: description 含冒号时必须加 YAML 引号")
         fm = parse_frontmatter(text)
         nm, desc = fm.get("name", ""), fm.get("description", "")
 
@@ -98,7 +97,7 @@ def main() -> int:
             errors.append(f"{name}: SKILL.md 超过 500 行({body_lines})")
         # 规范建议正文 <5000 token;没有 tokenizer,按 4 字符≈1 token 粗估,只告警
         if len(text) / 4 > 5000:
-            warnings.append(f"{name}: SKILL.md 正文约 {int(len(text)/4)} token,规范建议 <5000")
+            warnings.append(f"{name}: SKILL.md 正文约 {int(len(text) / 4)} token,规范建议 <5000")
 
         refdir = os.path.join(d, "references")
         if os.path.isdir(refdir):

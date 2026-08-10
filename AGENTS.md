@@ -113,10 +113,23 @@ grader。这两层曾经实现过 375 行 + 一个 DeepSeek 路由器,在仓库�
 python3 scripts/ci.py            # CI 跑的全部检查,以脚本为准,不在这里抄一份
 ```
 
-`scripts/ci.py --coverage` 追加 `scripts/` 的 branch coverage 门槛(需要 `coverage` 包);
-CI 只在一个解释器上跑它。符号链接是否退化也在 `ci.py` 里查,不必手动 `diff`。
+工具链是 **uv + ruff + ty**,版本钉在 `pyproject.toml` 的 `dev` 依赖组里,由 `ci.py` 通过
+`uv run --group dev` 按次供给——**不往全局装任何东西**,笔记本和 CI 用的是同一组版本。
+`scripts/ci.py --coverage` 追加 `scripts/` 的 branch coverage 门槛;CI 只在一个解释器上跑它。
+符号链接是否退化也在 `ci.py` 里查,不必手动 `diff`。
+
+格式化用 `ruff format`,但 CI 跑的是 `--check`:**会改文件的检查等于把红的变绿还不告诉你**。
 
 要求 **0 错误 0 警告**。每次 push/PR 由 `.github/workflows/validate-skills.yml` 自动校验。
+
+## 开发方式
+
+**先写会失败的测试,再实现。** 改仓库工具(`scripts/`)时这条是硬的:先写一条断言新行为的测试,
+跑它、看它红,再动实现。理由不是仪式感——这一轮里 `ci.py` 换 uv 依赖组、加 ruff/ty 那次,
+5 条测试先红后绿,而"实现完再补测试"写出来的测试只会断言你恰好写成的样子。
+
+测试名写成**行为陈述**而不是函数名(`test_every_check_runs_even_after_one_fails`
+而不是 `test_main`),docstring 写清"为什么这条行为重要"。读测试列表应该等于读一份规格。
 
 ## 新增 / 修改一个 skill 的流程
 

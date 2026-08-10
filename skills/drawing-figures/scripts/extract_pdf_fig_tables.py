@@ -21,7 +21,9 @@ class Caption:
 
 def parse_args() -> argparse.Namespace:
     """CLI: local PDF directory and output md are both required."""
-    p = argparse.ArgumentParser(description="Extract figure/table caption candidates from local PDFs")
+    p = argparse.ArgumentParser(
+        description="Extract figure/table caption candidates from local PDFs"
+    )
     p.add_argument("--pdf-dir", dest="pdf_dir", type=Path, required=True, help="PDF root directory")
     p.add_argument("--out", type=Path, required=True, help="output md path")
     return p.parse_args()
@@ -32,8 +34,7 @@ def pdf_to_lines(pdf_path: Path) -> list[str]:
     result = subprocess.run(
         ["pdftotext", "-raw", str(pdf_path), "-"],
         check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         text=True,
         errors="replace",
     )
@@ -41,7 +42,8 @@ def pdf_to_lines(pdf_path: Path) -> list[str]:
 
 
 def normalize_text(text: str) -> str:
-    """Normalize whitespace and the usual PDF-extraction garble (ligatures, hyphenation, and friends)."""
+    """Normalize whitespace and the usual PDF-extraction garble (ligatures, hyphenation, \
+and friends)."""
     text = re.sub(r"\s+", " ", text)
     text = text.replace("ﬁ", "fi").replace("ﬂ", "fl")
     text = text.replace("state-of-the-art", "state of the art")
@@ -58,13 +60,16 @@ def looks_like_caption_start(line: str) -> re.Match[str] | None:
     if not table_match:
         return None
     rest = table_match.group(3).strip()
-    if re.match(r"^(compares|shows|depicts|outlines|presents|displays|summarizes)\b", rest, flags=re.I):
+    if re.match(
+        r"^(compares|shows|depicts|outlines|presents|displays|summarizes)\b", rest, flags=re.I
+    ):
         return None
     return table_match
 
 
 def collect_caption(lines: list[str], start_index: int, match: re.Match[str]) -> Caption:
-    """Collect the full caption text from its opening line and the continuation lines that follow."""
+    """Collect the full caption text from its opening line and the continuation lines that \
+follow."""
     kind_token, number, rest = match.groups()
     kind = "Figure" if kind_token in {"Fig.", "Figure"} else "Table"
     parts = [rest] if rest else []
@@ -95,7 +100,8 @@ def collect_caption(lines: list[str], start_index: int, match: re.Match[str]) ->
 
 
 def parse_captions(lines: list[str]) -> list[Caption]:
-    """Parse every caption candidate out of a list of text lines, returning a list of Caption (pure function, no IO)."""
+    """Parse every caption candidate out of a list of text lines, returning a list of \
+Caption (pure function, no IO)."""
     results: list[Caption] = []
     for idx, line in enumerate(lines):
         match = looks_like_caption_start(line)
@@ -133,9 +139,13 @@ def render_markdown(rows: list[tuple[Path, list[Caption], list[Caption]]]) -> st
     lines = [
         "# Paper figure/table audit",
         "",
-        "This document batch-extracts Figure/Table captions from the given PDF directory, so you can see at a glance which figures papers usually draw and which tables they usually include.",
+        "This document batch-extracts Figure/Table captions from the given PDF directory, "
+        "so you can see at a glance which figures papers usually draw and which tables "
+        "they usually include.",
         "",
-        "Note: captions keep the paper's original English, so you can check them back against the PDF; the automatic extraction may contain line breaks, split words, or the odd body-text false match, so review them by hand before citing anything.",
+        "Note: captions keep the paper's original English, so you can check them back "
+        "against the PDF; the automatic extraction may contain line breaks, split words, "
+        "or the odd body-text false match, so review them by hand before citing anything.",
         "",
         f"Total PDFs: {len(rows)}",
         "",
@@ -167,7 +177,8 @@ def render_markdown(rows: list[tuple[Path, list[Caption], list[Caption]]]) -> st
 
 
 def main() -> None:
-    """Main entry point: scan the PDF directory, extract captions, and write out the Markdown file."""
+    """Main entry point: scan the PDF directory, extract captions, and write out the \
+Markdown file."""
     args = parse_args()
     pdf_dir: Path = args.pdf_dir
     out_path: Path = args.out

@@ -6,14 +6,24 @@ Every paper's figures/scripts/draw_*.py imports the same three:
     from figkit.plot_helpers import save_fig, style_axes, scatter_ours_vs_base
 which is what keeps the figures of different papers looking like one set.
 """
+
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
 
 from figkit.palette_base import (
-    BG, PANEL, TEXT, MUTED, RULE,
-    POINT_OURS_FILL, POINT_OURS_STROKE, POINT_BASE_FILL, POINT_BASE_STROKE,
-    FONT_AXIS, FONT_TICK, FONT_LEGEND,
+    BG,
+    FONT_AXIS,
+    FONT_LEGEND,
+    FONT_TICK,
+    MUTED,
+    PANEL,
+    POINT_BASE_FILL,
+    POINT_BASE_STROKE,
+    POINT_OURS_FILL,
+    POINT_OURS_STROKE,
+    RULE,
+    TEXT,
 )
 
 
@@ -48,8 +58,7 @@ def style_axes(ax, xlabel="", ylabel="", title=""):
     return ax
 
 
-def scatter_ours_vs_base(ax, ours_xy, base_xy, ours_label="Ours",
-                         base_labels=None, annotate=True):
+def scatter_ours_vs_base(ax, ours_xy, base_xy, ours_label="Ours", base_labels=None, annotate=True):
     """Draw the "ours vs baselines" scatter: ours in solid red, baselines in teal.
 
     ours_xy:     a single (x, y) point
@@ -58,14 +67,38 @@ def scatter_ours_vs_base(ax, ours_xy, base_xy, ours_label="Ours",
     """
     bx = [p[0] for p in base_xy]
     by = [p[1] for p in base_xy]
-    ax.scatter(bx, by, s=70, c=POINT_BASE_FILL, edgecolors=POINT_BASE_STROKE,
-               linewidths=1.0, zorder=3, label="Baselines")
-    ax.scatter([ours_xy[0]], [ours_xy[1]], s=130, marker="*",
-               c=POINT_OURS_FILL, edgecolors=POINT_OURS_STROKE,
-               linewidths=1.2, zorder=4, label=ours_label)
+    ax.scatter(
+        bx,
+        by,
+        s=70,
+        c=POINT_BASE_FILL,
+        edgecolors=POINT_BASE_STROKE,
+        linewidths=1.0,
+        zorder=3,
+        label="Baselines",
+    )
+    ax.scatter(
+        [ours_xy[0]],
+        [ours_xy[1]],
+        s=130,
+        marker="*",
+        c=POINT_OURS_FILL,
+        edgecolors=POINT_OURS_STROKE,
+        linewidths=1.2,
+        zorder=4,
+        label=ours_label,
+    )
     if annotate and base_labels:
-        for (x, y), name in zip(base_xy, base_labels):
-            ax.annotate(name, (x, y), fontsize=FONT_LEGEND, color=MUTED,
-                        xytext=(4, 4), textcoords="offset points")
+        # strict: a label list that does not match the points is a mistake worth
+        # raising over, not one to silently truncate.
+        for (x, y), name in zip(base_xy, base_labels, strict=True):
+            ax.annotate(
+                name,
+                (x, y),
+                fontsize=FONT_LEGEND,
+                color=MUTED,
+                xytext=(4, 4),
+                textcoords="offset points",
+            )
     ax.legend(fontsize=FONT_LEGEND, frameon=False)
     return ax

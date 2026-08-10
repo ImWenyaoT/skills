@@ -66,15 +66,22 @@ def compile_template(template: Path, strategy: str) -> tuple[bool, str]:
         workdir = Path(tmp) / "letter"
         shutil.copytree(template, workdir)
         if strategy == "latexmk":
-            commands = [["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error",
-                         "main.tex"]]
+            commands = [
+                ["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error", "main.tex"]
+            ]
         else:
             latex = ["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "main.tex"]
             commands = [latex, latex]
         output = ""
         for command in commands:
-            result = subprocess.run(command, cwd=workdir, stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT, text=True, check=False)
+            result = subprocess.run(
+                command,
+                cwd=workdir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                check=False,
+            )
             output += result.stdout
             if result.returncode != 0:
                 return False, "\n".join(output.splitlines()[-30:])

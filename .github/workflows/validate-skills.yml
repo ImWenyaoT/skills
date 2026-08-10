@@ -29,12 +29,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # scripts/ci.py supplies requirements-ci.txt per run through uv, pinned to
-      # the interpreter above, so nothing is installed into the job's Python.
+      # scripts/ci.py supplies the pyproject `dev` group per run through uv,
+      # pinned to the interpreter above, so nothing is installed into the job's
+      # Python. ruff and ty come from that group too — one declared version each,
+      # so CI and a laptop lint identically.
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
-          cache-dependency-glob: requirements-ci.txt
+          cache-dependency-glob: pyproject.toml
 
       - name: Run every check
         run: python scripts/ci.py

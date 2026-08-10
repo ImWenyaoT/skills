@@ -1,0 +1,37 @@
+[project]
+name = "imwenyaot-skills"
+version = "1.0.0"
+description = "Agent Skills for research and paper work."
+requires-python = ">=3.11"
+dependencies = []
+
+# The repository ships no importable package — the skills are folders, and the
+# repository tooling is stdlib-only. Everything here is what the *checks* need.
+[dependency-groups]
+dev = [
+    "coverage==7.10.7",
+    "matplotlib==3.10.6",
+    "pillow==11.3.0",
+    "python-docx==1.2.0",
+    "ruff==0.16.2",
+    "ty==0.0.69",
+]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["skills/training-models/sample_codes"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# The pitfall files exist to show wrong code beside right code.
+"skills/*/sample_codes/**" = ["ALL"]
+
+[tool.ty.environment]
+python-version = "3.11"
+
+[tool.ty.src]
+# Skill scripts import torch, matplotlib, and PIL. The first is never installed
+# here, so type-checking them would report the environment rather than the code.
+exclude = ["skills/training-models/sample_codes"]

@@ -17,7 +17,6 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-
 # Filename regex that excludes review/benchmark papers
 EXCLUDE_NAME_PATTERN = re.compile(
     r"(review|survey|benchmark|revisiting|comprehensive_review|experimental_comparison|dynamic_rgbt_tracking)",
@@ -42,7 +41,9 @@ CONCLUSION_HEADING_PATTERN = re.compile(
     re.IGNORECASE,
 )
 # Conclusion-section heading fallback match (unnumbered form)
-CONCLUSION_FALLBACK_PATTERN = re.compile(r"^\s*(?:Conclusion|CONCLUSION|Conclusions|CONCLUSIONS)\s*$")
+CONCLUSION_FALLBACK_PATTERN = re.compile(
+    r"^\s*(?:Conclusion|CONCLUSION|Conclusions|CONCLUSIONS)\s*$"
+)
 # Figure-caption line match
 FIGURE_CAPTION_PATTERN = re.compile(r"^\s*(?:Fig\.|Figure)\s*([0-9]+)\b", re.IGNORECASE)
 # Table-caption line match
@@ -66,10 +67,19 @@ class PaperCount:
 
 
 def parse_args() -> argparse.Namespace:
-    """CLI: the PDF corpus, the extracted-text directory, and the output CSV path are all required."""
-    p = argparse.ArgumentParser(description="Survey of figure/table counts in reference-paper experiments sections")
+    """CLI: the PDF corpus, the extracted-text directory, and the output CSV path are all \
+required."""
+    p = argparse.ArgumentParser(
+        description="Survey of figure/table counts in reference-paper experiments sections"
+    )
     p.add_argument("--corpus", type=Path, required=True, help="reference-paper PDF root directory")
-    p.add_argument("--text-root", dest="text_root", type=Path, required=True, help="directory of pdftotext output")
+    p.add_argument(
+        "--text-root",
+        dest="text_root",
+        type=Path,
+        required=True,
+        help="directory of pdftotext output",
+    )
     p.add_argument("--out", type=Path, required=True, help="output CSV path")
     return p.parse_args()
 
@@ -109,7 +119,9 @@ def find_experiment_slice(lines: list[str]) -> tuple[int, int]:
 
     end = len(lines)
     for index in range(start + 1, len(normalized)):
-        if CONCLUSION_HEADING_PATTERN.match(normalized[index]) or CONCLUSION_FALLBACK_PATTERN.match(normalized[index]):
+        if CONCLUSION_HEADING_PATTERN.match(normalized[index]) or CONCLUSION_FALLBACK_PATTERN.match(
+            normalized[index]
+        ):
             end = index
             break
     return start, end
@@ -127,7 +139,8 @@ def collect_unique_captions(lines: list[str], pattern: re.Pattern[str]) -> set[s
 
 
 def count_experiment_floats(lines: list[str]) -> dict[str, int]:
-    """Count the figures and tables inside the experiments section of a list of text lines (pure function).
+    """Count the figures and tables inside the experiments section of a list of text lines \
+(pure function).
 
     Locate the experiments heading → count the unique Fig./Table. references within that span.
     Returns {"figures": n, "tables": m}; both are 0 when no experiments section is found.
@@ -156,13 +169,15 @@ def ensure_pdf_text(pdf_path: Path, text_root: Path) -> Path:
 
 
 def list_method_reference_pdfs(corpus: Path) -> list[Path]:
-    """List the journal reference PDFs under the corpus directory, minus the review/benchmark ones."""
+    """List the journal reference PDFs under the corpus directory, minus the \
+review/benchmark ones."""
     pdfs = sorted(corpus.glob("**/*.pdf"))
     return [pdf for pdf in pdfs if not EXCLUDE_NAME_PATTERN.search(pdf.stem)]
 
 
 def count_one_pdf(pdf_path: Path, corpus: Path, text_root: Path) -> PaperCount | None:
-    """Count the figures/tables in one reference PDF's experiments section; returns None on failure."""
+    """Count the figures/tables in one reference PDF's experiments section; returns None \
+on failure."""
     text_path = ensure_pdf_text(pdf_path, text_root)
     lines = text_path.read_text(encoding="utf-8", errors="replace").splitlines()
     start, end = find_experiment_slice(lines)
@@ -180,7 +195,9 @@ def count_one_pdf(pdf_path: Path, corpus: Path, text_root: Path) -> PaperCount |
         figure_count=len(figure_ids),
         table_count=len(table_ids),
         total_count=len(figure_ids) + len(table_ids),
-        figures=";".join(sorted(figure_ids, key=lambda item: int(item) if item.isdigit() else item)),
+        figures=";".join(
+            sorted(figure_ids, key=lambda item: int(item) if item.isdigit() else item)
+        ),
         tables=";".join(sorted(table_ids)),
         section_start_line=start + 1,
         section_end_line=end,

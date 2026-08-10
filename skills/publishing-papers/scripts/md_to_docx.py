@@ -5,6 +5,7 @@ Takes any list of .md files plus an output directory. Conservative 11pt layout,
 which is what publisher submission systems expect for cover letters and
 highlights. Requires python-docx.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -12,6 +13,7 @@ import re
 from pathlib import Path
 
 from docx import Document
+from docx.document import Document as DocxDocument  # the class; `Document` is the factory
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 
@@ -45,7 +47,7 @@ def iter_markdown_blocks(path: Path) -> list[tuple[str, str]]:
     return blocks
 
 
-def apply_document_style(document: Document, font: str | None = None) -> None:
+def apply_document_style(document: DocxDocument, font: str | None = None) -> None:
     """Apply the conservative 11pt upload layout, optionally forcing one font family."""
     styles = document.styles
     for name in ("Normal", "Body Text"):
@@ -60,7 +62,7 @@ def apply_document_style(document: Document, font: str | None = None) -> None:
             styles[name].font.size = Pt(size)
 
 
-def add_block(document: Document, block_type: str, text: str) -> None:
+def add_block(document: DocxDocument, block_type: str, text: str) -> None:
     """Write one parsed Markdown block into the DOCX, dropping **bold** and `code` markers."""
     text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
     text = re.sub(r"`([^`]*)`", r"\1", text)
@@ -81,7 +83,7 @@ def markdown_to_docx(source: Path, target: Path, font: str | None = None) -> Non
     for block_type, text in iter_markdown_blocks(source):
         add_block(document, block_type, text)
     target.parent.mkdir(parents=True, exist_ok=True)
-    document.save(target)
+    document.save(str(target))
 
 
 def main() -> None:

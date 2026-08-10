@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Extract per-section word counts from a corpus of reference papers, giving robust target ranges for writing.
+"""Extract per-section word counts from a corpus of reference papers, giving robust target \
+ranges for writing.
 
 Word counts are right-skewed, so the median is the anchor and the IQR (Q1-Q3) is the target range,
 with mean/std/trimmed-mean attached for reference. Each section's extraction coverage
@@ -25,24 +26,39 @@ from pathlib import Path
 # Default exclusion regex: review/survey/benchmark and other non-method papers
 DEFAULT_EXCLUDE = r"Comprehensive_Review|Survey|UniRTL|Adversarial"
 
-# canonical section bucket -> heading keywords (matched in priority order; the first bucket to hit wins)
+# canonical section bucket -> heading keywords (matched in priority order;
+# the first bucket to hit wins)
 SECTION_KEYWORDS = [
     ("introduction", [r"introduction"]),
     ("related", [r"related\s+work", r"^background"]),
-    ("method", [r"method", r"methodology", r"proposed", r"approach",
-                r"\bour\b", r"framework", r"\bnetwork\b", r"architecture"]),
+    (
+        "method",
+        [
+            r"method",
+            r"methodology",
+            r"proposed",
+            r"approach",
+            r"\bour\b",
+            r"framework",
+            r"\bnetwork\b",
+            r"architecture",
+        ],
+    ),
     ("experiments", [r"experiment", r"experimental", r"result", r"evaluation"]),
     ("conclusion", [r"conclusion", r"concluding"]),
 ]
 # Marks the end of the body (nothing after references/acknowledgments counts)
-END_KEYWORDS = re.compile(r"^(references|acknowledg|declaration|appendix|"
-                          r"data\s+availability|supplementary)", re.I)
-SECTIONS = ["abstract", "introduction", "related", "method",
-            "experiments", "conclusion"]
+END_KEYWORDS = re.compile(
+    r"^(references|acknowledg|declaration|appendix|"
+    r"data\s+availability|supplementary)",
+    re.I,
+)
+SECTIONS = ["abstract", "introduction", "related", "method", "experiments", "conclusion"]
 
 
 def summarize(counts):
-    """Compute a robust distribution over a set of word counts: median anchor + IQR range (word counts are right-skewed).
+    """Compute a robust distribution over a set of word counts: median anchor + IQR range \
+(word counts are right-skewed).
 
     counts: list[int], one section's word counts across papers.
     Returns dict(median/q1/q3/mean/std/n); when n<2, q1/q3 collapse onto the median.
@@ -61,20 +77,32 @@ def summarize(counts):
 
 
 def parse_args():
-    """CLI: corpus directory and output directory are required; exclusion regex and output prefix are optional."""
-    p = argparse.ArgumentParser(description="Per-section word budget from reference papers (median+IQR)")
-    p.add_argument("--corpus", type=Path, required=True, help="root directory of the reference-paper PDF corpus")
-    p.add_argument("--out", type=Path, required=True, help="output directory for the statistics CSVs")
+    """CLI: corpus directory and output directory are required; exclusion regex and output \
+prefix are optional."""
+    p = argparse.ArgumentParser(
+        description="Per-section word budget from reference papers (median+IQR)"
+    )
+    p.add_argument(
+        "--corpus",
+        type=Path,
+        required=True,
+        help="root directory of the reference-paper PDF corpus",
+    )
+    p.add_argument(
+        "--out", type=Path, required=True, help="output directory for the statistics CSVs"
+    )
     p.add_argument("--exclude", default=DEFAULT_EXCLUDE, help="filename exclusion regex")
     p.add_argument("--prefix", default="", help="output filename prefix (e.g. myproject_)")
     return p.parse_args()
 
 
 def extract_text(pdf: Path) -> str:
-    """Extract the full text with pdftotext -raw (it preserves two-column reading order better than the default mode)."""
+    """Extract the full text with pdftotext -raw (it preserves two-column reading order \
+better than the default mode)."""
     res = subprocess.run(
         ["pdftotext", "-raw", "-q", str(pdf), "-"],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
     return res.stdout
 
@@ -89,9 +117,11 @@ def classify_heading(title: str) -> str | None:
 
 
 def find_numbered_headings(lines: list[str]) -> list[tuple[int, int, str]]:
-    """Find the top-level numbered section headings, returning [(line number, number N, canonical bucket)].
+    """Find the top-level numbered section headings, returning [(line number, number N, \
+canonical bucket)].
 
-    Only short lines of the form 'N. Title' / 'N Title' are accepted (<=6 words, <50 characters), and
+    Only short lines of the form 'N. Title' / 'N Title' are accepted (<=6 words, <50 \
+characters), and
     the numbering must rise roughly monotonically from 1, which filters out body-text noise such as
     'Fig. 1', list items, and equation numbers.
     """
@@ -109,7 +139,8 @@ def find_numbered_headings(lines: list[str]) -> list[tuple[int, int, str]]:
         if bucket is None:
             continue
         cand.append((i, num, bucket))
-    # keep only non-decreasing numbers and the first occurrence of each bucket, filtering stray mismatches
+    # keep only non-decreasing numbers and the first occurrence of each bucket,
+    # filtering stray mismatches
     kept: list[tuple[int, int, str]] = []
     last_num = 0
     seen: set[str] = set()
@@ -125,7 +156,8 @@ def find_numbered_headings(lines: list[str]) -> list[tuple[int, int, str]]:
 
 
 def count_words(lines: list[str], a: int, b: int) -> int:
-    """Count the English words in the line range [a, b) (skipping obvious short numeric header/footer lines)."""
+    """Count the English words in the line range [a, b) (skipping obvious short numeric \
+header/footer lines)."""
     words = 0
     for ln in lines[a:b]:
         s = ln.strip()
@@ -138,7 +170,8 @@ def count_words(lines: list[str], a: int, b: int) -> int:
 
 
 def section_counts(text: str) -> dict[str, int | None]:
-    """For one paper's full text, return the word count of each canonical section (None where it cannot be recovered)."""
+    """For one paper's full text, return the word count of each canonical section (None \
+where it cannot be recovered)."""
     lines = text.splitlines()
     out: dict[str, int | None] = {s: None for s in SECTIONS}
     headings = find_numbered_headings(lines)
@@ -162,7 +195,8 @@ def section_counts(text: str) -> dict[str, int | None]:
                 break
         out["abstract"] = count_words(lines, abs_start, abs_end)
 
-    # numbered sections: each bucket runs from its heading line to the next section heading / end of body
+    # numbered sections: each bucket runs from its heading line to the next section
+    # heading / end of body
     order = sorted([(i, b) for i, num, b in headings])
     # find the end of the body: references/acknowledgment and friends appearing after the conclusion
     end_idx = n
@@ -178,12 +212,13 @@ def section_counts(text: str) -> dict[str, int | None]:
 
 
 def robust_stats(vals: list[int]) -> dict[str, float]:
-    """Compute robust statistics over a set of word counts: N/mean/std/median/Q1/Q3/IQR/10% trimmed mean."""
+    """Compute robust statistics over a set of word counts: N/mean/std/median/Q1/Q3/IQR/10% \
+trimmed mean."""
     vals = sorted(vals)
     k = len(vals)
     q = st.quantiles(vals, n=4) if k >= 2 else [vals[0], vals[0], vals[0]]
     trim = max(1, int(k * 0.1))
-    core = vals[trim:k - trim] if k - 2 * trim >= 1 else vals
+    core = vals[trim : k - trim] if k - 2 * trim >= 1 else vals
     return {
         "N": k,
         "mean": round(st.mean(vals)),
@@ -198,7 +233,8 @@ def robust_stats(vals: list[int]) -> dict[str, float]:
 
 
 def main() -> None:
-    """Main flow: read the command-line arguments, extract each paper's per-section word counts -> write the per-paper CSV -> compute and write the per-section statistics CSV."""
+    """Main flow: read the command-line arguments, extract each paper's per-section word \
+counts -> write the per-paper CSV -> compute and write the per-section statistics CSV."""
     args = parse_args()
     exclude_pat = re.compile(args.exclude, re.I)
 
@@ -225,21 +261,24 @@ def main() -> None:
         summ.append({"section": s, "coverage": f"{cov}/{total}", **stats})
 
     with (args.out / f"{args.prefix}section_wordcount_summary.csv").open("w", newline="") as f:
-        cols = ["section", "coverage", "N", "median", "Q1", "Q3",
-                "mean", "std", "trimmed_mean"]
+        cols = ["section", "coverage", "N", "median", "Q1", "Q3", "mean", "std", "trimmed_mean"]
         w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(summ)
 
     # console output
     print(f"corpus: {total} method papers (excluded: {args.exclude})\n")
-    print(f"{'section':<13}{'cover':<8}{'median':>8}{'IQR(Q1-Q3)':>16}"
-          f"{'mean':>8}{'std':>7}{'trim_mean':>11}")
+    print(
+        f"{'section':<13}{'cover':<8}{'median':>8}{'IQR(Q1-Q3)':>16}"
+        f"{'mean':>8}{'std':>7}{'trim_mean':>11}"
+    )
     for d in summ:
         if "median" in d:
-            print(f"{d['section']:<13}{d['coverage']:<8}{d['median']:>8}"
-                  f"{str(d['Q1'])+'-'+str(d['Q3']):>16}{d['mean']:>8}"
-                  f"{d['std']:>7}{d['trimmed_mean']:>11}")
+            print(
+                f"{d['section']:<13}{d['coverage']:<8}{d['median']:>8}"
+                f"{str(d['Q1']) + '-' + str(d['Q3']):>16}{d['mean']:>8}"
+                f"{d['std']:>7}{d['trimmed_mean']:>11}"
+            )
         else:
             print(f"{d['section']:<13}{d['coverage']:<8}  (coverage too low, statistics skipped)")
 

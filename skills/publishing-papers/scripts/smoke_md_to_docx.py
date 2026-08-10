@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Convert the bundled Markdown fixture and verify a DOCX is written."""
+
 from __future__ import annotations
 
 import sys
@@ -8,7 +9,6 @@ import zipfile
 from pathlib import Path
 
 from md_to_docx import markdown_to_docx
-
 
 ROOT = Path(__file__).resolve().parents[1]
 

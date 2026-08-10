@@ -7,7 +7,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -33,6 +32,11 @@ class CheckPlanTests(unittest.TestCase):
         for shipped in ROOT.glob("skills/*/tests"):
             self.assertIn(shipped, suites)
 
+    def test_python_files_skips_the_virtualenv(self) -> None:
+        """uv builds .venv inside the repo; compiling its thousands of files is not a check."""
+        self.assertFalse([f for f in ci.python_files() if f.startswith(".venv")])
+        self.assertFalse([f for f in ci.python_files() if f.split("/")[0].startswith(".")])
+
     def test_python_files_skips_caches(self) -> None:
         files = ci.python_files()
         self.assertTrue(files)
@@ -56,6 +60,40 @@ class CheckPlanTests(unittest.TestCase):
         self.assertFalse([c for _, c in ci.checks(True) if "xml" in c])
 
 
+class DependencyDeclarationTests(unittest.TestCase):
+    """Given the project declares its dependencies, then it does so in one place."""
+
+    def test_dev_dependencies_live_in_pyproject(self) -> None:
+        import tomllib
+
+        pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        group = pyproject["dependency-groups"]["dev"]
+        joined = " ".join(group)
+        for package in ("coverage", "matplotlib", "pillow", "ruff", "ty"):
+            self.assertIn(package, joined.lower())
+
+    def test_requirements_txt_is_gone(self) -> None:
+        """uv reads pyproject; a second dependency file is a second thing to drift."""
+        self.assertFalse((ROOT / "requirements-ci.txt").exists())
+
+
+class LintAndTypeTests(unittest.TestCase):
+    """Given ruff and ty are the chosen tools, then ci.py must actually run them."""
+
+    def test_the_plan_lints_formats_and_type_checks(self) -> None:
+        plan = ci.checks(with_coverage=False)
+        flat = [" ".join(cmd) for _, cmd in plan]
+        self.assertTrue(any("ruff check" in cmd for cmd in flat))
+        self.assertTrue(any("ruff format" in cmd and "--check" in cmd for cmd in flat))
+        self.assertTrue(any("ty check" in cmd for cmd in flat))
+
+    def test_format_check_does_not_rewrite_files(self) -> None:
+        """A check that edits the tree turns a red build green without telling you."""
+        plan = dict(ci.checks(with_coverage=False))
+        fmt = [cmd for name, cmd in plan.items() if "format" in name.lower()][0]
+        self.assertIn("--check", fmt)
+
+
 class InterpreterTests(unittest.TestCase):
     def setUp(self) -> None:
         self._which = ci.shutil.which
@@ -65,7 +103,8 @@ class InterpreterTests(unittest.TestCase):
         ci.shutil.which = lambda name: "/usr/bin/uv" if name == "uv" else None
         argv = ci.interpreter()
         self.assertEqual(argv[:2], ["uv", "run"])
-        self.assertIn(ci.REQUIREMENTS, argv)
+        self.assertIn("--group", argv)
+        self.assertIn("dev", argv)
         # Without --python, a CI matrix over several versions would test one.
         self.assertIn("--python", argv)
         self.assertIn(sys.executable, argv)
@@ -115,13 +154,10 @@ class ExitCodeTests(unittest.TestCase):
 
 class DiscoveryTests(unittest.TestCase):
     def test_expected_count_comes_from_the_filesystem(self) -> None:
-        self.assertEqual(
-            discovery.expected_count(), len(list(ROOT.glob("skills/*/SKILL.md")))
-        )
+        self.assertEqual(discovery.expected_count(), len(list(ROOT.glob("skills/*/SKILL.md"))))
 
     def test_ansi_is_stripped_before_matching(self) -> None:
-        self.assertEqual(discovery.ANSI.sub("", "\x1b[32mFound 4 skills\x1b[0m"),
-                         "Found 4 skills")
+        self.assertEqual(discovery.ANSI.sub("", "\x1b[32mFound 4 skills\x1b[0m"), "Found 4 skills")
 
 
 if __name__ == "__main__":
