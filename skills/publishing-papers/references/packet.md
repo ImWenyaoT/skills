@@ -24,6 +24,22 @@ The Markdown-to-DOCX converter needs `python-docx`. `uv run --with python-docx` 
 which needs `uv` and network access. Without either, install the package once
 (`pip install python-docx`) and call `python scripts/md_to_docx.py` directly.
 
+## Running these scripts in your environment
+
+The commands below use `uv run --with …`, which fetches the dependency per run and
+needs nothing installed. That is the zero-setup path, and it is what the examples
+show.
+
+**If you already have an environment with these packages — conda, a virtualenv,
+anything — run the script with your own Python instead:** `python scripts/<name>.py …`.
+Prefer that when the script has to see your data, your checkpoints, or anything else
+your environment resolves, because `uv run --with` builds a *separate* ephemeral
+environment: it will not see what your conda env sees.
+
+Whichever way you run it, a missing package stops the script with exit code 2 and a
+message naming the package and the uv, pip, and conda commands that install it. Exit 2
+means the work is blocked, never that a check failed.
+
 ## Inputs
 
 Require the canonical manuscript source, target journal and article type, live author-guide URL,

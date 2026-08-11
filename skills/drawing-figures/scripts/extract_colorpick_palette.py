@@ -13,11 +13,23 @@ Black and white are kept on their own.
 from __future__ import annotations
 
 import colorsys
+import sys
 from collections import Counter
 from pathlib import Path
 
-import numpy as np
-from PIL import Image
+try:
+    import numpy as np
+    from PIL import Image
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'pillow numpy'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with pillow numpy python <this script>\n"
+        "    pip install pillow numpy\n"
+        "    conda install pillow numpy\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 # Default hyper-parameters —— overridable from the command line
 QUANT_PER_IMG = 32  # quantized colours per image (generous, to cover gradients)

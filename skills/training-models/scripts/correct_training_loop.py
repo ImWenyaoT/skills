@@ -15,9 +15,22 @@ Requirement: torch. Run: python correct_training_loop.py
 
 from __future__ import annotations
 
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader, TensorDataset
+import sys
+
+try:
+    import torch
+    import torch.nn as nn
+    from torch.utils.data import DataLoader, TensorDataset
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'torch'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with torch python <this script>\n"
+        "    pip install torch\n"
+        "    conda install pytorch -c pytorch\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 # The default device. The template never selects a GPU on its own, because a shared
 # machine can hold a GPU that belongs to a different user. Pass device="cuda:1" to main()

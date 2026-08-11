@@ -14,9 +14,21 @@ from __future__ import annotations
 
 import copy
 import math
+import sys
 
-import torch
-import torch.nn as nn
+try:
+    import torch
+    import torch.nn as nn
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'torch'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with torch python <this script>\n"
+        "    pip install torch\n"
+        "    conda install pytorch -c pytorch\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 # The layers that change their behaviour between train mode and eval mode.
 # LayerNorm is not in this list, because LayerNorm acts the same in both modes.

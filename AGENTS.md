@@ -44,6 +44,12 @@
 - **引用文件只下探一层**(从 `SKILL.md` 直接链到);**>100 行的引用文件需带 `## Contents` 目录**(本库 lint 项)。
 - 可放心 bundle 大资源(API 文档、数据集、脚本)——**未被读取的文件零 token 开销**。
 - 脚本优先 **`uv run`**、尽量 stdlib;**函数级注释**;新增脚本前先看现有脚本能否复用。
+- **随 skill 发出去的脚本要能在别人的环境里跑。** 第三方 import 一律包 `try/except ImportError`,
+  报出缺的包 + uv/pip/conda 三种装法,并以**退出码 2** 结束(2 = 被阻塞,不是检查失败,与外部二进制
+  缺失时的约定一致)。文档不能只教 `uv run --with X`:conda 用户该被告知可以直接用自己的 Python,
+  因为 `uv run --with` 起的是**另一个临时环境**,看不见他们环境里的数据和 checkpoint。
+  这条由 `tests/test_shipped_scripts.py` 守着,而且它**结构检查和真跑各做一次**——只做结构检查的
+  版本曾经放过两个 bug:消息里印出字面量反斜杠 n,以及包名位置印出 `None`。
 
 ## 指令强度(degrees of freedom)
 

@@ -9,7 +9,20 @@ which is what keeps the figures of different papers looking like one set.
 
 from __future__ import annotations
 
-import matplotlib.pyplot as plt
+import sys
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'matplotlib'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with matplotlib python <this script>\n"
+        "    pip install matplotlib\n"
+        "    conda install matplotlib\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 from figkit.palette_base import (
     BG,

@@ -10,12 +10,24 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from pathlib import Path
 
-from docx import Document
-from docx.document import Document as DocxDocument  # the class; `Document` is the factory
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Pt
+try:
+    from docx import Document
+    from docx.document import Document as DocxDocument  # the class; `Document` is the factory
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.shared import Pt
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'python-docx'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with python-docx python <this script>\n"
+        "    pip install python-docx\n"
+        "    conda install python-docx -c conda-forge\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 
 def iter_markdown_blocks(path: Path) -> list[tuple[str, str]]:

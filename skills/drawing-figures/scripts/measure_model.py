@@ -12,12 +12,25 @@ project-specific model loading is the caller's job (a thin wrapper script).
 """
 
 import argparse
-import time
 
 # torch and thop are the skill's declared optional runtime, not repository
 # dependencies; installing them to type-check a measurement helper is not worth it.
-import torch  # ty: ignore[unresolved-import]
-import torch.nn as nn  # ty: ignore[unresolved-import]
+import sys
+import time
+
+try:
+    import torch  # ty: ignore[unresolved-import]
+    import torch.nn as nn  # ty: ignore[unresolved-import]
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'torch'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with torch python <this script>\n"
+        "    pip install torch\n"
+        "    conda install pytorch -c pytorch\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 # ---------------------------------------------------------------------------
 # Public API

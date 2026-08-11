@@ -12,9 +12,21 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import sys
 
-from PIL import Image, ImageDraw, ImageFont
-from PIL.ImageFont import FreeTypeFont
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    from PIL.ImageFont import FreeTypeFont
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'pillow'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with pillow python <this script>\n"
+        "    pip install pillow\n"
+        "    conda install pillow\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 
 def stitch_row(

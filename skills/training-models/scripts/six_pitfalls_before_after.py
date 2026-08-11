@@ -9,8 +9,21 @@ Requirement: torch. Run: python six_pitfalls_before_after.py
 
 from __future__ import annotations
 
-import torch
-import torch.nn as nn
+import sys
+
+try:
+    import torch
+    import torch.nn as nn
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'torch'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with torch python <this script>\n"
+        "    pip install torch\n"
+        "    conda install pytorch -c pytorch\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 
 def make_separable_batch(n_per_class=64, in_features=10, num_classes=3, seed=0):

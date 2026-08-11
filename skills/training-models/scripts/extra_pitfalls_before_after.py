@@ -12,9 +12,22 @@ from __future__ import annotations
 
 import math
 
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader, TensorDataset
+import sys
+
+try:
+    import torch
+    import torch.nn as nn
+    from torch.utils.data import DataLoader, TensorDataset
+except ImportError as exc:  # pragma: no cover - environment, not logic
+    sys.stderr.write(
+        f"{exc.name or 'torch'} is needed by this script and is not importable here.\n"
+        "Install it whichever way suits your environment:\n"
+        "    uv run --with torch python <this script>\n"
+        "    pip install torch\n"
+        "    conda install pytorch -c pytorch\n"
+        "Exit code 2 means the check is blocked, not that it failed.\n"
+    )
+    raise SystemExit(2) from exc
 
 
 # ──────────────────────────────────────────────────────────────────────
