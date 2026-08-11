@@ -11,7 +11,7 @@ the agent's work sits on both sides of that handoff.
 ## Contents
 
 - [The loop, and where the agent is not in it](#the-loop-and-where-the-agent-is-not-in-it)
-- [1. Write the model as mermaid, once](#1-write-the-model-as-mermaid-once)
+- [1. Give the agent state](#1-give-the-agent-state)
 - [2. Write the prompt](#2-write-the-prompt)
 - [3. Review each returned image, dataflow first](#3-review-each-returned-image-dataflow-first)
 - [4. Keep a render ledger](#4-keep-a-render-ledger)
@@ -20,7 +20,7 @@ the agent's work sits on both sides of that handoff.
 
 ## The loop, and where the agent is not in it
 
-1. The agent writes the **model** as mermaid, once per model.
+1. The agent writes the **model** down once, as mermaid or as prose.
 2. The agent writes a **prompt** per figure, deriving its topology from the mermaid.
 3. The human runs the prompt through an image model and brings the picture back. The agent marks
    up what is wrong and revises the prompt. Repeat until the dataflow is right.
@@ -35,19 +35,29 @@ Two artifacts, not one, and they do different jobs:
 - **The prompt is the figure.** One per figure, and it is the source of truth for that figure —
   the accumulated result of every round of review, not a message you retype each time.
 
-## 1. Write the model as mermaid, once
+## 1. Give the agent state
 
-Start from [`assets/architecture-template.mmd`](assets/architecture-template.mmd).
+An agent is stateless across conversations. It starts every one of them knowing nothing about your
+model, and the only way it learns the architecture is by reading the code — slowly, at the cost of
+a large part of the window, and arriving somewhere slightly different each time. **Write the
+architecture down once and that stops.** The file is the state: the next conversation, and the next
+agent, loads it in one read.
 
-The reason to write it first is not that the image model needs it. It is that **the architecture
-becomes something an agent loads in one read.** Without it, every new conversation and every
-switched agent starts by reading the model code again to recover what connects to what — slow, and
-quietly arriving somewhere slightly different each time. The mermaid is that lookup, cached, in a
-file you can diff.
+That is what makes the rest of this loop affordable. Rerolling a prompt is mechanical and
+repetitive by nature, and it is only cheap if the expensive part — knowing what connects to what —
+was paid once and kept. Without the file, every round of a mechanical loop re-derives the same
+understanding before it can do the five minutes of actual work.
 
-Which is also why a stale one is worse than none: it is a confident wrong answer that costs nothing
-to believe. Revise it whenever the architecture changes, and record when it was last checked
-against the code.
+**Mermaid is the default form, not the requirement.** It is diffable, it renders, and its edge
+kinds line up with the prompt and the palette, so it is what
+[`assets/architecture-template.mmd`](assets/architecture-template.mmd) starts you from. A prose
+description works too if that is what the architecture wants. What the form has to give you is the
+same three things: every module named as the code names it, every connection stated, and a date
+saying when it was last checked against the source.
+
+That date is not bookkeeping. A stale file is worse than none — it is a confident wrong answer that
+costs nothing to believe, and an agent given one will build on it without ever opening the code
+that would have contradicted it. Revise it whenever the architecture changes.
 
 **Writing it also audits the figure you already have.** Reading the forward pass and writing down
 what it actually does is the only cheap way to find out that the published figure says something
@@ -60,7 +70,7 @@ model does not have, and a reviewer who reads the code finds them.
 [`assets/example-hgd-net.mmd`](assets/example-hgd-net.mmd) is that mermaid, for reference on what
 the output looks like at real complexity.
 
-Rules that make it a spec rather than a sketch:
+Rules that make it usable as state rather than a sketch:
 
 - **Every node carries its tensor shape.** The shape is what a reader checks and what a traced file
   most often gets wrong.

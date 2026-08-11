@@ -64,9 +64,9 @@ files, a stated DPI above 600, CMYK, or a physical size limit in millimetres.
 
 - [Budget workflow](references/budget-workflow.md): commands, dependencies, outputs, and Phase A
   completion criteria.
-- [Method figures](references/method-figures.md): the mermaid that keeps the model loadable in one
-  read, the nine-section prompt, what to check on a returned image and in what order, the render
-  ledger, and the pass over a traced draw.io or PowerPoint file.
+- [Method figures](references/method-figures.md): writing the architecture down once so a stateless
+  agent stops re-reading the code, the nine-section prompt, what to check on a returned image and
+  in what order, the render ledger, and the pass over a traced draw.io or PowerPoint file.
 - [Chart selection](references/chart-selection.md): which chart form fits which data shape, and
   what to do when values span orders of magnitude.
 - [Figure script reference](references/figure-script-reference.md): diagram, plot, stitch,
