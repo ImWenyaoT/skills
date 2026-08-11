@@ -60,6 +60,9 @@ npx skills add . --skill publishing-papers
 skills/<name>/SKILL.md     # 可安装 skills
 evals/trigger_cases.json   # 触发边界 golden cases
 scripts/                   # 仓库级校验工具
+CONTEXT.md                # 本库术语表(一个词一个意思)
+docs/development.md       # 开发规范
+docs/adr/                 # 只活在 commit message 里就会被推翻的决定
 docs/skill-quality.md     # 验收判据
 docs/spec-conformance.md  # 规范对齐情况
 .claude-plugin/           # Claude Code marketplace 清单

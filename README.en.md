@@ -64,6 +64,9 @@ matches the problem in front of you.
 skills/<name>/SKILL.md     # Installable skills
 evals/trigger_cases.json   # Trigger-boundary golden cases
 scripts/                   # Repository validation tools
+CONTEXT.md                # The vocabulary this repo runs on
+docs/development.md       # Development conventions
+docs/adr/                 # Decisions that would otherwise be re-litigated
 docs/skill-quality.md     # The acceptance rubric
 docs/spec-conformance.md  # What the spec requires and what CI enforces
 .claude-plugin/           # Claude Code marketplace manifest
