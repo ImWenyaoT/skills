@@ -1,0 +1,172 @@
+# Development conventions
+
+The rules for working on this repository. `AGENTS.md` is deliberately short and points here;
+this is where the reasons live, so that a rule and the evidence behind it stay together.
+
+Sources: Anthropic and OpenAI official docs (see the references at the end), plus what this
+repository learned the hard way. The acceptance criteria for a finished skill are in
+[`skill-quality.md`](skill-quality.md); what the Agent Skills spec requires and what CI actually
+enforces is in [`spec-conformance.md`](spec-conformance.md).
+
+## 黄金法则(本库的不可妥协项)
+
+1. **每个 skill 必须自洽、可单独分享。** 一个 `SKILL.md` 里**禁止引用其它 skill**(不写「use `other-skill`」),**禁止依赖外部 skill**(如 `superpowers:*`、`skill-creator`)。
+   - 理由:skill 是**在 agent 层组合**的(用户各自安装多个,模型自己挑着用);把一个 skill 单独发给别人,它不该还要别的 skill 才能用。
+   - 需要表达边界时,**描述行为本身,不要点名兄弟 skill**:写「不处理 X」而不是「X 用 `other-skill`」。
+2. **一个 skill = 一个可被发现的能力。** 不做大而全的 catch-all。判据:能不能给它写**一个具体的两段式名字 + 一句精准的「何时用」描述**?写不出来就是范围太宽,该收窄。
+3. **内聚的任务域放一个 skill,内部用文件拆分**(progressive disclosure),而不是拆成多个 skill。
+4. **改任何 skill 前先想触发,改完必须验证**(见「触发测试」)。
+
+## 命名(Anthropic best-practices + agentskills.io 规范)
+
+硬规则(required):
+
+- 只允许**小写字母 + 数字 + 连字符**,**≤64 字符**;不能以 `-` 开头/结尾,不能出现连续 `--`。
+- 不能含 XML 标签;不能用保留词 `anthropic` / `claude`。
+- **目录名 == `SKILL.md` 的 `name:` 字段**(部分 loader 强校验)。
+
+本库 house style:
+
+- **两段式 `x-y`(单连字符)**、简短可扫读;名字要**具体可发现**,避免 `helper`/`utils`/`data`/`tools` 这类泛名。
+- 例:`training-models`、`writing-papers`、`publishing-papers`、`drawing-figures`。
+
+## 描述 `description`(Anthropic SDO)
+
+- **第三人称**,以**触发条件**为主——回答「**何时用**」,而非「做什么/怎么做」。
+- **关键词要密**:写用户真实会打的话(中文用户场景就放中文触发词),便于发现。
+- **不要在描述里复述 workflow / 步骤**——否则 agent 会照描述办事、跳过正文。
+- 反向边界(anti-scope)可以写(「Do not use for …」),但**只描述边界、不点名兄弟 skill**(自洽性)。
+- `≤1024` 字符(目标 `<500`)。
+
+## 正文与结构(Anthropic)
+
+- `SKILL.md` 正文 **≤500 行**;超了把细节挪进 `references/`。
+- **引用文件只下探一层**(从 `SKILL.md` 直接链到);**>100 行的引用文件需带 `## Contents` 目录**(本库 lint 项)。
+- 可放心 bundle 大资源(API 文档、数据集、脚本)——**未被读取的文件零 token 开销**。
+- 脚本优先 **`uv run`**、尽量 stdlib;**函数级注释**;新增脚本前先看现有脚本能否复用。
+- **随 skill 发出去的脚本要能在别人的环境里跑。** 第三方 import 一律包 `try/except ImportError`,
+  报出缺的包 + uv/pip/conda 三种装法,并以**退出码 2** 结束(2 = 被阻塞,不是检查失败,与外部二进制
+  缺失时的约定一致)。文档不能只教 `uv run --with X`:conda 用户该被告知可以直接用自己的 Python,
+  因为 `uv run --with` 起的是**另一个临时环境**,看不见他们环境里的数据和 checkpoint。
+  这条由 `tests/test_shipped_scripts.py` 守着,而且它**结构检查和真跑各做一次**——只做结构检查的
+  版本曾经放过两个 bug:消息里印出字面量反斜杠 n,以及包名位置印出 `None`。
+
+## 指令强度(degrees of freedom)
+
+**按每段内容的脆弱性选语气,不要全篇一个调门。** Anthropic 的比喻:窄桥 vs 开阔地。
+
+- **窄桥**——脆弱、易错、顺序不能变。给精确步骤和硬判据。例:必须按序执行的迁移命令、训练前的 sanity check。
+- **开阔地**——多条路都通、选哪条依上下文。给方向、给排序、**给每个选项的理由**,让模型自己判断。
+
+**压缩时最容易出事**:把一份带理由的阶梯压成裸序列,就把引导写成了命令。模型照做,但选不对——因为你把判断依据删了。要么保留理由,要么把这段指向 reference 并说明"那里有每个选项的理由"。
+
+**解释 why,而不是堆 MUST。** 全大写的 `ALWAYS`/`NEVER` 是黄信号:能改写成「目标行为 + 理由」就改写。今天的模型有 theory of mind,给了理由它能外推到你没写的情形;只给禁令它只会在你写到的那一条上听话。
+
+**ASD-STE100 的取舍**:它的**词汇纪律**(一词一义、不为文采换词、主动语态、不省略成分、名词串 ≤3 词)对 agent 完全适用,与 Anthropic 的 "consistent terminology" 同向,该守。它的**命令语气**只适用于窄桥段落——那套规范是给飞机维修手册写的,那里每一步都是窄桥。整篇套用会把开阔地也写成窄桥。
+
+参考:[Anthropic — Set appropriate degrees of freedom](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)、[OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills)。
+
+## 三层检查,各管一件事
+
+三处地方都在"验",但验的不是同一种东西,别混:
+
+| 验什么 | 在哪 | 形态 | 发不发出去 |
+|---|---|---|---|
+| **仓库工具本身对不对**——校验器真的会拒绝坏名字吗,判分器真的扣着 validation 不说吗 | `tests/` | 代码 | 不发 |
+| **描述会不会把对的 skill 叫出来**——跨 skill 的边界 | `evals/trigger_cases.json` | 数据(golden) | 不发 |
+| **随 skill 发出去的脚本能不能跑** | `skills/<name>/tests/` | 代码 | **跟着 skill 装到别人机器上** |
+
+**测试跟着代码走,不跟着 skill 走。** 纯散文的 skill(`writing-papers`、`comparing-runs`)
+没有 `tests/` 是正确的,不是缺失。反过来,**打包进 `scripts/` 的东西应该是"测过的脚本"**
+——官方 best-practices 的原话就是 write a tested script once。
+
+**依赖装不上不是不测的理由。** `training-models` 的检查要 torch,而 torch 不该成为本仓库的
+依赖;做法是测试用 `skipUnless` 守住 import,在没有 torch 的地方整体跳过,同目录再放一个
+notebook 把**同一份测试**跑在 Colab 上。测试是唯一的事实来源,notebook 只是另一个跑它的地方。
+
+**每道门都要两个方向测。** 只会报 pass 的门不是门。写这批测试时,反向断言当场抓到三个真缺陷:
+gate 5 返回裸元组而同文件其它检查都返回带 verdict 的 dict;`run_sanity_checks` 用
+`last < first*0.1` 又判了一遍 gate 5,和函数里的绝对阈值是两套定义;gate 1 固定 ±0.5 的容差
+在 skill 自己要求的「2 到 8 个样本」上会对**健康模型误报**,而它是诊断顺序里的第一道门。
+
+剩余欠账:`drawing-figures` 12 个 py 对 1 个测试文件。
+
+**没有第四层。** skill 用起来产出好不好——官方 `evaluating-skills` 描述的那套
+(`evals/evals.json` + assertion + 带/不带 skill 对照)本库**一条都没有**,原因见
+[`docs/spec-conformance.md`](docs/spec-conformance.md)。要补是一个决定,不是补漏。
+
+验收判据在 [`docs/skill-quality.md`](docs/skill-quality.md);规范对齐情况在
+[`docs/spec-conformance.md`](docs/spec-conformance.md)。
+
+## 触发测试(本库的验证闭环)
+
+本库只做**离线**的一层:**该触发的声明了吗、不该触发的划清了吗**。
+
+不做模型在环的路由指标(precision / recall / F1 / 混淆矩阵 / pass^k),也不做结果层
+grader。这两层曾经实现过 375 行 + 一个 DeepSeek 路由器,在仓库全部历史里**一次都没跑过**
+(把仓库的 skill 描述发给外部端点这件事从未获批),已删除。真需要时那是一次性调研,
+不该常驻仓库。
+
+工具与契约:
+
+- `evals/trigger_cases.json`:按 **60/40 划分 train / validation**,每条用例带 `split` 字段。每个 skill 在**两个 split 里各自** ≥2 条 positive + ≥2 条 forbidden——一个 split 里只有一条,判不出任何东西。用**相邻 skill 做 hard negative**(如 writing-papers vs drawing-figures、comparing-runs vs training-models);官方建议负例用**近似命中**(共享关键词但需求不同),而不是明显无关的东西——后者什么也测不出。
+- `scripts/evaluate_skill_triggers.py`:三件事——**契约**(标签指向真实 skill、每个 skill 两向覆盖齐)、**anti-scope**(每条描述都得声明反向边界,且该边界被某条 forbidden 用例真正踩到)、**smoke**(prompt 与「路由器读 SKILL.md 之前能看到的那半边元数据」做词面重叠)。
+- **反向边界必须写,而且必须被测。** 官方文档与实测都指向同一件事:缺反例的描述路由准确率明显下降,「做不到什么」往往比「能做什么」更能防误触发。词袋无法表示否定,所以反向边界不进正面打分(否则它的词会把 skill 往它自己排除的 prompt 上拽),而是单独跟 goldens 对账——**写了没人测的边界会被判失败**——曾经有一条反例指着两轮前就删掉的 skill,没有任何检查会对它有反应,于是一直活着。
+- **smoke 的边界要知道**:它没有词干还原(`rewrite` 匹配不上 `rewriting`);中文只按「连续汉字段内的二元组」切,跨标点不成词;两个 skill 分数比值高于 `TIE_RATIO`(0.80)时**不下判决**,因为词面打分在那个区间读的是噪声(该阈值由本库 73 条正确案例的分布标定:干扰项/赢家的比值 95% 在 0.75 以下)。abstain 用例的 0.25 门槛在当前数据上几乎没有分辨力(abstain 最高 0.170,正例中位 0.159)——它挡的是灾难,不是精度。**smoke 过了不等于真实路由器会这么路由。**
+- **改了任何 `description` 后重跑它**,并且看的是「相邻 skill 有没有被挤下去」,不是绝对分值。
+- **只用 train 的失败去改描述。** validation 那半是用来回答另一个问题的:这次修改是泛化了,还是只是贴合了眼前这批用例?
+  所以判分器**只报 validation 的合格率、不报是哪条失败的**——知道是哪条,正是让你去为它打补丁的东西,而一个针对留出用例的补丁会把你唯一的泛化估计毁掉。
+  低于 `VALIDATION_FLOOR`(85%)才失败:它挡的是描述整体不再泛化,不是单条漂移。
+- **不要把失败用例里的词直接抄进描述**——那是过拟合。找那批用例代表的**一般类别**,改那个。
+- `--show-validation` 只有一个正当用途:**审计划分本身**(怀疑某条标注错了)。看过的留出用例就不再是留出的,
+  必须挪进 train 并补一条新的进 validation。这一步要写进 commit。
+- **改描述的 commit 不要同时改已有 golden。** 新增用例随时可以;修改或删除一条已有用例,是在动判分的基准,得单独成一次改动并写清理由——否则「描述改挂了顺手把用例改绿」和「修好了」在历史里长得一模一样。
+
+## 提交前(与 CI 同款)
+
+```bash
+python3 scripts/ci.py            # CI 跑的全部检查,以脚本为准,不在这里抄一份
+```
+
+工具链是 **uv + ruff + ty**,版本钉在 `pyproject.toml` 的 `dev` 依赖组里,由 `ci.py` 通过
+`uv run --group dev` 按次供给——**不往全局装任何东西**,笔记本和 CI 用的是同一组版本。
+`scripts/ci.py --coverage` 追加 `scripts/` 的 branch coverage 门槛;CI 只在一个解释器上跑它。
+符号链接是否退化也在 `ci.py` 里查,不必手动 `diff`。
+
+格式化用 `ruff format`,但 CI 跑的是 `--check`:**会改文件的检查等于把红的变绿还不告诉你**。
+
+要求 **0 错误 0 警告**。每次 push/PR 由 `.github/workflows/validate-skills.yml` 自动校验。
+
+## 开发方式
+
+**先写会失败的测试,再实现。** 改仓库工具(`scripts/`)时这条是硬的:先写一条断言新行为的测试,
+跑它、看它红,再动实现。理由不是仪式感——这一轮里 `ci.py` 换 uv 依赖组、加 ruff/ty 那次,
+5 条测试先红后绿,而"实现完再补测试"写出来的测试只会断言你恰好写成的样子。
+
+测试名写成**行为陈述**而不是函数名(`test_every_check_runs_even_after_one_fails`
+而不是 `test_main`),docstring 写清"为什么这条行为重要"。读测试列表应该等于读一份规格。
+
+## 新增 / 修改一个 skill 的流程
+
+1. **先写评估**(Anthropic「start with evaluation」):在 `evals/trigger_cases.json` 加该 skill 的 positive/forbidden 用例(含相邻 hard negative)。
+2. 写 `SKILL.md`:两段式名字、「何时用」描述(不复述 workflow)、正文≤500 行、**自洽不引用别的 skill**。
+3. 重资料/脚本进 `references/`、`scripts/`;长引用文件加 `## Contents`。
+4. 跑提交前检查,确认目标 skill 触发、相邻不串、域外 abstain。
+5. **绝不"复活"被刻意删除/归档的 skill**——先与用户确认。
+
+## 安装 / 更新
+
+- **本仓库是唯一源**;已安装副本由 `npx skills` 管理,不要手工复制或编辑。
+- 全局安装:`npx skills add ImWenyaoT/skills --all -g`。
+- 发布新提交后更新:`npx skills@latest update -g`。
+- 本机 Claude 的 `~/.claude/skills` 链接到统一的 `~/.agents/skills`;Codex 与 Claude 读取同一份安装。
+- 加载方式:Claude Code 用 `Skill` 工具加载(不要手动 `Read` skill 文件);Codex 原生加载。
+
+## 参考
+
+- Anthropic — Agent Skills 创作 best practices:<https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices>
+- Agent Skills 开放标准(`name`/结构规范):<https://agentskills.io/specification>
+- Anthropic 工程博客 — Equipping agents with Agent Skills:<https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills>
+- Anthropic — Demystifying evals for AI agents:<https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents>
+- OpenAI Codex — Agent Skills(同 agentskills 标准,Codex 读 `AGENTS.md` + `SKILL.md`):<https://learn.chatgpt.com/docs/build-skills>
+- OpenAI — Evals / Graders:<https://developers.openai.com/api/docs/guides/evals>

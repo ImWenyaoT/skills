@@ -162,3 +162,27 @@ class DiscoveryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EntryPointDocTests(unittest.TestCase):
+    """AGENTS.md was silently emptied of 172 of its 173 lines by a tool whose commit
+    message said it was adding conventions. Every check stayed green: the only one
+    that reads the file compares it to CLAUDE.md, and a symlink to an empty file is
+    still identical to itself."""
+
+    def test_agents_md_does_not_import_itself(self) -> None:
+        """`@AGENTS.md` is how CLAUDE.md includes it; inside AGENTS.md it is a loop."""
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertNotIn("@AGENTS.md", text)
+
+    def test_agents_md_points_at_the_conventions(self) -> None:
+        """Short is a choice; losing the rules is not. The pointer has to resolve."""
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("docs/development.md", text)
+        self.assertTrue((ROOT / "docs" / "development.md").is_file())
+
+    def test_the_conventions_still_carry_the_load_bearing_rules(self) -> None:
+        """A file that exists but was gutted passes a file-exists check."""
+        text = (ROOT / "docs" / "development.md").read_text(encoding="utf-8")
+        for rule in ("黄金法则", "触发测试", "VALIDATION_FLOOR", "TIE_RATIO", "先写会失败的测试"):
+            self.assertIn(rule, text, f"development.md no longer mentions {rule}")
